@@ -547,17 +547,33 @@ function renderGallery() {
 }
 
 function renderVideos() {
+    const videoUrl = "https://petalsparadiseevents.com/wp-content/uploads/2025/09/Wedding-Set-up-@dcwarmemorial-petalsparadiseevents-eventrentals-eventdecor-weddingsetup-dcw.mp4";
+
     return `
         <div class="container">
             <div class="text-center">
                 <h2 class="section-title">Videos</h2>
                 <p class="section-subtitle">Watch our beautiful decor setups come to life.</p>
             </div>
-            <div class="empty-state">
-                <i data-feather="video"></i>
-                <h3>More videos coming soon!</h3>
-                <p style="color: var(--text-secondary); margin-top:1rem;">Follow us on Instagram to see our latest reels.</p>
-                <a href="#" class="btn btn-primary mt-2">View Instagram</a>
+            
+            <div style="max-width: 800px; margin: 0 auto;">
+                <div class="card" style="padding: 1rem; background: var(--surface-color); overflow: hidden; border-radius: 20px;">
+                    <video controls style="width: 100%; border-radius: 12px; box-shadow: var(--shadow-md);">
+                        <source src="${videoUrl}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div style="padding: 1.5rem 0.5rem 0.5rem;">
+                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">Wedding Set-up @ DC War Memorial</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">A stunning outdoor wedding arrangement showcasing our premium rentals and design expertise.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-2">
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Follow us on Instagram to see more of our latest event highlights.</p>
+                <a href="https://www.instagram.com/petalsparadiseevents/" target="_blank" class="btn btn-outline">
+                    <i data-feather="instagram" style="width: 16px; margin-right: 8px; vertical-align: middle;"></i> View More on Instagram
+                </a>
             </div>
         </div>
     `;
