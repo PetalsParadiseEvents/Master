@@ -979,10 +979,26 @@ function renderCheckout() {
     };
 
     window.initAutocomplete = () => {
+        try {
+            const input = document.querySelector('input[name="delivery_address"]');
+            if (input && window.google && window.google.maps && window.google.maps.places) {
+                const autocomplete = new google.maps.places.Autocomplete(input);
+                autocomplete.setComponentRestrictions({ country: ['us'] });
+            }
+        } catch (error) {
+            console.error("Google Maps Autocomplete failed to initialize:", error);
+            // Non-blocking: Input remains a standard text field
+        }
+    };
+
+    // Global handler for Google Maps authentication failures
+    window.gm_authFailure = () => {
+        console.warn("Google Maps authentication failed. Switching to manual address entry.");
         const input = document.querySelector('input[name="delivery_address"]');
-        if (input && window.google) {
-            const autocomplete = new google.maps.places.Autocomplete(input);
-            autocomplete.setComponentRestrictions({ country: ['us'] });
+        if (input) {
+            // Remove any Google-injected styles that might block the input
+            input.style.backgroundImage = 'none';
+            input.placeholder = "Enter full address manually";
         }
     };
 
