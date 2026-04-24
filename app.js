@@ -65,6 +65,42 @@ function getCartTotal() {
     return cart.reduce((sum, item) => sum + getItemTotal(item), 0);
 }
 
+function getDynamicRecommendations() {
+    if (cart.length === 0) return rentalItems.slice(0, 4);
+
+    const cartTitles = cart.map(item => item.title.toLowerCase());
+    const cartCategories = [];
+    
+    if (cartTitles.some(t => t.includes('grad'))) cartCategories.push('grad');
+    if (cartTitles.some(t => t.includes('baby') || t.includes('seemantham'))) cartCategories.push('baby');
+    if (cartTitles.some(t => t.includes('wedding') || t.includes('centerpiece'))) cartCategories.push('wedding');
+    if (cartTitles.some(t => t.includes('neon'))) cartCategories.push('neon');
+
+    let recommendations = rentalItems.filter(item => {
+        const inCart = cart.some(c => c.id === item.id);
+        if (inCart) return false;
+
+        const title = item.title.toLowerCase();
+        return cartCategories.some(cat => {
+            if (cat === 'grad') return title.includes('grad') || title.includes('marquee');
+            if (cat === 'baby') return title.includes('baby') || title.includes('seemantham') || title.includes('chair');
+            if (cat === 'wedding') return title.includes('wedding') || title.includes('centerpiece') || title.includes('tent');
+            if (cat === 'neon') return title.includes('neon') || title.includes('vibes');
+            return false;
+        });
+    });
+
+    if (recommendations.length < 4) {
+        const general = rentalItems.filter(item => 
+            !cart.some(c => c.id === item.id) && 
+            !recommendations.some(r => r.id === item.id)
+        );
+        recommendations = [...recommendations, ...general];
+    }
+
+    return recommendations.slice(0, 4);
+}
+
 function getDiscount() {
     if (!appliedPromo) return 0;
     const subtotal = getCartTotal();
@@ -590,6 +626,10 @@ function renderCart() {
         const input = e.target.querySelector('input');
         applyPromoCode(input.value);
     };
+    window.quickAdd = (id) => {
+        const item = rentalItems.find(i => i.id === id);
+        if (item) addToCart(item);
+    };
     window.setFulfillment = (method) => {
         fulfillmentMethod = method;
         saveCart();
@@ -695,16 +735,6 @@ function renderCart() {
                         </div>
                     ` : ''}
                     
-                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(212, 175, 55, 0.1); border-radius: 8px; border: 1px dashed var(--primary-color);">
-                        <p style="font-weight: 700; color: var(--primary-color); font-size: 0.85rem; margin-bottom: 0.5rem;">🎓 GRAD SEASON PROMOTION</p>
-                        <ul style="font-size: 0.75rem; color: var(--text-secondary); list-style: none;">
-                            <li>• PETALS5: $5 off $100+</li>
-                            <li>• PETALS10: $10 off $150+</li>
-                            <li>• PETALS15: $15 off $200+</li>
-                            <li>• PETALS20: $20 off $300+</li>
-                        </ul>
-                    </div>
-
                     <form onsubmit="handlePromo(event)" style="margin-top: 1.5rem;">
                         <div class="form-group" style="display: flex; gap: 0.5rem; margin-bottom: 0;">
                             <input type="text" class="form-control" placeholder="Promo Code" value="${appliedPromo || ''}" style="margin-bottom: 0;">
@@ -719,6 +749,31 @@ function renderCart() {
                     <a href="#checkout" class="btn btn-primary" style="width: 100%; text-align:center; margin-top:1.5rem;">Proceed to Checkout</a>
                     <a href="#rentals" class="btn btn-outline" style="width: 100%; text-align:center; margin-top:1rem;">Continue Shopping</a>
                 </div>
+            </div>
+
+            <div class="mt-2" style="border-top: 1px solid var(--border-color); padding-top: 2rem;">
+                <h3 style="margin-bottom: 1.5rem; color: var(--primary-color);">Complete Your Event Setup</h3>
+                <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">
+                    ${getDynamicRecommendations().map(item => `
+                        <div class="card recommendation-card">
+                            <div class="card-img-wrapper" style="height: 150px;">
+                                <img src="${item.img}" alt="${item.title}">
+                            </div>
+                            <div class="card-body" style="padding: 1rem;">
+                                <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem; line-height: 1.2;">${item.title}</h4>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span class="price" style="font-size: 0.9rem;">$${item.price}</span>
+                                    <button class="btn btn-primary" style="padding: 4px 12px; font-size: 0.75rem;" onclick="quickAdd(${item.id})">Add</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <!-- Sticky Checkout Button for Mobile -->
+            <div id="sticky-checkout" class="sticky-checkout-container">
+                <a href="#checkout" class="btn btn-primary" style="width: 100%; text-align:center;">Proceed to Checkout</a>
             </div>
         </div>
     `;
