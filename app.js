@@ -783,6 +783,28 @@ function renderCheckout() {
             const finalTotal = getCartTotal() - getDiscount();
             summaryTotal.textContent = type === 'Delivery' ? `$${finalTotal} + Delivery (TBD)` : `$${finalTotal}`;
         }
+
+        // Handle Logistics Order and Labels
+        const logisticsContainer = document.getElementById('logistics-container');
+        const pickupBlock = document.getElementById('pickup-block');
+        const dropoffBlock = document.getElementById('dropoff-block');
+        
+        if (pickupBlock && dropoffBlock) {
+            const pLabel = pickupBlock.querySelector('.form-label');
+            const dLabel = dropoffBlock.querySelector('.form-label');
+            
+            if (type === 'Delivery') {
+                pLabel.textContent = 'Collection Date';
+                dLabel.textContent = 'Delivery Date';
+                pickupBlock.style.order = '2';
+                dropoffBlock.style.order = '1';
+            } else {
+                pLabel.textContent = 'Pick Up Date';
+                dLabel.textContent = 'Return Date';
+                pickupBlock.style.order = '1';
+                dropoffBlock.style.order = '2';
+            }
+        }
     };
 
     const subtotal = getCartTotal();
@@ -838,24 +860,26 @@ function renderCheckout() {
                                 </p>
                             </div>
                         </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div class="form-group">
-                                <label class="form-label">Pick Up Date</label>
-                                <input type="date" name="pickup_date" class="form-control" required>
+                        <div id="logistics-container" style="display: flex; flex-direction: column;">
+                            <div id="pickup-block" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label class="form-label">Pick Up Date</label>
+                                    <input type="date" name="pickup_date" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Pick Up Time</label>
+                                    <input type="time" name="pickup_time" class="form-control" required>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">Pick Up Time</label>
-                                <input type="time" name="pickup_time" class="form-control" required>
-                            </div>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div class="form-group">
-                                <label class="form-label">Drop Off Date</label>
-                                <input type="date" name="dropoff_date" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Drop Off Time</label>
-                                <input type="time" name="dropoff_time" class="form-control" required>
+                            <div id="dropoff-block" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label class="form-label">Return Date</label>
+                                    <input type="date" name="dropoff_date" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Return Time</label>
+                                    <input type="time" name="dropoff_time" class="form-control" required>
+                                </div>
                             </div>
                         </div>
                         <div class="form-group">
