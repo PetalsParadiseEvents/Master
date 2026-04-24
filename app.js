@@ -788,7 +788,14 @@ function renderCheckout() {
         const logisticsContainer = document.getElementById('logistics-container');
         const pickupBlock = document.getElementById('pickup-block');
         const dropoffBlock = document.getElementById('dropoff-block');
+        const venueSection = document.getElementById('venue-location-section');
         
+        if (venueSection) {
+            venueSection.style.display = type === 'Delivery' ? 'none' : 'block';
+            const venueInput = venueSection.querySelector('input');
+            if (venueInput) venueInput.required = type === 'Pickup';
+        }
+
         if (pickupBlock && dropoffBlock) {
             const pLabel = pickupBlock.querySelector('.form-label');
             const dLabel = dropoffBlock.querySelector('.form-label');
@@ -833,7 +840,7 @@ function renderCheckout() {
                             <label class="form-label">Event Date</label>
                             <input type="date" name="date" class="form-control" required>
                         </div>
-                        <div class="form-group">
+                        <div id="venue-location-section" class="form-group">
                             <label class="form-label">Venue Location (Name/City)</label>
                             <input type="text" name="location" class="form-control" placeholder="e.g. Westfields Marriott or Aldie, VA" required>
                         </div>
