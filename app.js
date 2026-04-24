@@ -148,7 +148,8 @@ const rentalItems = [
     { id: 12, title: 'GRAD Marquee Letters', price: 30, img: 'https://petalsparadiseevents.com/wp-content/uploads/2025/12/image-1.png', desc: 'Lighted GRAD marquee letters for rent.' },
     { id: 13, title: '4FT Marquee Numbers', price: 20, img: 'https://petalsparadiseevents.com/wp-content/uploads/2025/07/image-7.png', desc: 'Giant Marquee Numbers for birthdays, anniversaries, or graduations.' },
     { id: 14, title: 'Photo/Any Event Backdrop', price: 150, img: 'https://petalsparadiseevents.com/wp-content/uploads/2025/06/image-2.png', desc: 'Celebrate the beauty of your Mehendi ceremony with our elegant and artistic backdrops, perfect for creating a stunning photo-worthy setting.' },
-    { id: 15, title: 'New Born Baby Photo Prop', price: 20, img: 'https://petalsparadiseevents.com/wp-content/uploads/2025/05/Baby-backdrop-1-scaled.jpg', desc: 'Dreamy Moon Swing Photo Prop for cozy gatherings.' }
+    { id: 15, title: 'New Born Baby Photo Prop', price: 20, img: 'https://petalsparadiseevents.com/wp-content/uploads/2025/05/Baby-backdrop-1-scaled.jpg', desc: 'Dreamy Moon Swing Photo Prop for cozy gatherings.' },
+    { id: 16, title: 'Custom Graduation Setup', price: 'Varies', img: 'https://images.unsplash.com/photo-1523050853063-bd803f29107b?auto=format&fit=crop&q=80&w=800', desc: 'Personalized graduation decor setup tailored to your school colors and theme. Contact us for a quote.' }
 ];
 
 const services = [
@@ -368,7 +369,7 @@ function renderRentals() {
             actionHtml = `<button class="btn btn-primary" onclick="handleAddToCart(${item.id})">Add to Cart</button>`;
         }
 
-        let priceDisplay = `$${item.price}`;
+        let priceDisplay = typeof item.price === 'number' ? `$${item.price}` : item.price;
         let priceStyle = '';
         if (item.id === 4) {
             priceDisplay = `$2.00 (<30)<br/>$1.50 (30+)`;
@@ -808,11 +809,13 @@ function renderItemCard(item) {
         actionHtml = `<button class="btn btn-primary" onclick="handleAddToCart(${item.id})">Add to Cart</button>`;
     }
 
-    let priceDisplay = `$${item.price}`;
+    let priceDisplay = typeof item.price === 'number' ? `$${item.price}` : item.price;
     let priceStyle = '';
     if (item.id === 4) {
         priceDisplay = `$2.00 (<30)<br/>$1.50 (30+)`;
         priceStyle = 'font-size: 0.85em; line-height: 1.2; text-align: left;';
+    } else if (item.price === 'Varies') {
+        priceStyle = 'color: var(--primary-color); font-weight: 700;';
     }
 
     return `

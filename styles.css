@@ -673,6 +673,7 @@ footer {
   .banner-content {
     flex-direction: column;
     gap: 0.3rem;
+    align-items: center;
   }
 
   .banner-extra-text {
