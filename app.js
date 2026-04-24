@@ -4,15 +4,17 @@ let appliedPromo = JSON.parse(localStorage.getItem('appliedPromo')) || null;
 let fulfillmentMethod = localStorage.getItem('fulfillmentMethod') || 'Pickup';
 let searchQuery = '';
 
-function saveCart() {
+function saveCart(skipRouter = false) {
     localStorage.setItem('cart', JSON.stringify(cart));
     localStorage.setItem('appliedPromo', JSON.stringify(appliedPromo));
     localStorage.setItem('fulfillmentMethod', fulfillmentMethod);
     updateCartBadge();
-    if (window.location.hash === '#cart' || window.location.hash === '#checkout') {
-        if (typeof router === 'function') router();
-    } else if (window.location.hash === '#rentals') {
-        if (typeof refreshRentalsUI === 'function') refreshRentalsUI();
+    if (!skipRouter) {
+        if (window.location.hash === '#cart' || window.location.hash === '#checkout') {
+            if (typeof router === 'function') router();
+        } else if (window.location.hash === '#rentals') {
+            if (typeof refreshRentalsUI === 'function') refreshRentalsUI();
+        }
     }
 }
 
@@ -996,7 +998,7 @@ function renderCheckout() {
         }
 
         fulfillmentMethod = type;
-        saveCart();
+        saveCart(true); // Skip full router refresh to prevent jumping/flickering
 
         // Handle Logistics Order and Labels
         const logisticsContainer = document.getElementById('logistics-container');
