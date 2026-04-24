@@ -940,14 +940,14 @@ function renderCheckout() {
         body += `Fulfillment: ${details.fulfillment}\n`;
         if (details.fulfillment === 'Delivery') {
             body += `Delivery Address: ${details.delivery_address}\n`;
-            body += `Delivery Date: ${details.dropoff_date} at ${details.dropoff_time}\n`;
-            body += `Collection Date: ${details.pickup_date} at ${details.pickup_time}\n`;
+            body += `Delivery Date: ${details.delivery_date_manual} at ${details.delivery_time_manual}\n`;
+            body += `Collection Date: ${details.collection_date_manual} at ${details.collection_time_manual}\n`;
         } else {
-            body += `Pick Up Date: ${details.pickup_date} at ${details.pickup_time}\n`;
-            body += `Return Date: ${details.dropoff_date} at ${details.dropoff_time}\n`;
+            body += `Pick Up Date: ${details.pickup_date_manual} at ${details.pickup_time_manual}\n`;
+            body += `Return Date: ${details.dropoff_date_manual} at ${details.dropoff_time_manual}\n`;
         }
         body += `Event Date: ${details.date}\n`;
-        body += `Venue Location: ${details.location}\n\n`;
+        body += `Venue Location: ${details.location || 'N/A'}\n\n`;
         
         body += `ORDER SUMMARY\n`;
         body += `-------------\n`;
@@ -1043,10 +1043,9 @@ function renderCheckout() {
         fulfillmentMethod = type;
         saveCart(true); // Skip full router refresh to prevent jumping/flickering
 
-        // Handle Logistics Order and Labels
-        const logisticsContainer = document.getElementById('logistics-container');
-        const pickupBlock = document.getElementById('pickup-block');
-        const dropoffBlock = document.getElementById('dropoff-block');
+        // Toggle Dedicated Logistics Blocks
+        const pickupLogistics = document.getElementById('logistics-pickup');
+        const deliveryLogistics = document.getElementById('logistics-delivery');
         const venueSection = document.getElementById('venue-location-section');
         
         if (venueSection) {
@@ -1055,25 +1054,13 @@ function renderCheckout() {
             if (venueInput) venueInput.required = type === 'Pickup';
         }
 
-        if (pickupBlock && dropoffBlock) {
-            const pLabel = pickupBlock.querySelector('.form-label');
-            const dLabel = dropoffBlock.querySelector('.form-label');
+        if (pickupLogistics && deliveryLogistics) {
+            pickupLogistics.style.display = type === 'Pickup' ? 'block' : 'none';
+            deliveryLogistics.style.display = type === 'Delivery' ? 'block' : 'none';
             
-            if (type === 'Delivery') {
-                pLabel.textContent = 'Collection Date';
-                pickupBlock.querySelector('.form-group:last-child .form-label').textContent = 'Collection Time';
-                dLabel.textContent = 'Delivery Date';
-                dropoffBlock.querySelector('.form-group:last-child .form-label').textContent = 'Delivery Time';
-                pickupBlock.style.order = '2';
-                dropoffBlock.style.order = '1';
-            } else {
-                pLabel.textContent = 'Pick Up Date';
-                pickupBlock.querySelector('.form-group:last-child .form-label').textContent = 'Pick Up Time';
-                dLabel.textContent = 'Return Date';
-                dropoffBlock.querySelector('.form-group:last-child .form-label').textContent = 'Return Time';
-                pickupBlock.style.order = '1';
-                dropoffBlock.style.order = '2';
-            }
+            // Set required status for active inputs
+            pickupLogistics.querySelectorAll('input').forEach(i => i.required = type === 'Pickup');
+            deliveryLogistics.querySelectorAll('input').forEach(i => i.required = type === 'Delivery');
         }
     };
 
@@ -1130,25 +1117,52 @@ function renderCheckout() {
                                 </p>
                             </div>
                         </div>
-                        <div id="logistics-container" style="display: flex; flex-direction: column;">
-                            <div id="pickup-block" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; order: ${fulfillmentMethod === 'Delivery' ? 2 : 1};">
-                                <div class="form-group">
-                                    <label class="form-label">${fulfillmentMethod === 'Delivery' ? 'Collection Date' : 'Pick Up Date'}</label>
-                                    <input type="date" name="pickup_date" class="form-control" required>
+                        <div id="logistics-container">
+                            <!-- Dedicated Pickup Mode Fields -->
+                            <div id="logistics-pickup" style="display: ${fulfillmentMethod === 'Pickup' ? 'block' : 'none'};">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                    <div class="form-group">
+                                        <label class="form-label">Pick Up Date</label>
+                                        <input type="date" name="pickup_date_manual" class="form-control" ${fulfillmentMethod === 'Pickup' ? 'required' : ''}>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Pick Up Time</label>
+                                        <input type="time" name="pickup_time_manual" class="form-control" ${fulfillmentMethod === 'Pickup' ? 'required' : ''}>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label class="form-label">${fulfillmentMethod === 'Delivery' ? 'Collection Time' : 'Pick Up Time'}</label>
-                                    <input type="time" name="pickup_time" class="form-control" required>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                    <div class="form-group">
+                                        <label class="form-label">Return Date</label>
+                                        <input type="date" name="dropoff_date_manual" class="form-control" ${fulfillmentMethod === 'Pickup' ? 'required' : ''}>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Return Time</label>
+                                        <input type="time" name="dropoff_time_manual" class="form-control" ${fulfillmentMethod === 'Pickup' ? 'required' : ''}>
+                                    </div>
                                 </div>
                             </div>
-                            <div id="dropoff-block" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; order: ${fulfillmentMethod === 'Delivery' ? 1 : 2};">
-                                <div class="form-group">
-                                    <label class="form-label">${fulfillmentMethod === 'Delivery' ? 'Delivery Date' : 'Return Date'}</label>
-                                    <input type="date" name="dropoff_date" class="form-control" required>
+
+                            <!-- Dedicated Delivery Mode Fields -->
+                            <div id="logistics-delivery" style="display: ${fulfillmentMethod === 'Delivery' ? 'block' : 'none'};">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                    <div class="form-group">
+                                        <label class="form-label">Delivery Date</label>
+                                        <input type="date" name="delivery_date_manual" class="form-control" ${fulfillmentMethod === 'Delivery' ? 'required' : ''}>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Delivery Time</label>
+                                        <input type="time" name="delivery_time_manual" class="form-control" ${fulfillmentMethod === 'Delivery' ? 'required' : ''}>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label class="form-label">${fulfillmentMethod === 'Delivery' ? 'Delivery Time' : 'Return Time'}</label>
-                                    <input type="time" name="dropoff_time" class="form-control" required>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                    <div class="form-group">
+                                        <label class="form-label">Collection Date</label>
+                                        <input type="date" name="collection_date_manual" class="form-control" ${fulfillmentMethod === 'Delivery' ? 'required' : ''}>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Collection Time</label>
+                                        <input type="time" name="collection_time_manual" class="form-control" ${fulfillmentMethod === 'Delivery' ? 'required' : ''}>
+                                    </div>
                                 </div>
                             </div>
                         </div>
