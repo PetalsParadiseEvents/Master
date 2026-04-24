@@ -38,11 +38,12 @@ function addToCart(item) {
     const existing = cart.find(i => i.id === item.id);
     if (existing) {
         existing.quantity += 1;
+        showToast(`1 more ${item.title} added to cart. Total: ${existing.quantity}`);
     } else {
         cart.push({ ...item, quantity: 1 });
+        showToast(`Added ${item.title} to cart!`);
     }
     saveCart();
-    showToast(`Added ${item.title} to cart!`);
 }
 
 function getItemPrice(item) {
@@ -68,11 +69,20 @@ function removeFromCart(id) {
 function updateQuantity(id, change) {
     const item = cart.find(i => i.id === id);
     if (item) {
+        const oldQty = item.quantity;
         item.quantity += change;
         if (item.quantity <= 0) {
+            const itemName = item.title;
             removeFromCart(id);
+            showToast(`Removed ${itemName} from cart.`);
         } else {
             saveCart();
+            const diff = Math.abs(change);
+            if (change > 0) {
+                showToast(`${diff} item${diff > 1 ? 's' : ''} added for ${item.title}. Total: ${item.quantity}`);
+            } else {
+                showToast(`${diff} item${diff > 1 ? 's' : ''} removed for ${item.title}. Total: ${item.quantity}`);
+            }
         }
     }
 }
@@ -90,15 +100,27 @@ function setQuantity(id, newQty) {
     const qty = parseInt(newQty, 10);
     if (isNaN(qty)) return;
 
+    const item = cart.find(i => i.id === id);
+    if (!item) return;
+
     if (qty <= 0) {
+        const itemName = item.title;
         removeFromCart(id);
+        showToast(`Removed ${itemName} from cart.`);
         return;
     }
 
-    const item = cart.find(i => i.id === id);
-    if (item) {
-        item.quantity = qty;
-        saveCart();
+    const oldQty = item.quantity;
+    if (qty === oldQty) return;
+
+    item.quantity = qty;
+    saveCart();
+    
+    const diff = Math.abs(qty - oldQty);
+    if (qty > oldQty) {
+        showToast(`${diff} more ${item.title} added to cart. Total: ${qty}`);
+    } else {
+        showToast(`${diff} ${item.title} removed from cart. Total: ${qty}`);
     }
 }
 
