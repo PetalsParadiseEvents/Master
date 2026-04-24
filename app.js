@@ -1127,23 +1127,23 @@ function renderCheckout() {
                             </div>
                         </div>
                         <div id="logistics-container" style="display: flex; flex-direction: column;">
-                            <div id="pickup-block" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div id="pickup-block" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; order: ${fulfillmentMethod === 'Delivery' ? 2 : 1};">
                                 <div class="form-group">
-                                    <label class="form-label">Pick Up Date</label>
+                                    <label class="form-label">${fulfillmentMethod === 'Delivery' ? 'Collection Date' : 'Pick Up Date'}</label>
                                     <input type="date" name="pickup_date" class="form-control" required>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Pick Up Time</label>
+                                    <label class="form-label">Time</label>
                                     <input type="time" name="pickup_time" class="form-control" required>
                                 </div>
                             </div>
-                            <div id="dropoff-block" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div id="dropoff-block" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; order: ${fulfillmentMethod === 'Delivery' ? 1 : 2};">
                                 <div class="form-group">
-                                    <label class="form-label">Return Date</label>
+                                    <label class="form-label">${fulfillmentMethod === 'Delivery' ? 'Delivery Date' : 'Return Date'}</label>
                                     <input type="date" name="dropoff_date" class="form-control" required>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Return Time</label>
+                                    <label class="form-label">Time</label>
                                     <input type="time" name="dropoff_time" class="form-control" required>
                                 </div>
                             </div>
