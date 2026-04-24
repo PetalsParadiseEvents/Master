@@ -166,7 +166,8 @@ function renderBanner() {
             <a href="#graduation" class="promo-banner">
                 <div class="banner-content">
                     <i data-feather="award"></i>
-                    <span>CONGRATULATIONS CLASS OF 2026! CELEBRATE YOUR MILESTONE WITH OUR EXCLUSIVE GRAD DECOR.</span>
+                    <span class="banner-main-text">CONGRATULATIONS CLASS OF 2026!</span>
+                    <span class="banner-extra-text">CELEBRATE YOUR MILESTONE WITH OUR EXCLUSIVE GRAD DECOR.</span>
                     <span class="banner-cta">EXPLORE GRAD COLLECTION <i data-feather="arrow-right"></i></span>
                 </div>
             </a>

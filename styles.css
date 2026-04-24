@@ -99,9 +99,9 @@ a {
   transform: scale(1.05);
 }
 
-.promo-banner i {
-  width: 18px;
-  height: 18px;
+.banner-cta i {
+  width: 14px;
+  height: 14px;
 }
 
 .logo-text {
@@ -666,21 +666,32 @@ footer {
   }
   
   .promo-banner {
-    font-size: 0.75rem;
-    padding: 0 10px;
-    line-height: 1.2;
-    text-align: center;
+    font-size: 0.8rem;
+    padding: 0 1rem;
+  }
+
+  .banner-extra-text {
+    display: none;
+  }
+
+  .banner-main-text {
+    font-weight: 700;
   }
 
   .banner-cta {
-    display: none; /* Hide CTA text on very small mobile to save space */
+    display: flex;
+    margin-left: 0.5rem;
+    font-size: 0.7rem;
+    padding: 2px 8px;
   }
 
-  .banner-content span:first-of-type {
-    max-width: 250px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .banner-cta span {
+    display: none; /* Hide 'EXPLORE GRAD COLLECTION' text */
+  }
+
+  /* Add 'Explore' text for mobile specifically */
+  .banner-cta::after {
+    content: 'Explore';
   }
 
 .sticky-checkout-container.hidden {
