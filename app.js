@@ -504,6 +504,24 @@ function renderCart() {
     window.setQty = setQuantity;
     window.handleClearCart = clearCart;
 
+    // Intersection Observer for sticky checkout button
+    setTimeout(() => {
+        const summary = document.querySelector('.cart-summary');
+        const stickyBtn = document.getElementById('sticky-checkout');
+        if (summary && stickyBtn) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        stickyBtn.classList.add('hidden');
+                    } else {
+                        stickyBtn.classList.remove('hidden');
+                    }
+                });
+            }, { threshold: 0.1 });
+            observer.observe(summary);
+        }
+    }, 100);
+
     if (cart.length === 0) {
         const recommendations = rentalItems.slice(0, 4);
         return `
@@ -581,6 +599,11 @@ function renderCart() {
                     <a href="#checkout" class="btn btn-primary" style="width: 100%; text-align:center; margin-top:1.5rem;">Proceed to Checkout</a>
                     <a href="#rentals" class="btn btn-outline" style="width: 100%; text-align:center; margin-top:1rem;">Continue Shopping</a>
                 </div>
+            </div>
+            
+            <!-- Sticky Checkout Button for Mobile -->
+            <div id="sticky-checkout" class="sticky-checkout-container">
+                <a href="#checkout" class="btn btn-primary" style="width: 100%; text-align:center;">Proceed to Checkout</a>
             </div>
         </div>
     `;

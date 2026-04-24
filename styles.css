@@ -587,6 +587,28 @@ footer {
   opacity: 1;
 }
 
+/* Sticky Checkout Button */
+.sticky-checkout-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: var(--surface-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 1.5rem 2rem;
+  border-top: 1px solid var(--border-color);
+  z-index: 1000;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  display: none; /* Hidden by default on desktop */
+}
+
+.sticky-checkout-container.hidden {
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
 @keyframes slideInRight {
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
@@ -719,5 +741,10 @@ footer {
   
   .footer-grid {
     gap: 1.5rem;
+  }
+
+  .sticky-checkout-container {
+    display: block;
+    padding: 1rem;
   }
 }
