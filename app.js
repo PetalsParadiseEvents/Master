@@ -1,10 +1,12 @@
 // State Management
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let appliedPromo = JSON.parse(localStorage.getItem('appliedPromo')) || null;
+let fulfillmentMethod = localStorage.getItem('fulfillmentMethod') || 'Pickup';
 
 function saveCart() {
     localStorage.setItem('cart', JSON.stringify(cart));
     localStorage.setItem('appliedPromo', JSON.stringify(appliedPromo));
+    localStorage.setItem('fulfillmentMethod', fulfillmentMethod);
     updateCartBadge();
     if (window.location.hash === '#cart' || window.location.hash === '#checkout') {
         if (typeof router === 'function') router();
@@ -581,6 +583,11 @@ function renderCart() {
         const input = e.target.querySelector('input');
         applyPromoCode(input.value);
     };
+    window.setFulfillment = (method) => {
+        fulfillmentMethod = method;
+        saveCart();
+        router(); // Refresh to update totals
+    };
 
     // Intersection Observer for sticky checkout button
     setTimeout(() => {
@@ -662,7 +669,26 @@ function renderCart() {
                         </div>
                     ` : ''}
                     
-                    <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(212, 175, 55, 0.1); border-radius: 8px; border: 1px dashed var(--primary-color);">
+                    <div class="form-group" style="margin-top: 1.5rem;">
+                        <label class="form-label" style="font-size: 0.85rem;">Fulfillment Method</label>
+                        <div style="display: flex; gap: 1.5rem; margin-top: 0.5rem;">
+                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.85rem;">
+                                <input type="radio" name="cart_fulfillment" value="Pickup" ${fulfillmentMethod === 'Pickup' ? 'checked' : ''} onclick="setFulfillment('Pickup')"> Pickup
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.85rem;">
+                                <input type="radio" name="cart_fulfillment" value="Delivery" ${fulfillmentMethod === 'Delivery' ? 'checked' : ''} onclick="setFulfillment('Delivery')"> Delivery
+                            </label>
+                        </div>
+                    </div>
+
+                    ${fulfillmentMethod === 'Delivery' ? `
+                        <div class="summary-row" style="margin-top: 0.5rem;">
+                            <span>Delivery</span>
+                            <span style="color: var(--primary-color);">TBD</span>
+                        </div>
+                    ` : ''}
+                    
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(212, 175, 55, 0.1); border-radius: 8px; border: 1px dashed var(--primary-color);">
                         <p style="font-weight: 700; color: var(--primary-color); font-size: 0.85rem; margin-bottom: 0.5rem;">🎓 GRAD SEASON PROMOTION</p>
                         <ul style="font-size: 0.75rem; color: var(--text-secondary); list-style: none;">
                             <li>• PETALS5: $5 off $100+</li>
@@ -681,7 +707,7 @@ function renderCart() {
 
                     <div class="summary-total" style="margin-top: 1.5rem;">
                         <span>Total Estimate:</span>
-                        <span style="float:right;">$${subtotal - discount}</span>
+                        <span style="float:right;">$${subtotal - discount}${fulfillmentMethod === 'Delivery' ? ' + Delivery (TBD)' : ''}</span>
                     </div>
                     <a href="#checkout" class="btn btn-primary" style="width: 100%; text-align:center; margin-top:1.5rem;">Proceed to Checkout</a>
                     <a href="#rentals" class="btn btn-outline" style="width: 100%; text-align:center; margin-top:1rem;">Continue Shopping</a>
@@ -784,6 +810,9 @@ function renderCheckout() {
             summaryTotal.textContent = type === 'Delivery' ? `$${finalTotal} + Delivery (TBD)` : `$${finalTotal}`;
         }
 
+        fulfillmentMethod = type;
+        saveCart();
+
         // Handle Logistics Order and Labels
         const logisticsContainer = document.getElementById('logistics-container');
         const pickupBlock = document.getElementById('pickup-block');
@@ -849,18 +878,18 @@ function renderCheckout() {
                             <label class="form-label">Fulfillment Method</label>
                             <div style="display: flex; gap: 2rem; margin-top: 0.5rem;">
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="radio" name="fulfillment" value="Pickup" checked onclick="toggleDelivery('Pickup')"> Pickup
+                                    <input type="radio" name="fulfillment" value="Pickup" ${fulfillmentMethod === 'Pickup' ? 'checked' : ''} onclick="toggleDelivery('Pickup')"> Pickup
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="radio" name="fulfillment" value="Delivery" onclick="toggleDelivery('Delivery')"> Delivery
+                                    <input type="radio" name="fulfillment" value="Delivery" ${fulfillmentMethod === 'Delivery' ? 'checked' : ''} onclick="toggleDelivery('Delivery')"> Delivery
                                 </label>
                             </div>
                         </div>
 
-                        <div id="delivery-section" style="display: none; border: 1px dashed var(--primary-color); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; background: rgba(212, 175, 55, 0.05);">
+                        <div id="delivery-section" style="display: ${fulfillmentMethod === 'Delivery' ? 'block' : 'none'}; border: 1px dashed var(--primary-color); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; background: rgba(212, 175, 55, 0.05);">
                             <div class="form-group" style="margin-bottom: 0;">
                                 <label class="form-label">Delivery Address</label>
-                                <input type="text" name="delivery_address" class="form-control" placeholder="Enter full address for delivery quote">
+                                <input type="text" name="delivery_address" class="form-control" placeholder="Enter full address for delivery quote" ${fulfillmentMethod === 'Delivery' ? 'required' : ''}>
                                 <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
                                     <i data-feather="truck" style="width: 14px; vertical-align: middle;"></i> 
                                     Delivery fee will be based on location. Our team will contact you with the final estimate once the request is submitted.
