@@ -631,7 +631,7 @@ function renderCart() {
                     <p style="color: var(--text-secondary); font-size:0.9rem; margin-bottom:1rem;">* Payment will be collected in person.</p>
                     <div class="summary-total">
                         <span>Total Estimate:</span>
-                        <span style="float:right;">$${total}</span>
+                        <span id="summary-total-val" style="float:right;">$${total}${document.querySelector('input[name="fulfillment"]:checked')?.value === 'Delivery' ? ' + Delivery (TBD)' : ''}</span>
                     </div>
                     <a href="#checkout" class="btn btn-primary" style="width: 100%; text-align:center; margin-top:1.5rem;">Proceed to Checkout</a>
                     <a href="#rentals" class="btn btn-outline" style="width: 100%; text-align:center; margin-top:1rem;">Continue Shopping</a>
@@ -661,8 +661,12 @@ function renderCheckout() {
         body += `Name: ${details.name}\n`;
         body += `Email: ${details.email}\n`;
         body += `Phone: ${details.phone}\n`;
+        body += `Fulfillment: ${details.fulfillment}\n`;
+        if (details.fulfillment === 'Delivery') {
+            body += `Delivery Address: ${details.delivery_address}\n`;
+        }
         body += `Event Date: ${details.date}\n`;
-        body += `Location: ${details.location}\n`;
+        body += `Venue Location: ${details.location}\n`;
         body += `Pick Up: ${details.pickup_date} at ${details.pickup_time}\n`;
         body += `Drop Off: ${details.dropoff_date} at ${details.dropoff_time}\n\n`;
         body += `Items Requested:\n`;
@@ -672,7 +676,7 @@ function renderCheckout() {
             body += `- ${item.quantity}x ${item.title} ($${getItemTotal(item)})\n`;
             total += getItemTotal(item);
         });
-        body += `\nEstimated Total: $${total}\n\n`;
+        body += `\nEstimated Total: $${total}${details.fulfillment === 'Delivery' ? ' + Delivery Fee (TBD)' : ''}\n\n`;
 
         if (details.special_requests) {
             body += `Special Requests / Missing Items:\n${details.special_requests}\n`;
@@ -696,6 +700,21 @@ function renderCheckout() {
             </div>
         `;
         feather.replace();
+    };
+
+    window.toggleDelivery = (type) => {
+        const deliverySection = document.getElementById('delivery-section');
+        const summaryTotal = document.getElementById('summary-total-val');
+        
+        if (deliverySection) {
+            deliverySection.style.display = type === 'Delivery' ? 'block' : 'none';
+            const addressInput = deliverySection.querySelector('input');
+            if (addressInput) addressInput.required = type === 'Delivery';
+        }
+        
+        if (summaryTotal) {
+            summaryTotal.textContent = type === 'Delivery' ? `$${total} + Delivery (TBD)` : `$${total}`;
+        }
     };
 
     return `
@@ -722,8 +741,31 @@ function renderCheckout() {
                             <input type="date" name="date" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Venue Location</label>
-                            <input type="text" name="location" class="form-control" required>
+                            <label class="form-label">Venue Location (Name/City)</label>
+                            <input type="text" name="location" class="form-control" placeholder="e.g. Westfields Marriott or Aldie, VA" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Fulfillment Method</label>
+                            <div style="display: flex; gap: 2rem; margin-top: 0.5rem;">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="radio" name="fulfillment" value="Pickup" checked onclick="toggleDelivery('Pickup')"> Pickup
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="radio" name="fulfillment" value="Delivery" onclick="toggleDelivery('Delivery')"> Delivery
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="delivery-section" style="display: none; border: 1px dashed var(--primary-color); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; background: rgba(212, 175, 55, 0.05);">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label">Delivery Address</label>
+                                <input type="text" name="delivery_address" class="form-control" placeholder="Enter full address for delivery quote">
+                                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                                    <i data-feather="truck" style="width: 14px; vertical-align: middle;"></i> 
+                                    Delivery fee will be based on location. Our team will contact you with the final estimate once the request is submitted.
+                                </p>
+                            </div>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                             <div class="form-group">
