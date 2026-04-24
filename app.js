@@ -159,6 +159,22 @@ const services = [
 ];
 
 // Rendering Layout
+function renderBanner() {
+    const banner = document.getElementById('top-banner');
+    if (banner) {
+        banner.innerHTML = `
+            <a href="#graduation" class="promo-banner">
+                <div class="banner-content">
+                    <i data-feather="award"></i>
+                    <span>CONGRATULATIONS CLASS OF 2026! CELEBRATE YOUR MILESTONE WITH OUR EXCLUSIVE GRAD DECOR.</span>
+                    <span class="banner-cta">EXPLORE GRAD COLLECTION <i data-feather="arrow-right"></i></span>
+                </div>
+            </a>
+        `;
+        feather.replace();
+    }
+}
+
 function renderNavbar() {
     const nav = document.getElementById('navbar');
     nav.innerHTML = `
@@ -169,6 +185,7 @@ function renderNavbar() {
         <div class="nav-links">
             <a href="#" class="nav-link">Home</a>
             <a href="#rentals" class="nav-link">Rentals</a>
+            <a href="#graduation" class="nav-link" style="color: #f1c40f; font-weight: 700;">GRAD 2026</a>
             <a href="#services" class="nav-link">Services</a>
             <a href="#videos" class="nav-link">Videos</a>
             <a href="#gallery" class="nav-link">Gallery</a>
@@ -186,6 +203,7 @@ function renderNavbar() {
             </button>
             <a href="#" class="nav-link">Home</a>
             <a href="#rentals" class="nav-link">Rentals</a>
+            <a href="#graduation" class="nav-link" style="color: #f1c40f;">GRAD 2026</a>
             <a href="#services" class="nav-link">Services</a>
             <a href="#videos" class="nav-link">Videos</a>
             <a href="#gallery" class="nav-link">Gallery</a>
@@ -744,6 +762,75 @@ function renderCheckout() {
     `;
 }
 
+function renderGraduation() {
+    const gradSpecific = rentalItems.filter(i => i.title.includes('GRAD') || i.title.includes('Marquee'));
+    const essentials = rentalItems.filter(i => ['Round Fold-In-Half Table', 'Adult Folding Chair', 'Wedding Tent (16x26)'].includes(i.title));
+
+    return `
+        <div class="container">
+            <div class="text-center">
+                <h2 class="section-title">Class of 2026 Graduation Collection</h2>
+                <p class="section-subtitle">Make your graduation party unforgettable with our premium decor and party essentials.</p>
+            </div>
+
+            <div class="mb-2">
+                <h3 style="margin-bottom: 2rem; color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;">Featured Graduation Decor</h3>
+                <div class="grid">
+                    ${gradSpecific.map(item => renderItemCard(item)).join('')}
+                </div>
+            </div>
+
+            <div class="mt-2">
+                <h3 style="margin-bottom: 2rem; color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;">Party Essentials You'll Need</h3>
+                <div class="grid">
+                    ${essentials.map(item => renderItemCard(item)).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function renderItemCard(item) {
+    const cartItem = cart.find(i => i.id === item.id);
+    const qty = cartItem ? cartItem.quantity : 0;
+
+    let actionHtml = '';
+    if (qty > 0) {
+        actionHtml = `
+            <div class="quantity-controls" style="background: var(--bg-color); border: 1px solid var(--border-color); display: inline-flex;">
+                <button class="quantity-btn" onclick="changeQty(${item.id}, -1)">-</button>
+                <input type="number" min="0" value="${qty}" style="width: 40px; text-align: center; background: transparent; border: none; color: var(--text-primary); font-family: var(--font-family); font-size: 1rem; -moz-appearance: textfield;" onchange="setQty(${item.id}, this.value)">
+                <button class="quantity-btn" onclick="changeQty(${item.id}, 1)">+</button>
+            </div>
+        `;
+    } else {
+        actionHtml = `<button class="btn btn-primary" onclick="handleAddToCart(${item.id})">Add to Cart</button>`;
+    }
+
+    let priceDisplay = `$${item.price}`;
+    let priceStyle = '';
+    if (item.id === 4) {
+        priceDisplay = `$2.00 (<30)<br/>$1.50 (30+)`;
+        priceStyle = 'font-size: 0.85em; line-height: 1.2; text-align: left;';
+    }
+
+    return `
+        <div class="card">
+            <div class="card-img-wrapper">
+                <img src="${item.img}" alt="${item.title}">
+            </div>
+            <div class="card-body">
+                <h3 class="card-title">${item.title}</h3>
+                <p class="card-desc">${item.desc}</p>
+                <div class="card-footer">
+                    <span class="price" style="${priceStyle}">${priceDisplay}</span>
+                    <div id="action-controls-${item.id}">${actionHtml}</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 // Router
 function router() {
     const hash = window.location.hash || '#';
@@ -761,6 +848,7 @@ function router() {
     switch (hash) {
         case '#': content = renderHome(); break;
         case '#rentals': content = renderRentals(); break;
+        case '#graduation': content = renderGraduation(); break;
         case '#services': content = renderServices(); break;
         case '#gallery': content = renderGallery(); break;
         case '#videos': content = renderVideos(); break;
@@ -793,6 +881,7 @@ function router() {
 
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
+    renderBanner();
     renderNavbar();
     renderFooter();
     router();

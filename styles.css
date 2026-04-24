@@ -9,6 +9,7 @@
   --border-color: rgba(255, 255, 255, 0.08);
   --font-family: 'Outfit', sans-serif;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --banner-height: 40px;
 }
 
 * {
@@ -33,7 +34,7 @@ a {
 /* Glassmorphism Navigation */
 .glass-nav {
   position: fixed;
-  top: 0;
+  top: var(--banner-height);
   width: 100%;
   background: var(--surface-glass);
   backdrop-filter: blur(12px);
@@ -45,6 +46,62 @@ a {
   justify-content: space-between;
   align-items: center;
   transition: var(--transition);
+}
+
+.promo-banner {
+  height: var(--banner-height);
+  background: linear-gradient(90deg, #b8860b, #d4af37, #f1c40f, #d4af37, #b8860b);
+  background-size: 200% auto;
+  color: #0d0f12;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1100;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.4);
+  text-decoration: none;
+  overflow: hidden;
+  animation: shine 3s linear infinite;
+}
+
+@keyframes shine {
+  to { background-position: 200% center; }
+}
+
+.banner-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.banner-cta {
+  background: #0d0f12;
+  color: #f1c40f;
+  padding: 2px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  margin-left: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: var(--transition);
+}
+
+.promo-banner:hover .banner-cta {
+  background: #fff;
+  color: #000;
+  transform: scale(1.05);
+}
+
+.promo-banner i {
+  width: 18px;
+  height: 18px;
 }
 
 .logo-text {
@@ -125,7 +182,7 @@ a {
 /* Main Layout */
 main {
   min-height: calc(100vh - 80px);
-  padding-top: 80px; /* offset for fixed nav */
+  padding-top: calc(80px + var(--banner-height)); /* offset for fixed nav + banner */
   animation: fadeIn 0.6s ease-out;
 }
 
@@ -602,6 +659,29 @@ footer {
   transition: transform 0.3s ease, opacity 0.3s ease;
   display: none; /* Hidden by default on desktop */
 }
+
+@media (max-width: 768px) {
+  :root {
+    --banner-height: 50px; /* Taller on mobile for text wrapping if needed */
+  }
+  
+  .promo-banner {
+    font-size: 0.75rem;
+    padding: 0 10px;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .banner-cta {
+    display: none; /* Hide CTA text on very small mobile to save space */
+  }
+
+  .banner-content span:first-of-type {
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
 .sticky-checkout-container.hidden {
   transform: translateY(100%);
