@@ -150,7 +150,14 @@ const rentalItems = [
     { id: 14, title: 'Photo/Any Event Backdrop', price: 150, img: 'https://petalsparadiseevents.com/wp-content/uploads/2025/06/image-2.png', desc: 'Celebrate the beauty of your Mehendi ceremony with our elegant and artistic backdrops, perfect for creating a stunning photo-worthy setting.' },
     { id: 15, title: 'New Born Baby Photo Prop', price: 20, img: 'https://petalsparadiseevents.com/wp-content/uploads/2025/05/Baby-backdrop-1-scaled.jpg', desc: 'Dreamy Moon Swing Photo Prop for cozy gatherings.' },
     { id: 16, title: 'Custom Graduation Setup', price: 'Varies', img: 'https://petalsparadiseevents.com/wp-content/uploads/2025/07/IMG_9906-1-scaled.jpg', desc: 'Personalized graduation decor setup tailored to your school colors and theme. Contact us for a quote.' },
-    { id: 17, title: 'Premium GRAD Decor', price: 'Varies', img: 'https://petalsparadiseevents.com/wp-content/uploads/2025/07/IMG_9901-1-scaled.jpg', desc: 'Exquisite graduation celebration setup with premium backdrops and floral arrangements. Price varies by request.' }
+    { id: 17, title: 'Premium GRAD Decor', price: 'Varies', img: 'https://petalsparadiseevents.com/wp-content/uploads/2025/07/IMG_9901-1-scaled.jpg', desc: 'Exquisite graduation celebration setup with premium backdrops and floral arrangements. Price varies by request.' },
+    { id: 18, title: 'Seemantham/Baby Shower Backdrop', price: 150, img: 'https://petalsparadiseevents.com/wp-content/uploads/2025/07/Seemantham-2.jpg', desc: 'Traditional Seemantham or Baby Shower backdrop for your special occasion.' },
+    { id: 19, title: 'VEVOR Metal Wedding Centerpiece (2PCS)', price: 25, img: 'https://m.media-amazon.com/images/I/71rYvWvJ0pL._AC_SL1500_.jpg', desc: 'Gold crystal metal centerpiece (55cm / 21.65\") - Set of 2 pieces.' },
+    { id: 20, title: 'Happy Birthday Neon Sign', price: 10, img: 'https://petalsparadiseevents.com/wp-content/uploads/2025/05/HBD.jpg', desc: 'Bright and festive Happy Birthday neon sign to light up your party.' },
+    { id: 21, title: 'Good Vibes Only Neon Sign', price: 10, img: 'https://petalsparadiseevents.com/wp-content/uploads/2025/07/image-5.png', desc: 'Trendy \"Good Vibes Only\" neon sign for a modern event feel.' },
+    { id: 22, title: 'Congrats Grad Neon Sign', price: 10, img: 'https://petalsparadiseevents.com/wp-content/uploads/2025/07/81i8bvay0GL._AC_SX679_.jpg', desc: 'Celebratory Congrats Grad neon sign - perfect for Class of 2026 parties!' },
+    { id: 23, title: 'Mehandi Umbrella Set', price: 3, img: 'https://petalsparadiseevents.com/wp-content/uploads/2025/05/Umbrella.jpg', desc: 'Colorful traditional umbrellas for Mehandi or festive ceremonies ($3 each).' },
+    { id: 24, title: 'Easel for Rent', price: 10, img: 'https://petalsparadiseevents.com/wp-content/uploads/2025/09/gold-litton-lane-boards-easels-27391-64_600.jpg', desc: 'Elegant gold easel for displaying welcome signs or photos.' }
 ];
 
 const services = [
