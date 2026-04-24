@@ -547,30 +547,49 @@ function renderGallery() {
 }
 
 function renderVideos() {
-    const videoUrl = "https://petalsparadiseevents.com/wp-content/uploads/2025/09/Wedding-Set-up-@dcwarmemorial-petalsparadiseevents-eventrentals-eventdecor-weddingsetup-dcw.mp4";
+    const videos = [
+        { url: "https://petalsparadiseevents.com/wp-content/uploads/2025/09/Wedding-Set-up-@dcwarmemorial-petalsparadiseevents-eventrentals-eventdecor-weddingsetup-dcw.mp4", title: "Wedding Set-up @ DC War Memorial" },
+        { url: "https://petalsparadiseevents.com/wp-content/uploads/2025/12/IMG_0560.mov", title: "Elegant Event Highlight" },
+        { url: "https://petalsparadiseevents.com/wp-content/uploads/2025/09/Winnie-the-Pooh-Themed-Birthday-DecorThank-you-@tdupexperience-It-was-great-collaborating-with-y.mp4", title: "Winnie the Pooh Themed Birthday" },
+        { url: "https://petalsparadiseevents.com/wp-content/uploads/2025/09/Bridal-Shower-Decorpetalsparadiseevents-eventdecor-eventrentals-babyshowerdecor-birthdaydec.mp4", title: "Bridal Shower Decor" },
+        { url: "https://petalsparadiseevents.com/wp-content/uploads/2025/07/Seemantham-Video-1.mp4", title: "Seemantham Celebration" },
+        { url: "https://petalsparadiseevents.com/wp-content/uploads/2025/07/July-4th-Video-1.mp4", title: "July 4th Celebration" },
+        { url: "https://petalsparadiseevents.com/wp-content/uploads/2025/07/Bday-Decor-Video.mp4", title: "Birthday Party Setup" },
+        { url: "https://petalsparadiseevents.com/wp-content/uploads/2025/07/Baby-Shower-Video.mp4", title: "Baby Shower Highlights" },
+        { url: "https://petalsparadiseevents.com/wp-content/uploads/2025/07/Seemantham-Video.mp4", title: "Traditional Seemantham" },
+        { url: "https://petalsparadiseevents.com/wp-content/uploads/2025/06/7BB8EC83-E840-4082-9C8D-C2B664F3C78Asegment_video_2.mp4", title: "Grand Event Setup" },
+        { url: "https://petalsparadiseevents.com/wp-content/uploads/2025/06/0B6B56B8-F9AD-466F-B758-DEC86D60898Dsegment_video_1.mp4", title: "Ceremony Backdrop" },
+        { url: "https://petalsparadiseevents.com/wp-content/uploads/2025/06/Sharing-some-recent-event-setups-we-had-pleasure-meeting-some-nice-people-🫰1030-tent-available-for-rent.eventrental-event-decor.mp4", title: "Recent Tent & Decor Setups" },
+        { url: "https://petalsparadiseevents.com/wp-content/uploads/2025/06/House-warming-decoreventdecor-eventrentals-petalsparadiseevents-babyshower.mp4", title: "House Warming Decor" },
+        { url: "https://petalsparadiseevents.com/wp-content/uploads/2025/06/Birthday-Decor.Please-contact-us-for-any-event-decorations.birthdaydecor-babyshower-graduationparty🎓-sweet16.mp4", title: "Dream Birthday Decorations" },
+        { url: "https://petalsparadiseevents.com/wp-content/uploads/2025/06/Baby-Shower-Decor-🎈eventdecoration-babyshowerdecor-petalsparadiseevents-eventrentals.mp4", title: "Deluxe Baby Shower Decor" }
+    ];
 
     return `
         <div class="container">
             <div class="text-center">
-                <h2 class="section-title">Videos</h2>
-                <p class="section-subtitle">Watch our beautiful decor setups come to life.</p>
+                <h2 class="section-title">Videos Gallery</h2>
+                <p class="section-subtitle">Experience the magic of our event transformations through these highlights.</p>
             </div>
             
-            <div style="max-width: 800px; margin: 0 auto;">
-                <div class="card" style="padding: 1rem; background: var(--surface-color); overflow: hidden; border-radius: 20px;">
-                    <video controls style="width: 100%; border-radius: 12px; box-shadow: var(--shadow-md);">
-                        <source src="${videoUrl}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                    <div style="padding: 1.5rem 0.5rem 0.5rem;">
-                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">Wedding Set-up @ DC War Memorial</h3>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem;">A stunning outdoor wedding arrangement showcasing our premium rentals and design expertise.</p>
+            <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;">
+                ${videos.map(v => `
+                    <div class="card" style="padding: 0.5rem; background: var(--surface-color); overflow: hidden; border-radius: 16px;">
+                        <div style="aspect-ratio: 9/16; width: 100%; border-radius: 12px; overflow: hidden; background: #000; display: flex; align-items: center;">
+                            <video controls preload="metadata" style="width: 100%; height: auto; display: block;">
+                                <source src="${v.url}">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        <div style="padding: 1rem 0.5rem;">
+                            <h4 style="color: var(--primary-color); font-size: 0.95rem; margin-bottom: 0.2rem;">${v.title}</h4>
+                            <p style="color: var(--text-secondary); font-size: 0.8rem; font-style: italic;">#petalsparadiseevents</p>
+                        </div>
                     </div>
-                </div>
+                `).join('')}
             </div>
 
             <div class="text-center mt-2">
-                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Follow us on Instagram to see more of our latest event highlights.</p>
                 <a href="https://www.instagram.com/petalsparadiseevents/" target="_blank" class="btn btn-outline">
                     <i data-feather="instagram" style="width: 16px; margin-right: 8px; vertical-align: middle;"></i> View More on Instagram
                 </a>
