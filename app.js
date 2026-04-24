@@ -373,6 +373,13 @@ function renderRentals() {
                     `;
     }).join('')}
             </div>
+
+            <div class="empty-state mt-2">
+                <i data-feather="help-circle"></i>
+                <h3>Can't find what you're looking for?</h3>
+                <p style="color: var(--text-secondary); margin-top:1rem;">If there's a specific item you need for your event that isn't listed here, please let us know! We are constantly updating our inventory.</p>
+                <a href="#contact" class="btn btn-outline mt-2">Inquire About Missing Items</a>
+            </div>
         </div>
     `;
 }
@@ -635,7 +642,11 @@ function renderCheckout() {
             body += `- ${item.quantity}x ${item.title} ($${getItemTotal(item)})\n`;
             total += getItemTotal(item);
         });
-        body += `\nEstimated Total: $${total}`;
+        body += `\nEstimated Total: $${total}\n\n`;
+
+        if (details.special_requests) {
+            body += `Special Requests / Missing Items:\n${details.special_requests}\n`;
+        }
 
         const subject = encodeURIComponent(`Rental Request: ${details.name} - ${details.date}`);
         window.location.href = `mailto:contact@petalsparadiseevents.com?subject=${subject}&body=${encodeURIComponent(body)}`;
@@ -703,6 +714,10 @@ function renderCheckout() {
                                 <label class="form-label">Drop Off Time</label>
                                 <input type="time" name="dropoff_time" class="form-control" required>
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Special Requests / Missing Items</label>
+                            <textarea name="special_requests" class="form-control" placeholder="Is there something specific you're looking for that's missing from our catalog? Or any other special instructions?"></textarea>
                         </div>
                         <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">
                             <i data-feather="info" style="width:16px; margin-right:4px; vertical-align:middle;"></i>
