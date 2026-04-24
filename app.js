@@ -655,15 +655,34 @@ function renderCart() {
     }, 100);
 
     if (cart.length === 0) {
-        const recommendations = rentalItems.slice(0, 4);
         return `
             <div class="container">
                 <h2 class="section-title">Your Cart</h2>
-                <div class="empty-state">
-                    <i data-feather="shopping-bag"></i>
+                <div class="empty-state" style="margin-bottom: 4rem;">
+                    <i data-feather="shopping-bag" style="width: 64px; height: 64px; color: var(--border-color); margin-bottom: 1.5rem;"></i>
                     <h3>Your cart is empty</h3>
-                    <p style="color: var(--text-secondary); margin-top:1rem;">Browse our rentals to add items.</p>
+                    <p style="color: var(--text-secondary); margin-top:1rem;">Browse our rentals to find the perfect decor for your event.</p>
                     <a href="#rentals" class="btn btn-primary mt-2">View Rentals</a>
+                </div>
+                
+                <div class="mt-2" style="border-top: 1px solid var(--border-color); padding-top: 2rem;">
+                    <h3 style="margin-bottom: 1.5rem; color: var(--primary-color);">Recommended for Your Event</h3>
+                    <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">
+                        ${getDynamicRecommendations().map(item => `
+                            <div class="card recommendation-card">
+                                <div class="card-img-wrapper" style="height: 150px;">
+                                    <img src="${item.img}" alt="${item.title}">
+                                </div>
+                                <div class="card-body" style="padding: 1rem;">
+                                    <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem; line-height: 1.2;">${item.title}</h4>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span class="price" style="font-size: 0.9rem;">$${item.price}</span>
+                                        <button class="btn btn-primary" style="padding: 4px 12px; font-size: 0.75rem;" onclick="quickAdd(${item.id})">Add</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
                 </div>
             </div>
         `;
