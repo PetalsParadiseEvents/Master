@@ -768,23 +768,20 @@ function renderCart() {
         });
     };
 
-    // Intersection Observer for sticky checkout button
-    setTimeout(() => {
-        const summary = document.querySelector('.cart-summary');
-        const stickyBtn = document.getElementById('sticky-checkout');
-        if (summary && stickyBtn) {
+    window.initStickyObserver = (buttonId, stickyId) => {
+        const btn = document.getElementById(buttonId);
+        const sticky = document.getElementById(stickyId);
+        if (btn && sticky) {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        stickyBtn.classList.add('hidden');
-                    } else {
-                        stickyBtn.classList.remove('hidden');
-                    }
+                    sticky.style.display = entry.isIntersecting ? 'none' : 'block';
                 });
             }, { threshold: 0.1 });
-            observer.observe(summary);
+            observer.observe(btn);
         }
-    }, 100);
+    };
+
+    setTimeout(() => window.initStickyObserver('cart-checkout-btn', 'sticky-checkout'), 100);
 
     if (cart.length === 0) {
         return `
@@ -897,7 +894,9 @@ function renderCart() {
                         <span>Total Estimate:</span>
                         <span id="summary-total-val" style="float:right;">$${subtotal - discount}${fulfillmentMethod === 'Delivery' ? ' + Delivery (TBD)' : ''}</span>
                     </div>
-                    <a href="#checkout" class="btn btn-primary" style="width: 100%; text-align:center; margin-top:1.5rem;">Proceed to Checkout</a>
+                    <a href="#checkout" id="cart-checkout-btn" class="btn btn-primary" style="width: 100%; text-align: center; margin-top: 1.5rem; display: block; padding: 1.2rem;">
+                        Proceed to Checkout
+                    </a>
                     <a href="#rentals" class="btn btn-outline" style="width: 100%; text-align:center; margin-top:1rem;">Continue Shopping</a>
                 </div>
             </div>
@@ -1184,7 +1183,7 @@ function renderCheckout() {
                             <label class="form-label">Special Requests / Missing Items</label>
                             <textarea name="special_requests" class="form-control" placeholder="Is there something specific you're looking for that's missing from our catalog? Or any other special instructions?"></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Rental Request</button>
+                        <button type="submit" id="checkout-submit-btn" class="btn btn-primary" style="width: 100%; padding: 1.2rem;">Submit Rental Request</button>
                     </form>
                 </div>
                 <div class="cart-summary">
@@ -1296,6 +1295,35 @@ function renderItemCard(item) {
     `;
 }
 
+// Helper for Mobile Sticky Actions
+function initStickyObserver(targetId, actionText, actionFnStr) {
+    const stickyContainer = document.getElementById('sticky-action-container');
+    const targetBtn = document.getElementById(targetId);
+
+    if (!stickyContainer) return;
+
+    if (!targetBtn) {
+        stickyContainer.classList.remove('visible');
+        return;
+    }
+
+    // Set content
+    stickyContainer.innerHTML = `<button class="btn btn-primary" onclick="${actionFnStr}">${actionText}</button>`;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            // Show sticky if target is NOT intersecting (off-screen)
+            if (entry.isIntersecting) {
+                stickyContainer.classList.remove('visible');
+            } else {
+                stickyContainer.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    observer.observe(targetBtn);
+}
+
 // Router
 function router() {
     const hash = window.location.hash || '#';
@@ -1367,6 +1395,17 @@ function router() {
 
     main.innerHTML = content;
     feather.replace(); // Re-initialize icons
+
+    // Reset Sticky Mobile Actions
+    const stickyContainer = document.getElementById('sticky-action-container');
+    if (stickyContainer) stickyContainer.classList.remove('visible');
+
+    // Initialize Sticky Observers based on page
+    if (hash === '#cart') {
+        setTimeout(() => initStickyObserver('cart-checkout-btn', 'Proceed to Checkout', "window.location.hash = '#checkout'"), 200);
+    } else if (hash === '#checkout') {
+        setTimeout(() => initStickyObserver('checkout-submit-btn', 'Submit Rental Request', "document.getElementById('checkout-submit-btn').click()"), 200);
+    }
 
     // Initialize date and time pickers with Flatpickr
     if (typeof flatpickr !== 'undefined') {
