@@ -517,6 +517,35 @@ footer {
   gap: 2rem;
 }
 
+/* Recommendations Carousel */
+.recommendations-carousel {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--bg-color);
+}
+
+.recommendations-carousel::-webkit-scrollbar {
+  height: 6px;
+}
+
+.recommendations-carousel::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 10px;
+}
+
+.recommendation-card {
+  min-width: 200px;
+  max-width: 200px;
+  cursor: pointer;
+}
+
+.recommendation-card img {
+  height: 150px;
+}
+
 /* Empty States */
 .empty-state {
   text-align: center;

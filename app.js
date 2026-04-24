@@ -66,6 +66,14 @@ function removeFromCart(id) {
     saveCart();
 }
 
+function clearCart() {
+    if (confirm('Are you sure you want to clear your entire cart?')) {
+        cart = [];
+        saveCart();
+        showToast('Cart cleared.');
+    }
+}
+
 function updateQuantity(id, change) {
     const item = cart.find(i => i.id === id);
     if (item) {
@@ -494,8 +502,10 @@ function renderCart() {
     window.changeQty = updateQuantity;
     window.removeItem = removeFromCart;
     window.setQty = setQuantity;
+    window.handleClearCart = clearCart;
 
     if (cart.length === 0) {
+        const recommendations = rentalItems.slice(0, 4);
         return `
             <div class="container">
                 <h2 class="section-title">Your Cart</h2>
@@ -505,6 +515,21 @@ function renderCart() {
                     <p style="color: var(--text-secondary); margin-top:1rem;">Browse our rentals to add items.</p>
                     <a href="#rentals" class="btn btn-primary mt-2">View Rentals</a>
                 </div>
+                
+                <div class="mt-2">
+                    <h3 style="margin-bottom: 1.5rem; color: var(--primary-color);">Recommended for Your Event</h3>
+                    <div class="recommendations-carousel">
+                        ${recommendations.map(item => `
+                            <div class="card recommendation-card" onclick="window.location.hash='#rentals'">
+                                <img src="${item.img}" alt="${item.title}">
+                                <div class="card-body" style="padding: 1rem;">
+                                    <h4 style="font-size: 1rem;">${item.title}</h4>
+                                    <p class="price" style="font-size: 1rem;">$${item.price}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
             </div>
         `;
     }
@@ -513,8 +538,13 @@ function renderCart() {
 
     return `
         <div class="container">
-            <h2 class="section-title">Your Cart</h2>
-            <p class="section-subtitle" style="margin-bottom: 2rem;">Review your selected rental items below.</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1rem;">
+                <h2 class="section-title" style="margin-bottom: 0;">Your Cart</h2>
+                <button class="btn btn-outline" style="border-color: #ef4444; color: #ef4444;" onclick="handleClearCart()">
+                    <i data-feather="trash-2" style="width: 16px; vertical-align: middle; margin-right: 8px;"></i>Clear All
+                </button>
+            </div>
+            <p class="section-subtitle" style="margin-bottom: 2rem; text-align: left; margin-left: 0;">Review your selected rental items below.</p>
             <div class="cart-layout">
                 <div>
                     ${cart.map(item => `
@@ -549,6 +579,7 @@ function renderCart() {
                         <span style="float:right;">$${total}</span>
                     </div>
                     <a href="#checkout" class="btn btn-primary" style="width: 100%; text-align:center; margin-top:1.5rem;">Proceed to Checkout</a>
+                    <a href="#rentals" class="btn btn-outline" style="width: 100%; text-align:center; margin-top:1rem;">Continue Shopping</a>
                 </div>
             </div>
         </div>
