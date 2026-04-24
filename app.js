@@ -2,6 +2,7 @@
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let appliedPromo = JSON.parse(localStorage.getItem('appliedPromo')) || null;
 let fulfillmentMethod = localStorage.getItem('fulfillmentMethod') || 'Pickup';
+let searchQuery = '';
 
 function saveCart() {
     localStorage.setItem('cart', JSON.stringify(cart));
@@ -14,6 +15,83 @@ function saveCart() {
         if (typeof refreshRentalsUI === 'function') refreshRentalsUI();
     }
 }
+
+window.handleSearch = (e) => {
+    // Handle both input events and form submit events
+    const val = e.target.value !== undefined ? e.target.value : (e.target.querySelector ? e.target.querySelector('input').value : searchQuery);
+    searchQuery = val.toLowerCase();
+    if (window.refreshRentalsUI) window.refreshRentalsUI();
+};
+
+window.changeQty = (id, change) => updateQuantity(id, change);
+window.setQty = (id, qty) => setQuantity(id, qty);
+window.removeItem = (id) => removeFromCart(id);
+window.handleClearCart = () => clearCart();
+
+window.refreshRentalsUI = () => {
+    const grid = document.getElementById('rentals-grid');
+    if (!grid) return;
+    
+    const filtered = rentalItems.filter(item => 
+        item.title.toLowerCase().includes(searchQuery) || 
+        (item.category && item.category.toLowerCase().includes(searchQuery)) ||
+        (item.desc && item.desc.toLowerCase().includes(searchQuery))
+    );
+
+    if (filtered.length === 0) {
+        grid.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem;">
+                <i data-feather="search" style="width: 48px; height: 48px; color: var(--border-color); margin-bottom: 1rem;"></i>
+                <h3 style="color: var(--text-secondary);">No items found for "${searchQuery}"</h3>
+                <p style="color: var(--text-secondary); margin-top: 0.5rem;">Try searching for something else or browse all categories.</p>
+            </div>
+        `;
+        if (window.feather) feather.replace();
+        return;
+    }
+
+    grid.innerHTML = filtered.map(item => {
+        const cartItem = cart.find(i => i.id === item.id);
+        const qty = cartItem ? cartItem.quantity : 0;
+        
+        let actionHtml = '';
+        if (qty > 0) {
+            actionHtml = `
+                <div class="quantity-controls" style="background: var(--bg-color); border: 1px solid var(--border-color); display: inline-flex;">
+                    <button class="quantity-btn" onclick="changeQty(${item.id}, -1)">-</button>
+                    <input type="number" min="0" value="${qty}" style="width: 40px; text-align: center; background: transparent; border: none; color: var(--text-primary); font-family: var(--font-family); font-size: 1rem; -moz-appearance: textfield;" onchange="setQty(${item.id}, this.value)">
+                    <button class="quantity-btn" onclick="changeQty(${item.id}, 1)">+</button>
+                </div>
+            `;
+        } else {
+            actionHtml = `<button class="btn btn-primary" style="width: 100%;" onclick="handleAddToCart(${item.id})">Add to Request</button>`;
+        }
+
+        let priceDisplay = typeof item.price === 'number' ? `$${item.price}` : item.price;
+        let priceStyle = '';
+        if (item.id === 4) {
+            priceDisplay = `$2.00 (<30)<br/>$1.50 (30+)`;
+            priceStyle = 'font-size: 0.85em; line-height: 1.2; text-align: left;';
+        }
+
+        return `
+            <div class="card product-card">
+                <div class="card-img-wrapper">
+                    <img src="${item.img}" alt="${item.title}">
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">${item.title}</h3>
+                    <p class="card-desc" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">${item.desc || ''}</p>
+                    <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
+                        <span class="price" style="${priceStyle}">${priceDisplay}</span>
+                        <div id="action-controls-${item.id}">${actionHtml}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    if (window.feather) feather.replace();
+};
 
 function showToast(message) {
     let container = document.getElementById('toast-container');
@@ -66,7 +144,7 @@ function getCartTotal() {
 }
 
 function getDynamicRecommendations() {
-    if (cart.length === 0) return rentalItems.slice(0, 4);
+    if (cart.length === 0) return rentalItems.slice(0, 5);
 
     const cartTitles = cart.map(item => item.title.toLowerCase());
     const cartCategories = [];
@@ -431,58 +509,37 @@ function refreshRentalsUI() {
 function renderRentals() {
     window.handleAddToCart = (id) => {
         const item = rentalItems.find(i => i.id === id);
-        addToCart(item);
+        if (item) addToCart(item);
     };
-    window.changeQty = updateQuantity;
-    window.setQty = setQuantity;
+
+    // Trigger initial refresh
+    setTimeout(() => {
+        if (window.refreshRentalsUI) window.refreshRentalsUI();
+    }, 0);
 
     return `
         <div class="container">
             <div class="text-center">
-                <h2 class="section-title">Event Rentals</h2>
-                <p class="section-subtitle">Browse our exquisite collection of decor items available for rent to elevate your event.</p>
+                <h2 class="section-title">Rentals Collection</h2>
+                <p class="section-subtitle">Browse our premium selection of event decor and party essentials.</p>
             </div>
-            <div class="grid">
-                ${rentalItems.map(item => {
-        const cartItem = cart.find(i => i.id === item.id);
-        const qty = cartItem ? cartItem.quantity : 0;
 
-        let actionHtml = '';
-        if (qty > 0) {
-            actionHtml = `
-                            <div class="quantity-controls" style="background: var(--bg-color); border: 1px solid var(--border-color); display: inline-flex;">
-                                <button class="quantity-btn" onclick="changeQty(${item.id}, -1)">-</button>
-                                <input type="number" min="0" value="${qty}" style="width: 40px; text-align: center; background: transparent; border: none; color: var(--text-primary); font-family: var(--font-family); font-size: 1rem; -moz-appearance: textfield;" onchange="setQty(${item.id}, this.value)">
-                                <button class="quantity-btn" onclick="changeQty(${item.id}, 1)">+</button>
-                            </div>
-                        `;
-        } else {
-            actionHtml = `<button class="btn btn-primary" onclick="handleAddToCart(${item.id})">Add to Cart</button>`;
-        }
+            <!-- Search Bar -->
+            <div style="max-width: 600px; margin: 0 auto 3rem;">
+                <form onsubmit="event.preventDefault(); window.handleSearch(event);" style="position: relative;">
+                    <i data-feather="search" style="position: absolute; left: 1.5rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); width: 20px;"></i>
+                    <input type="text" 
+                        placeholder="Search for backdrops, marquee letters, neon signs..." 
+                        class="form-control" 
+                        style="padding-left: 3.5rem; border-radius: 50px; height: 60px; font-size: 1.1rem; box-shadow: var(--shadow-sm); border: 2px solid var(--border-color);"
+                        oninput="window.handleSearch(event)"
+                        value="${searchQuery}">
+                    <button type="submit" style="display: none;"></button>
+                </form>
+            </div>
 
-        let priceDisplay = typeof item.price === 'number' ? `$${item.price}` : item.price;
-        let priceStyle = '';
-        if (item.id === 4) {
-            priceDisplay = `$2.00 (<30)<br/>$1.50 (30+)`;
-            priceStyle = 'font-size: 0.85em; line-height: 1.2; text-align: left;';
-        }
-
-        return `
-                    <div class="card">
-                        <div class="card-img-wrapper">
-                            <img src="${item.img}" alt="${item.title}">
-                        </div>
-                        <div class="card-body">
-                            <h3 class="card-title">${item.title}</h3>
-                            <p class="card-desc">${item.desc}</p>
-                            <div class="card-footer">
-                                <span class="price" style="${priceStyle}">${priceDisplay}</span>
-                                <div id="action-controls-${item.id}">${actionHtml}</div>
-                            </div>
-                        </div>
-                    </div>
-                    `;
-    }).join('')}
+            <div id="rentals-grid" class="grid">
+                <div style="grid-column: 1/-1; text-align: center; padding: 2rem;">Loading collection...</div>
             </div>
 
             <div class="empty-state mt-2">
@@ -674,10 +731,6 @@ function renderContact() {
 }
 
 function renderCart() {
-    window.changeQty = updateQuantity;
-    window.removeItem = removeFromCart;
-    window.setQty = setQuantity;
-    window.handleClearCart = clearCart;
     window.handlePromo = (e) => {
         e.preventDefault();
         const input = e.target.querySelector('input');
