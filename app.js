@@ -210,19 +210,26 @@ const services = [
 // Rendering Layout
 function renderBanner() {
     const banner = document.getElementById('top-banner');
-    if (banner) {
-        banner.innerHTML = `
-            <a href="#graduation" class="promo-banner">
-                <div class="banner-content">
-                    <i data-feather="award"></i>
-                    <span class="banner-main-text">CONGRATULATIONS CLASS OF 2026!</span>
-                    <span class="banner-extra-text">CELEBRATE YOUR MILESTONE WITH OUR EXCLUSIVE GRAD DECOR.</span>
-                    <span class="banner-cta">EXPLORE GRAD COLLECTION <i data-feather="arrow-right"></i></span>
+    if (!banner) return;
+
+    banner.innerHTML = `
+        <div class="promo-banner">
+            <div class="ticker-wrap">
+                <div class="ticker">
+                    <span class="ticker-item">🎓 CONGRATULATIONS CLASS OF 2026! 🎓</span>
+                    <span class="ticker-item">📞 QUESTIONS? CALL US AT <a href="tel:+18484486993">+1 848-448-6993</a></span>
+                    <span class="ticker-item">✨ EXCLUSIVE GRAD DECOR NOW AVAILABLE! ✨</span>
+                    <span class="ticker-item">🎊 <a href="#graduation">EXPLORE GRAD COLLECTION</a> 🎊</span>
+                    <span class="ticker-item">🚚 WE OFFER DELIVERY & PICKUP OPTIONS! 🚚</span>
+                    <!-- Duplicate for seamless loop -->
+                    <span class="ticker-item">🎓 CONGRATULATIONS CLASS OF 2026! 🎓</span>
+                    <span class="ticker-item">📞 QUESTIONS? CALL US AT <a href="tel:+18484486993">+1 848-448-6993</a></span>
+                    <span class="ticker-item">✨ EXCLUSIVE GRAD DECOR NOW AVAILABLE! ✨</span>
+                    <span class="ticker-item">🎊 <a href="#graduation">EXPLORE GRAD COLLECTION</a> 🎊</span>
                 </div>
-            </a>
-        `;
-        feather.replace();
-    }
+            </div>
+        </div>
+    `;
 }
 
 function renderNavbar() {

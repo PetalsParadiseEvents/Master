@@ -55,19 +55,46 @@ a {
   color: #0d0f12;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.9rem;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   z-index: 1100;
-  letter-spacing: 0.5px;
   box-shadow: 0 2px 15px rgba(0,0,0,0.4);
   text-decoration: none;
   overflow: hidden;
   animation: shine 3s linear infinite;
+}
+
+.ticker-wrap {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.ticker {
+  display: flex;
+  width: fit-content;
+  animation: ticker 60s linear infinite;
+}
+
+.ticker-item {
+  display: inline-block;
+  padding: 0 4rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
+
+.ticker-item a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 @keyframes shine {
@@ -662,43 +689,21 @@ footer {
 }
 
 @media (max-width: 768px) {
-  :root {
-    --banner-height: 65px; /* Increased height for stacking */
+  .promo-banner {
+    height: 40px; 
   }
   
-  .promo-banner {
+  :root {
+    --banner-height: 40px;
+  }
+
+  .ticker {
+    animation: ticker 20s linear infinite;
+  }
+
+  .ticker-item {
     font-size: 0.8rem;
-    padding: 0.5rem;
-  }
-
-  .banner-content {
-    flex-direction: column;
-    gap: 0.3rem;
-    align-items: center;
-  }
-
-  .banner-extra-text {
-    display: none;
-  }
-
-  .banner-main-text {
-    font-weight: 700;
-  }
-
-  .banner-cta {
-    display: flex;
-    margin-left: 0;
-    font-size: 0.75rem;
-    padding: 2px 12px;
-  }
-
-  .banner-cta span {
-    display: inline; /* Show 'EXPLORE GRAD COLLECTION' text on mobile now */
-  }
-
-  /* Remove 'Explore' text for mobile specifically */
-  .banner-cta::after {
-    content: none;
+    padding: 0 1rem;
   }
 }
 
