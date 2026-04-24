@@ -1061,12 +1061,16 @@ function renderCheckout() {
             
             if (type === 'Delivery') {
                 pLabel.textContent = 'Collection Date';
+                pickupBlock.querySelector('.form-group:last-child .form-label').textContent = 'Collection Time';
                 dLabel.textContent = 'Delivery Date';
+                dropoffBlock.querySelector('.form-group:last-child .form-label').textContent = 'Delivery Time';
                 pickupBlock.style.order = '2';
                 dropoffBlock.style.order = '1';
             } else {
                 pLabel.textContent = 'Pick Up Date';
+                pickupBlock.querySelector('.form-group:last-child .form-label').textContent = 'Pick Up Time';
                 dLabel.textContent = 'Return Date';
+                dropoffBlock.querySelector('.form-group:last-child .form-label').textContent = 'Return Time';
                 pickupBlock.style.order = '1';
                 dropoffBlock.style.order = '2';
             }
@@ -1133,7 +1137,7 @@ function renderCheckout() {
                                     <input type="date" name="pickup_date" class="form-control" required>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Time</label>
+                                    <label class="form-label">${fulfillmentMethod === 'Delivery' ? 'Collection Time' : 'Pick Up Time'}</label>
                                     <input type="time" name="pickup_time" class="form-control" required>
                                 </div>
                             </div>
@@ -1143,7 +1147,7 @@ function renderCheckout() {
                                     <input type="date" name="dropoff_date" class="form-control" required>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Time</label>
+                                    <label class="form-label">${fulfillmentMethod === 'Delivery' ? 'Delivery Time' : 'Return Time'}</label>
                                     <input type="time" name="dropoff_time" class="form-control" required>
                                 </div>
                             </div>
