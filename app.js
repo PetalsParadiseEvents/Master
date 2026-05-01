@@ -81,9 +81,9 @@ window.refreshRentalsUI = () => {
         if (qty > 0) {
             actionHtml = `
                 <div class="quantity-controls" style="background: var(--bg-color); border: 1px solid var(--border-color); display: inline-flex;">
-                    <button class="quantity-btn" onclick="changeQty(${item.id}, -1)">-</button>
-                    <input type="number" min="0" value="${qty}" style="width: 40px; text-align: center; background: transparent; border: none; color: var(--text-primary); font-family: var(--font-family); font-size: 1rem; -moz-appearance: textfield;" onchange="setQty(${item.id}, this.value)">
-                    <button class="quantity-btn" onclick="changeQty(${item.id}, 1)">+</button>
+                    <button class="quantity-btn" onclick="changeQty(${item.id}, -1)" aria-label="Decrease quantity for ${item.title.replace(/"/g, '&quot;')}">-</button>
+                    <input type="number" min="0" value="${qty}" aria-label="Quantity for ${item.title.replace(/"/g, '&quot;')}" style="width: 40px; text-align: center; background: transparent; border: none; color: var(--text-primary); font-family: var(--font-family); font-size: 1rem; -moz-appearance: textfield;" onchange="setQty(${item.id}, this.value)">
+                    <button class="quantity-btn" onclick="changeQty(${item.id}, 1)" aria-label="Increase quantity for ${item.title.replace(/"/g, '&quot;')}">+</button>
                 </div>
             `;
         } else {
@@ -386,7 +386,7 @@ function renderBanner() {
 function renderNavbar() {
     const nav = document.getElementById('navbar');
     nav.innerHTML = `
-        <button class="mobile-menu-btn" id="mobile-menu-btn">
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open navigation menu">
             <i data-feather="menu"></i>
         </button>
         <a href="#" class="logo-text">Petals Paradise Events</a>
@@ -399,14 +399,14 @@ function renderNavbar() {
             <a href="#gallery" class="nav-link">Gallery</a>
             <a href="#contact" class="nav-link">Contact Us</a>
         </div>
-        <a href="#cart" class="cart-icon-container">
+        <a href="#cart" class="cart-icon-container" aria-label="View cart with ${cart.reduce((sum, item) => sum + item.quantity, 0)} items">
             <i data-feather="shopping-bag"></i>
             <span id="cart-badge" class="cart-badge">0</span>
         </a>
         
         <!-- Mobile Menu Overlay -->
-        <div class="mobile-menu" id="mobile-menu">
-            <button class="mobile-menu-close" id="mobile-menu-close">
+        <div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Mobile navigation">
+            <button class="mobile-menu-close" id="mobile-menu-close" aria-label="Close navigation menu">
                 <i data-feather="x"></i>
             </button>
             <a href="#" class="nav-link">Home</a>
@@ -445,15 +445,15 @@ function renderFooter() {
                 <h3>Petals Paradise Events</h3>
                 <p>Crafting Unforgettable Moments with elegant decor and personalized touches for every occasion in the DMV area.</p>
                 <div class="social-links">
-                    <a href="https://www.facebook.com/people/Petals-Paradise-Events/61574977307091/" target="_blank" rel="noopener noreferrer">
+                    <a href="https://www.facebook.com/people/Petals-Paradise-Events/61574977307091/" target="_blank" rel="noopener noreferrer" aria-label="Visit our Facebook page">
                        <i data-feather="facebook"></i>
                     </a>
 
-                    <a href="https://www.instagram.com/petalsparadiseevents/" target="_blank" rel="noopener noreferrer">
+                    <a href="https://www.instagram.com/petalsparadiseevents/" target="_blank" rel="noopener noreferrer" aria-label="Visit our Instagram profile">
                        <i data-feather="instagram"></i>
                     </a>
 
-                    <a href="https://wa.me/qr/UGD3LZ3UNUCQP1" target="_blank" rel="noopener noreferrer">
+                    <a href="https://wa.me/qr/UGD3LZ3UNUCQP1" target="_blank" rel="noopener noreferrer" aria-label="Contact us on WhatsApp">
                        <i data-feather="message-circle"></i>
                     </a>
                 </div>
@@ -507,7 +507,7 @@ function renderHome() {
                         <div class="card-body">
                             <h3 class="card-title">${s.title}</h3>
                             <p class="card-desc">${s.desc}</p>
-                            <a href="#services" class="btn btn-outline" style="width:100%; text-align:center;">Learn More</a>
+                            <a href="#services" class="btn btn-outline" style="width:100%; text-align:center;" aria-label="Learn more about ${s.title}">Learn More</a>
                         </div>
                     </div>
                 `).join('')}
@@ -1142,20 +1142,20 @@ function renderCheckout() {
                     <h3 style="margin-bottom: 1.5rem;">Event Details</h3>
                     <form onsubmit="handleOrderSubmit(event)">
                         <div class="form-group">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" name="name" class="form-control" required>
+                            <label for="checkout-name" class="form-label">Full Name</label>
+                            <input type="text" id="checkout-name" name="name" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control" required>
+                            <label for="checkout-email" class="form-label">Email</label>
+                            <input type="email" id="checkout-email" name="email" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Phone</label>
-                            <input type="tel" name="phone" class="form-control" required>
+                            <label for="checkout-phone" class="form-label">Phone</label>
+                            <input type="tel" id="checkout-phone" name="phone" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Event Date</label>
-                            <input type="date" name="date" class="form-control" required>
+                            <label for="checkout-date" class="form-label">Event Date</label>
+                            <input type="date" id="checkout-date" name="date" class="form-control" required>
                         </div>
                         <div id="venue-location-section" class="form-group">
                             <label class="form-label">Venue Location (Name/City)</label>

@@ -5,11 +5,33 @@
   --primary-color: #d4af37; /* Elegant Gold */
   --primary-hover: #f1c40f;
   --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --border-color: rgba(255, 255, 255, 0.08);
+  --text-secondary: #cbd5e1; /* Lightened from #94a3b8 for better contrast */
+  --border-color: rgba(255, 255, 255, 0.12); /* Slightly more visible */
   --font-family: 'Outfit', sans-serif;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --banner-height: 40px;
+}
+
+/* Accessibility: Visible Focus States */
+:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 4px;
+}
+
+/* Accessibility: Skip to Content */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  background: var(--primary-color);
+  color: var(--bg-color);
+  padding: 1rem;
+  z-index: 2000;
+  transition: top 0.3s;
+}
+
+.skip-link:focus {
+  top: 0;
 }
 
 * {
