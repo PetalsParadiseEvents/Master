@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://petalsparadiseevents.com/sitemap.xml
