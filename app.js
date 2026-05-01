@@ -107,9 +107,21 @@ window.refreshRentalsUI = () => {
         `;
     }).join('');
     if (window.feather) feather.replace();
+
+    const stickyCart = document.getElementById('sticky-view-cart');
+    if (stickyCart) {
+        if (cart.length > 0) {
+            stickyCart.style.display = 'block';
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const btn = stickyCart.querySelector('a');
+            if (btn) btn.textContent = `View Cart (${totalItems} item${totalItems !== 1 ? 's' : ''})`;
+        } else {
+            stickyCart.style.display = 'none';
+        }
+    }
 };
 
-function showToast(message) {
+function showToast(message, showCartLink = false) {
     let container = document.getElementById('toast-container');
     if (!container) {
         container = document.createElement('div');
@@ -120,7 +132,11 @@ function showToast(message) {
 
     const toast = document.createElement('div');
     toast.className = 'toast';
-    toast.innerHTML = `<i data-feather="check-circle" style="color: var(--primary-color)"></i> <span>${message}</span>`;
+    let html = `<i data-feather="check-circle" style="color: var(--primary-color)"></i> <span>${message}</span>`;
+    if (showCartLink) {
+        html += ` <a href="#cart" style="color: var(--primary-color); margin-left: auto; font-weight: bold; text-decoration: underline;">View Cart</a>`;
+    }
+    toast.innerHTML = html;
 
     container.appendChild(toast);
     if (window.feather) feather.replace();
@@ -136,10 +152,10 @@ function addToCart(item) {
     const existing = cart.find(i => i.id === item.id);
     if (existing) {
         existing.quantity += 1;
-        showToast(`1 more ${item.title} added to cart. Total: ${existing.quantity}`);
+        showToast(`1 more ${item.title} added to cart. Total: ${existing.quantity}`, true);
     } else {
         cart.push({ ...item, quantity: 1 });
-        showToast(`Added ${item.title} to cart!`);
+        showToast(`Added ${item.title} to cart!`, true);
     }
     saveCart();
 }
@@ -255,7 +271,7 @@ function updateQuantity(id, change) {
             saveCart();
             const diff = Math.abs(change);
             if (change > 0) {
-                showToast(`${diff} item${diff > 1 ? 's' : ''} added for ${item.title}. Total: ${item.quantity}`);
+                showToast(`${diff} item${diff > 1 ? 's' : ''} added for ${item.title}. Total: ${item.quantity}`, true);
             } else {
                 showToast(`${diff} item${diff > 1 ? 's' : ''} removed for ${item.title}. Total: ${item.quantity}`);
             }
@@ -294,7 +310,7 @@ function setQuantity(id, newQty) {
     
     const diff = Math.abs(qty - oldQty);
     if (qty > oldQty) {
-        showToast(`${diff} more ${item.title} added to cart. Total: ${qty}`);
+        showToast(`${diff} more ${item.title} added to cart. Total: ${qty}`, true);
     } else {
         showToast(`${diff} ${item.title} removed from cart. Total: ${qty}`);
     }
@@ -466,7 +482,7 @@ function renderHome() {
                 <h1>Crafting Unforgettable Moments</h1>
                 <p>We specialize in transforming your celebrations into beautiful memories with elegant decor and personalized touches for every occasion.</p>
                 <div class="hero-btns">
-                    <a href="#rentals" class="btn btn-primary">Explore Rentals</a>
+                    <a href="#rentals" class="btn btn-primary">explore rentalss</a>
                     <a href="#contact" class="btn btn-outline">Contact Us</a>
                 </div>
             </div>
@@ -514,6 +530,18 @@ function refreshRentalsUI() {
             }
         }
     });
+
+    const stickyCart = document.getElementById('sticky-view-cart');
+    if (stickyCart) {
+        if (cart.length > 0) {
+            stickyCart.style.display = 'block';
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const btn = stickyCart.querySelector('a');
+            if (btn) btn.textContent = `View Cart (${totalItems} item${totalItems !== 1 ? 's' : ''})`;
+        } else {
+            stickyCart.style.display = 'none';
+        }
+    }
 }
 
 function renderRentals() {
@@ -536,15 +564,15 @@ function renderRentals() {
 
             <!-- Search Bar -->
             <div style="max-width: 600px; margin: 0 auto 3rem;">
-                <form onsubmit="event.preventDefault(); window.handleSearch(event);" style="position: relative;">
+                <form onsubmit="event.preventDefault(); window.handleSearch(event);" style="position: relative; display: flex; align-items: center; width: 100%;">
                     <i data-feather="search" style="position: absolute; left: 1.5rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); width: 20px;"></i>
                     <input type="text" 
                         placeholder="Search for backdrops, marquee letters, neon signs..." 
                         class="form-control" 
-                        style="padding-left: 3.5rem; border-radius: 50px; height: 60px; font-size: 1.1rem; box-shadow: var(--shadow-sm); border: 2px solid var(--border-color);"
+                        style="padding-left: 3.5rem; padding-right: 110px; border-radius: 50px; height: 60px; font-size: 1.1rem; box-shadow: var(--shadow-sm); border: 2px solid var(--border-color); width: 100%;"
                         oninput="window.handleSearch(event)"
                         value="${searchQuery}">
-                    <button type="submit" style="display: none;"></button>
+                    <button type="submit" class="btn btn-primary" style="position: absolute; right: 6px; height: 48px; border-radius: 40px; padding: 0 1.5rem; margin: 0; font-size: 1rem; border: none; display: flex; align-items: center; justify-content: center;">Search</button>
                 </form>
             </div>
 
@@ -557,6 +585,11 @@ function renderRentals() {
                 <h3>Can't find what you're looking for?</h3>
                 <p style="color: var(--text-secondary); margin-top:1rem;">If there's a specific item you need for your event that isn't listed here, please let us know! We are constantly updating our inventory.</p>
                 <a href="#contact" class="btn btn-outline mt-2">Inquire About Missing Items</a>
+            </div>
+
+            <!-- Sticky Cart Button -->
+            <div id="sticky-view-cart" class="sticky-checkout-container" style="display: none;">
+                <a href="#cart" class="btn btn-primary" style="width: 100%; text-align:center;">View Cart</a>
             </div>
         </div>
     `;
@@ -760,10 +793,12 @@ function renderCart() {
         const text = method === 'Delivery' ? `$${finalTotal} + Delivery (TBD)` : `$${finalTotal}`;
         
         totalDisplays.forEach(el => {
-            el.innerHTML = `<span>Total Estimate:</span> <span>${text}</span>`;
+            el.innerHTML = `<span style="font-size: 1rem; color: var(--text-secondary);">Total Estimate:</span> <span style="font-size: 1.25rem; font-weight: 700; color: var(--primary-color); text-align: right;">${text}</span>`;
             el.style.display = 'flex';
             el.style.justifyContent = 'space-between';
             el.style.alignItems = 'center';
+            el.style.flexWrap = 'wrap';
+            el.style.gap = '0.5rem';
             el.style.width = '100%';
         });
         
@@ -896,9 +931,9 @@ function renderCart() {
                         </div>
                     </form>
 
-                    <div id="summary-total-val" class="summary-total" style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                        <span>Total Estimate:</span>
-                        <span style="font-weight: 700; color: var(--primary-color);">$${subtotal - discount}${fulfillmentMethod === 'Delivery' ? ' + Delivery (TBD)' : ''}</span>
+                    <div id="summary-total-val" class="summary-total" style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                        <span style="font-size: 1rem; color: var(--text-secondary);">Total Estimate:</span>
+                        <span style="font-size: 1.25rem; font-weight: 700; color: var(--primary-color); text-align: right;">$${subtotal - discount}${fulfillmentMethod === 'Delivery' ? ' + Delivery (TBD)' : ''}</span>
                     </div>
                     <a href="#checkout" id="cart-checkout-btn" class="btn btn-primary" style="width: 100%; text-align: center; margin-top: 1.5rem; display: block; padding: 1.2rem;">
                         Proceed to Checkout
@@ -998,26 +1033,23 @@ function renderCheckout() {
         appliedPromo = null;
         saveCart();
 
-        const main = document.getElementById('main-content');
-        main.innerHTML = `
-            <div class="container text-center" style="padding: 4rem 2rem;">
-                <div style="color: var(--primary-color); margin-bottom:1rem;">
-                    <i data-feather="check-circle" style="width: 64px; height: 64px;"></i>
-                </div>
-                <h2 class="section-title">Request Prepared!</h2>
-                <p class="section-subtitle">Your email client has been opened to send the rental request to us. We will contact you shortly to confirm availability and coordinate payment in person.</p>
-                <a href="#" class="btn btn-primary mt-2">Back to Home</a>
-            </div>
-        `;
-        feather.replace();
+        window.location.hash = '#confirmation';
     };
 
     window.initAutocomplete = () => {
         try {
             const input = document.querySelector('input[name="delivery_address"]');
-            if (input && window.google && window.google.maps && window.google.maps.places) {
+            if (input && !input.hasAttribute('data-autocomplete-init') && window.google && window.google.maps && window.google.maps.places) {
                 const autocomplete = new google.maps.places.Autocomplete(input);
                 autocomplete.setComponentRestrictions({ country: ['us'] });
+                input.setAttribute('data-autocomplete-init', 'true');
+                
+                // Prevent 'Enter' from submitting the form when selecting an autocomplete option
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                    }
+                });
             }
         } catch (error) {
             console.error("Google Maps Autocomplete failed to initialize:", error);
@@ -1033,6 +1065,11 @@ function renderCheckout() {
             // Remove any Google-injected styles that might block the input
             input.style.backgroundImage = 'none';
             input.placeholder = "Enter full address manually";
+            input.disabled = false;
+            input.readOnly = false;
+            input.removeAttribute('disabled');
+            input.removeAttribute('readonly');
+            input.classList.remove('pac-target-input');
         }
     };
 
@@ -1216,9 +1253,9 @@ function renderCheckout() {
                         </div>
                     </form>
 
-                    <div id="summary-total-val" class="summary-total" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>Total Estimate:</span>
-                        <span style="font-weight: 700; color: var(--primary-color);">$${subtotal - discount}${fulfillmentMethod === 'Delivery' ? ' + Delivery (TBD)' : ''}</span>
+                    <div id="summary-total-val" class="summary-total" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                        <span style="font-size: 1rem; color: var(--text-secondary);">Total Estimate:</span>
+                        <span style="font-size: 1.25rem; font-weight: 700; color: var(--primary-color); text-align: right;">$${subtotal - discount}${fulfillmentMethod === 'Delivery' ? ' + Delivery (TBD)' : ''}</span>
                     </div>
                     <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 1rem;">
                         <i data-feather="info" style="width:16px; margin-right:4px; vertical-align:middle;"></i>
@@ -1330,6 +1367,40 @@ function initStickyObserver(targetId, actionText, actionFnStr) {
     observer.observe(targetBtn);
 }
 
+function renderConfirmation() {
+    setTimeout(() => {
+        if (typeof confetti === 'function') {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+    }, 100);
+
+    return `
+        <div class="container text-center" style="padding: 4rem 2rem;">
+            <div style="color: var(--primary-color); margin-bottom:1rem;">
+                <i data-feather="check-circle" style="width: 64px; height: 64px;"></i>
+            </div>
+            <h2 class="section-title">Request Prepared!</h2>
+            <p class="section-subtitle">Your email client has been opened to send the rental request to us. We will contact you shortly to confirm availability and coordinate payment in person.</p>
+            
+            <div style="margin-top: 3rem; background: var(--surface-color); padding: 2.5rem; border-radius: 12px; border: 1px dashed var(--primary-color); max-width: 600px; margin-left: auto; margin-right: auto;">
+                <h3 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.5rem;">How was your experience?</h3>
+                <p style="margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 1.1rem;">We'd love to hear from you. Please consider leaving us a review on Google!</p>
+                <a href="https://g.page/r/CXcHwjVlRTQIEBM/review" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+                    <i data-feather="star"></i> Leave a Google Review
+                </a>
+            </div>
+
+            <div style="margin-top: 3rem;">
+                <a href="#" class="btn btn-outline">Back to Home</a>
+            </div>
+        </div>
+    `;
+}
+
 // Router
 function router() {
     const hash = window.location.hash || '#';
@@ -1388,6 +1459,10 @@ function router() {
         case '#checkout': 
             content = renderCheckout(); 
             pageTitle = 'Secure Checkout | Petals Paradise Events';
+            break;
+        case '#confirmation':
+            content = renderConfirmation();
+            pageTitle = 'Order Confirmed | Petals Paradise Events';
             break;
         default: 
             content = renderHome();
