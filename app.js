@@ -1050,9 +1050,17 @@ function renderCheckout() {
     window.initAutocomplete = () => {
         try {
             const input = document.querySelector('input[name="delivery_address"]');
-            if (input && window.google && window.google.maps && window.google.maps.places) {
+            if (input && !input.hasAttribute('data-autocomplete-init') && window.google && window.google.maps && window.google.maps.places) {
                 const autocomplete = new google.maps.places.Autocomplete(input);
                 autocomplete.setComponentRestrictions({ country: ['us'] });
+                input.setAttribute('data-autocomplete-init', 'true');
+                
+                // Prevent 'Enter' from submitting the form when selecting an autocomplete option
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                    }
+                });
             }
         } catch (error) {
             console.error("Google Maps Autocomplete failed to initialize:", error);
@@ -1068,6 +1076,11 @@ function renderCheckout() {
             // Remove any Google-injected styles that might block the input
             input.style.backgroundImage = 'none';
             input.placeholder = "Enter full address manually";
+            input.disabled = false;
+            input.readOnly = false;
+            input.removeAttribute('disabled');
+            input.removeAttribute('readonly');
+            input.classList.remove('pac-target-input');
         }
     };
 
