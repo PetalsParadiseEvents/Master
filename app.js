@@ -13,7 +13,7 @@ function saveCart(skipRouter = false) {
     updateCartBadge();
     if (!skipRouter) {
         if (window.location.hash === '#cart' || window.location.hash === '#checkout') {
-            if (typeof router === 'function') router();
+            if (typeof router === 'function') router(true);
         } else if (window.location.hash === '#rentals') {
             if (typeof refreshRentalsUI === 'function') refreshRentalsUI();
         }
@@ -243,7 +243,6 @@ function applyPromoCode(code) {
             appliedPromo = code.toUpperCase();
             saveCart();
             showToast(`Promo ${appliedPromo} applied! $${promo.discount} off.`);
-            if (typeof router === 'function') router();
         } else {
             showToast(`Min. order for ${code} is $${promo.min}. (Excl. delivery)`);
         }
@@ -613,7 +612,7 @@ function renderServices() {
                 ${services.map(s => `
                     <div class="card">
                         <div class="card-img-wrapper">
-                            <img src="${s.img}" alt="${s.title}">
+                            <img src="${s.img}" alt="${s.title}" onerror="this.onerror=null;this.src='https://via.placeholder.com/300?text=Image+Not+Found'"/>
                         </div>
                         <div class="card-body">
                             <h3 class="card-title">${s.title}</h3>
@@ -665,7 +664,7 @@ function renderGallery() {
                     <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
                         ${images.map(img => `
                             <div class="card" style="padding: 0; overflow: hidden; border-radius: 12px; height: 350px;">
-                                <img src="${img}" alt="${category}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                                <img src="${img}" alt="${category}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;" onerror="this.onerror=null;this.src='https://via.placeholder.com/300?text=Image+Not+Found'" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)">
                             </div>
                         `).join('')}
                     </div>
@@ -1337,7 +1336,7 @@ function renderItemCard(item) {
     return `
         <div class="card">
             <div class="card-img-wrapper">
-                <img src="${item.img}" alt="${item.title}">
+                <img src="${item.img}" alt="${item.title}" onerror="this.onerror=null;this.src='https://via.placeholder.com/300?text=Image+Not+Found'"/>
             </div>
             <div class="card-body">
                 <h3 class="card-title">${item.title}</h3>
@@ -1415,7 +1414,7 @@ function renderConfirmation() {
 }
 
 // Router
-function router() {
+function router(preserveScroll = false) {
     const hash = window.location.hash || '#';
     const main = document.getElementById('main-content');
 
@@ -1516,7 +1515,9 @@ function router() {
         });
     }
 
-    window.scrollTo(0, 0); // Scroll to top on page change
+    if (!preserveScroll) {
+        window.scrollTo(0, 0); // Scroll to top on page change
+    }
 }
 
 // Initialization
