@@ -1033,18 +1033,7 @@ function renderCheckout() {
         appliedPromo = null;
         saveCart();
 
-        const main = document.getElementById('main-content');
-        main.innerHTML = `
-            <div class="container text-center" style="padding: 4rem 2rem;">
-                <div style="color: var(--primary-color); margin-bottom:1rem;">
-                    <i data-feather="check-circle" style="width: 64px; height: 64px;"></i>
-                </div>
-                <h2 class="section-title">Request Prepared!</h2>
-                <p class="section-subtitle">Your email client has been opened to send the rental request to us. We will contact you shortly to confirm availability and coordinate payment in person.</p>
-                <a href="#" class="btn btn-primary mt-2">Back to Home</a>
-            </div>
-        `;
-        feather.replace();
+        window.location.hash = '#confirmation';
     };
 
     window.initAutocomplete = () => {
@@ -1378,6 +1367,40 @@ function initStickyObserver(targetId, actionText, actionFnStr) {
     observer.observe(targetBtn);
 }
 
+function renderConfirmation() {
+    setTimeout(() => {
+        if (typeof confetti === 'function') {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+    }, 100);
+
+    return `
+        <div class="container text-center" style="padding: 4rem 2rem;">
+            <div style="color: var(--primary-color); margin-bottom:1rem;">
+                <i data-feather="check-circle" style="width: 64px; height: 64px;"></i>
+            </div>
+            <h2 class="section-title">Request Prepared!</h2>
+            <p class="section-subtitle">Your email client has been opened to send the rental request to us. We will contact you shortly to confirm availability and coordinate payment in person.</p>
+            
+            <div style="margin-top: 3rem; background: var(--surface-color); padding: 2.5rem; border-radius: 12px; border: 1px dashed var(--primary-color); max-width: 600px; margin-left: auto; margin-right: auto;">
+                <h3 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.5rem;">How was your experience?</h3>
+                <p style="margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 1.1rem;">We'd love to hear from you. Please consider leaving us a review on Google!</p>
+                <a href="https://g.page/r/CXcHwjVlRTQIEBM/review" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+                    <i data-feather="star"></i> Leave a Google Review
+                </a>
+            </div>
+
+            <div style="margin-top: 3rem;">
+                <a href="#" class="btn btn-outline">Back to Home</a>
+            </div>
+        </div>
+    `;
+}
+
 // Router
 function router() {
     const hash = window.location.hash || '#';
@@ -1436,6 +1459,10 @@ function router() {
         case '#checkout': 
             content = renderCheckout(); 
             pageTitle = 'Secure Checkout | Petals Paradise Events';
+            break;
+        case '#confirmation':
+            content = renderConfirmation();
+            pageTitle = 'Order Confirmed | Petals Paradise Events';
             break;
         default: 
             content = renderHome();
