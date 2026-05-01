@@ -564,15 +564,15 @@ function renderRentals() {
 
             <!-- Search Bar -->
             <div style="max-width: 600px; margin: 0 auto 3rem;">
-                <form onsubmit="event.preventDefault(); window.handleSearch(event);" style="position: relative;">
+                <form onsubmit="event.preventDefault(); window.handleSearch(event);" style="position: relative; display: flex; align-items: center; width: 100%;">
                     <i data-feather="search" style="position: absolute; left: 1.5rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); width: 20px;"></i>
                     <input type="text" 
                         placeholder="Search for backdrops, marquee letters, neon signs..." 
                         class="form-control" 
-                        style="padding-left: 3.5rem; border-radius: 50px; height: 60px; font-size: 1.1rem; box-shadow: var(--shadow-sm); border: 2px solid var(--border-color);"
+                        style="padding-left: 3.5rem; padding-right: 110px; border-radius: 50px; height: 60px; font-size: 1.1rem; box-shadow: var(--shadow-sm); border: 2px solid var(--border-color); width: 100%;"
                         oninput="window.handleSearch(event)"
                         value="${searchQuery}">
-                    <button type="submit" style="display: none;"></button>
+                    <button type="submit" class="btn btn-primary" style="position: absolute; right: 6px; height: 48px; border-radius: 40px; padding: 0 1.5rem; margin: 0; font-size: 1rem; border: none; display: flex; align-items: center; justify-content: center;">Search</button>
                 </form>
             </div>
 
