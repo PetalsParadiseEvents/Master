@@ -13,7 +13,7 @@ function saveCart(skipRouter = false) {
     updateCartBadge();
     if (!skipRouter) {
         if (window.location.hash === '#cart' || window.location.hash === '#checkout') {
-            if (typeof router === 'function') router();
+            if (typeof router === 'function') router(true);
         } else if (window.location.hash === '#rentals') {
             if (typeof refreshRentalsUI === 'function') refreshRentalsUI();
         }
@@ -243,7 +243,6 @@ function applyPromoCode(code) {
             appliedPromo = code.toUpperCase();
             saveCart();
             showToast(`Promo ${appliedPromo} applied! $${promo.discount} off.`);
-            if (typeof router === 'function') router();
         } else {
             showToast(`Min. order for ${code} is $${promo.min}. (Excl. delivery)`);
         }
@@ -1415,7 +1414,7 @@ function renderConfirmation() {
 }
 
 // Router
-function router() {
+function router(preserveScroll = false) {
     const hash = window.location.hash || '#';
     const main = document.getElementById('main-content');
 
@@ -1516,7 +1515,9 @@ function router() {
         });
     }
 
-    window.scrollTo(0, 0); // Scroll to top on page change
+    if (!preserveScroll) {
+        window.scrollTo(0, 0); // Scroll to top on page change
+    }
 }
 
 // Initialization
