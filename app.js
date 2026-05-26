@@ -332,6 +332,7 @@ const rentalItems = [
     { id: 3, title: 'Adult Rectangular Folding Table Rental', price: 8, img: './wp-content/uploads/2025/04/Tables.webp', desc: 'Perfect seating to match any occasion and theme.' },
     { id: 4, title: 'Adult Folding Chair', price: 2, img: './wp-content/uploads/2025/04/Chairs.webp', desc: 'Perfect seating for any occasion. Note: Bulk discount! $1.50 each when renting 30 or more.' },
     { id: 5, title: 'Wedding Tent (16x26)', price: 150, img: './wp-content/uploads/2026/04/image.png', desc: 'Light weight yet sturdy, high quality yet affordable tent.' },
+    { id: 25, title: 'Tent (10x20)', price: 100, img: './wp-content/uploads/2026/05/tent-10x20.jpg', desc: '10x20 ft canopy tent, perfect for outdoor events, graduations, and parties.' },
     { id: 6, title: 'Round Cylinder Pedestal Display', price: 30, img: './wp-content/uploads/2025/05/Screen-Shot-2025-05-11-at-9.53.07-PM.png', desc: 'Set of 5 pedestals with gold/white covers for grand displays.' },
     { id: 7, title: 'Buffet Food Warmers', price: 10, img: './wp-content/uploads/2025/04/Buffet-Food-Warmers.webp', desc: 'Let your guests enjoy every bite at the perfect temperature.' },
     { id: 8, title: 'Loveseat for rental', price: 100, img: './wp-content/uploads/2026/03/IMG_1048-scaled.jpg', desc: 'Perfect for parties, baby showers, weddings, and more. Visit our website to explore our full range of rental items.' },
@@ -350,8 +351,7 @@ const rentalItems = [
     { id: 21, title: 'Good Vibes Only Neon Sign', price: 10, img: './wp-content/uploads/2025/07/image-5.png', desc: 'Trendy \"Good Vibes Only\" neon sign for a modern event feel.' },
     { id: 22, title: 'Congrats Grad Neon Sign', price: 10, img: './wp-content/uploads/2025/07/81i8bvay0GL._AC_SX679_.jpg', desc: 'Celebratory Congrats Grad neon sign - perfect for Class of 2026 parties!' },
     { id: 23, title: 'Mehandi Umbrella Set', price: 3, img: './wp-content/uploads/2025/05/Umbrella.jpg', desc: 'Colorful traditional umbrellas for Mehandi or festive ceremonies ($3 each).' },
-    { id: 24, title: 'Easel for Rent', price: 10, img: './wp-content/uploads/2025/09/gold-litton-lane-boards-easels-27391-64_600.jpg', desc: 'Elegant gold easel for displaying welcome signs or photos.' },
-    { id: 25, title: 'Tent (10x20)', price: 100, img: './wp-content/uploads/2026/05/tent-10x20.jpg', desc: '10x20 ft canopy tent, perfect for outdoor events, graduations, and parties.' }
+    { id: 24, title: 'Easel for Rent', price: 10, img: './wp-content/uploads/2025/09/gold-litton-lane-boards-easels-27391-64_600.jpg', desc: 'Elegant gold easel for displaying welcome signs or photos.' }
 ];
 
 const services = [
@@ -1331,7 +1331,12 @@ function renderCheckout() {
 
 function renderGraduation() {
     const gradSpecific = rentalItems.filter(i => i.title.toLowerCase().includes('grad') || i.title.includes('Marquee'));
-    const essentials = rentalItems.filter(i => ['Round Fold-In-Half Table', 'Adult Folding Chair', 'Wedding Tent (16x26)', 'Tent (10x20)'].includes(i.title));
+    const essentials = [
+        rentalItems.find(i => i.title === 'Wedding Tent (16x26)'),
+        rentalItems.find(i => i.title === 'Tent (10x20)'),
+        rentalItems.find(i => i.title === 'Round Fold-In-Half Table'),
+        rentalItems.find(i => i.title === 'Adult Folding Chair')
+    ].filter(Boolean);
 
     return `
         <div class="container">
