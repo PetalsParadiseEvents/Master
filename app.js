@@ -350,7 +350,8 @@ const rentalItems = [
     { id: 21, title: 'Good Vibes Only Neon Sign', price: 10, img: './wp-content/uploads/2025/07/image-5.png', desc: 'Trendy \"Good Vibes Only\" neon sign for a modern event feel.' },
     { id: 22, title: 'Congrats Grad Neon Sign', price: 10, img: './wp-content/uploads/2025/07/81i8bvay0GL._AC_SX679_.jpg', desc: 'Celebratory Congrats Grad neon sign - perfect for Class of 2026 parties!' },
     { id: 23, title: 'Mehandi Umbrella Set', price: 3, img: './wp-content/uploads/2025/05/Umbrella.jpg', desc: 'Colorful traditional umbrellas for Mehandi or festive ceremonies ($3 each).' },
-    { id: 24, title: 'Easel for Rent', price: 10, img: './wp-content/uploads/2025/09/gold-litton-lane-boards-easels-27391-64_600.jpg', desc: 'Elegant gold easel for displaying welcome signs or photos.' }
+    { id: 24, title: 'Easel for Rent', price: 10, img: './wp-content/uploads/2025/09/gold-litton-lane-boards-easels-27391-64_600.jpg', desc: 'Elegant gold easel for displaying welcome signs or photos.' },
+    { id: 25, title: 'Tent (10x20)', price: 100, img: './wp-content/uploads/2026/05/tent-10x20.jpg', desc: '10x20 ft canopy tent, perfect for outdoor events, graduations, and parties.' }
 ];
 
 const services = [
@@ -1330,7 +1331,7 @@ function renderCheckout() {
 
 function renderGraduation() {
     const gradSpecific = rentalItems.filter(i => i.title.toLowerCase().includes('grad') || i.title.includes('Marquee'));
-    const essentials = rentalItems.filter(i => ['Round Fold-In-Half Table', 'Adult Folding Chair', 'Wedding Tent (16x26)'].includes(i.title));
+    const essentials = rentalItems.filter(i => ['Round Fold-In-Half Table', 'Adult Folding Chair', 'Wedding Tent (16x26)', 'Tent (10x20)'].includes(i.title));
 
     return `
         <div class="container">
