@@ -4,6 +4,7 @@ let appliedPromo = JSON.parse(localStorage.getItem('appliedPromo')) || null;
 let fulfillmentMethod = localStorage.getItem('fulfillmentMethod') || 'Pickup';
 let rentalDays = parseInt(localStorage.getItem('rentalDays')) || 1;
 let searchQuery = '';
+let selectedCategory = 'All';
 
 function saveCart(skipRouter = false) {
     localStorage.setItem('cart', JSON.stringify(cart));
@@ -42,6 +43,11 @@ window.refreshRentalsUI = () => {
     if (!grid) return;
     
     const filtered = rentalItems.filter(item => {
+        // Category filtering
+        if (selectedCategory && selectedCategory !== 'All') {
+            if (item.category !== selectedCategory) return false;
+        }
+
         const title = item.title.toLowerCase();
         const desc = (item.desc || "").toLowerCase();
         const category = (item.category || "").toLowerCase();
@@ -354,6 +360,28 @@ const rentalItems = [
     { id: 24, title: 'Easel for Rent', price: 10, img: './wp-content/uploads/2025/09/gold-litton-lane-boards-easels-27391-64_600.jpg', desc: 'Elegant gold easel for displaying welcome signs or photos.' }
 ];
 
+// Dynamically categorize rental items for advanced sidebar & filter bar
+rentalItems.forEach(item => {
+    const title = item.title.toLowerCase();
+    if (title.includes('chair') || title.includes('loveseat')) {
+        item.category = 'Chairs';
+    } else if (title.includes('table')) {
+        item.category = 'Tables';
+    } else if (title.includes('tent')) {
+        item.category = 'Tents';
+    } else if (title.includes('warmer') || title.includes('buffet')) {
+        item.category = 'Buffet Sets';
+    } else if (title.includes('backdrop') || title.includes('stand') || title.includes('photo prop') || title.includes('swing')) {
+        item.category = 'Backdrops';
+    } else if (title.includes('marquee') || title.includes('number') || title.includes('letter')) {
+        item.category = 'Marquee Letters';
+    } else if (title.includes('neon')) {
+        item.category = 'Neon Signs';
+    } else {
+        item.category = 'Traditional Decor';
+    }
+});
+
 const services = [
     { title: 'Wedding Party', desc: 'From breathtaking floral arrangements to elegant backdrops, we craft the perfect ambiance for your special day.', img: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80' },
     { title: 'HouseWarming', desc: 'Elegant décor and personalized styling for your housewarming party, creating a warm and welcoming ambiance.', img: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80' },
@@ -409,12 +437,36 @@ function renderNavbar() {
         </a>
         
         <!-- Mobile Menu Overlay -->
+        <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
+
+        <!-- Mobile Left Nav Menu Sidebar -->
         <div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Mobile navigation">
             <button class="mobile-menu-close" id="mobile-menu-close" aria-label="Close navigation menu">
                 <i data-feather="x"></i>
             </button>
             <a href="#" class="nav-link">Home</a>
-            <a href="#rentals" class="nav-link">Rentals</a>
+            
+            <!-- Rentals Section with Expandable Inventory Categories -->
+            <div class="menu-item-with-submenu">
+                <div class="submenu-toggle-wrapper">
+                    <a href="#rentals" class="nav-link">Rentals</a>
+                    <button class="submenu-toggle-btn" id="rentals-toggle" aria-label="Toggle rentals categories">
+                        <i data-feather="chevron-down"></i>
+                    </button>
+                </div>
+                <div class="submenu-container" id="rentals-submenu">
+                    <a href="#rentals" data-category="All" class="submenu-link"><i data-feather="grid"></i> All Rentals</a>
+                    <a href="#rentals" data-category="Chairs" class="submenu-link"><i data-feather="check"></i> Chairs</a>
+                    <a href="#rentals" data-category="Tables" class="submenu-link"><i data-feather="minus"></i> Tables</a>
+                    <a href="#rentals" data-category="Buffet Sets" class="submenu-link"><i data-feather="coffee"></i> Buffet Sets</a>
+                    <a href="#rentals" data-category="Tents" class="submenu-link"><i data-feather="home"></i> Tents</a>
+                    <a href="#rentals" data-category="Backdrops" class="submenu-link"><i data-feather="image"></i> Backdrops</a>
+                    <a href="#rentals" data-category="Marquee Letters" class="submenu-link"><i data-feather="type"></i> Marquees</a>
+                    <a href="#rentals" data-category="Neon Signs" class="submenu-link"><i data-feather="zap"></i> Neon Signs</a>
+                    <a href="#rentals" data-category="Traditional Decor" class="submenu-link"><i data-feather="award"></i> Traditional</a>
+                </div>
+            </div>
+
             <a href="#graduation" class="nav-link" style="color: #f1c40f;">GRAD 2026</a>
             <a href="#services" class="nav-link">Services</a>
             <a href="#videos" class="nav-link">Videos</a>
@@ -429,14 +481,49 @@ function renderNavbar() {
     const menuBtn = document.getElementById('mobile-menu-btn');
     const closeBtn = document.getElementById('mobile-menu-close');
     const mobileMenu = document.getElementById('mobile-menu');
+    const overlay = document.getElementById('mobile-menu-overlay');
 
-    if (menuBtn && closeBtn && mobileMenu) {
-        menuBtn.addEventListener('click', () => mobileMenu.classList.add('active'));
-        closeBtn.addEventListener('click', () => mobileMenu.classList.remove('active'));
+    if (menuBtn && closeBtn && mobileMenu && overlay) {
+        const openMenu = () => {
+            mobileMenu.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        };
+
+        const closeMenu = () => {
+            mobileMenu.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        };
+
+        menuBtn.addEventListener('click', openMenu);
+        closeBtn.addEventListener('click', closeMenu);
+        overlay.addEventListener('click', closeMenu);
         
         // Close menu on link click
         mobileMenu.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', () => mobileMenu.classList.remove('active'));
+            link.addEventListener('click', closeMenu);
+        });
+
+        // Toggle Rentals categories accordion
+        const rentalsToggle = document.getElementById('rentals-toggle');
+        const rentalsSubmenu = document.getElementById('rentals-submenu');
+        if (rentalsToggle && rentalsSubmenu) {
+            rentalsToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                rentalsToggle.classList.toggle('open');
+                rentalsSubmenu.classList.toggle('open');
+            });
+        }
+
+        // Submenu category selection links
+        mobileMenu.querySelectorAll('.submenu-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const cat = link.getAttribute('data-category');
+                window.selectRentalsCategory(cat);
+                closeMenu();
+            });
         });
     }
 }
@@ -563,6 +650,35 @@ function refreshRentalsUI() {
     }
 }
 
+// Category filter logic
+window.selectRentalsCategory = (category) => {
+    selectedCategory = category;
+    
+    // Update category pills if currently rendered on page
+    document.querySelectorAll('.category-pill').forEach(pill => {
+        if (pill.textContent.trim() === category) {
+            pill.classList.add('active');
+        } else {
+            pill.classList.remove('active');
+        }
+    });
+
+    // Update active state of submenu links in the left nav
+    document.querySelectorAll('.submenu-link').forEach(link => {
+        if (link.getAttribute('data-category') === category) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+
+    if (window.location.hash !== '#rentals') {
+        window.location.hash = '#rentals';
+    } else {
+        if (window.refreshRentalsUI) window.refreshRentalsUI();
+    }
+};
+
 function renderRentals() {
     window.handleAddToCart = (id) => {
         const item = rentalItems.find(i => i.id === id);
@@ -572,7 +688,18 @@ function renderRentals() {
     // Trigger initial refresh
     setTimeout(() => {
         if (window.refreshRentalsUI) window.refreshRentalsUI();
+        
+        // Sync active state of submenu link
+        document.querySelectorAll('.submenu-link').forEach(link => {
+            if (link.getAttribute('data-category') === selectedCategory) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
     }, 0);
+
+    const categories = ['All', 'Chairs', 'Tables', 'Buffet Sets', 'Tents', 'Backdrops', 'Marquee Letters', 'Neon Signs', 'Traditional Decor'];
 
     return `
         <div class="container">
@@ -582,7 +709,7 @@ function renderRentals() {
             </div>
 
             <!-- Search Bar -->
-            <div style="max-width: 600px; margin: 0 auto 3rem;">
+            <div style="max-width: 600px; margin: 0 auto 1.5rem;">
                 <form onsubmit="event.preventDefault(); window.handleSearch(event);" style="position: relative;">
                     <i data-feather="search" style="position: absolute; left: 1.5rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); width: 20px;"></i>
                     <input type="text" 
@@ -593,6 +720,14 @@ function renderRentals() {
                         value="${searchQuery}">
                     <button type="submit" style="display: none;"></button>
                 </form>
+            </div>
+
+            <!-- Categories Filter Bar -->
+            <div class="category-filter-bar">
+                ${categories.map(cat => {
+                    const isActive = selectedCategory === cat;
+                    return `<button onclick="window.selectRentalsCategory('${cat}')" class="category-pill ${isActive ? 'active' : ''}">${cat}</button>`;
+                }).join('')}
             </div>
 
             <div id="rentals-grid" class="grid">
