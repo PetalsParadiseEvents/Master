@@ -721,6 +721,23 @@ function renderRentals() {
         if (activePill && typeof activePill.scrollIntoView === 'function') {
             activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
         }
+
+        // Hide swipe prompt dynamically upon scroll interaction
+        const bar = document.querySelector('.category-filter-bar');
+        const prompt = document.getElementById('filter-scroll-prompt');
+        if (bar && prompt) {
+            bar.addEventListener('scroll', function hidePrompt() {
+                if (bar.scrollLeft > 15) {
+                    prompt.style.opacity = '0';
+                    prompt.style.transform = 'translateY(5px)';
+                    setTimeout(() => {
+                        prompt.style.display = 'none';
+                    }, 500);
+                    // Unbind listener immediately
+                    bar.removeEventListener('scroll', hidePrompt);
+                }
+            });
+        }
     }, 50);
 
     return `
@@ -755,6 +772,11 @@ function renderRentals() {
                         </button>
                     `;
                 }).join('')}
+            </div>
+
+            <!-- Swipe/Scroll Assistant Indicator -->
+            <div class="filter-scroll-prompt" id="filter-scroll-prompt">
+                <span>Swipe left / right for more categories</span> <i data-feather="arrow-right" class="no-zoom" style="width: 14px; height: 14px; stroke-width: 2.5px;"></i>
             </div>
 
             <div id="rentals-grid" class="grid">
