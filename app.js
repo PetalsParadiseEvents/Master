@@ -651,12 +651,13 @@ function refreshRentalsUI() {
 }
 
 // Category filter logic
-window.selectRentalsCategory = (category) => {
+window.selectRentalsCategory = (category, element) => {
     selectedCategory = category;
     
     // Update category pills if currently rendered on page
     document.querySelectorAll('.category-pill').forEach(pill => {
-        if (pill.textContent.trim() === category) {
+        const text = pill.childNodes[0].textContent.trim();
+        if (text === category) {
             pill.classList.add('active');
         } else {
             pill.classList.remove('active');
@@ -672,6 +673,11 @@ window.selectRentalsCategory = (category) => {
         }
     });
 
+    // Smooth scroll the selected pill to center on mobile
+    if (element && typeof element.scrollIntoView === 'function') {
+        element.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+
     if (window.location.hash !== '#rentals') {
         window.location.hash = '#rentals';
     } else {
@@ -685,6 +691,18 @@ function renderRentals() {
         if (item) addToCart(item);
     };
 
+    const categories = ['All', 'Chairs', 'Tables', 'Buffet Sets', 'Tents', 'Backdrops', 'Marquee Letters', 'Neon Signs', 'Traditional Decor'];
+
+    // Calculate dynamic counts
+    const counts = {};
+    categories.forEach(cat => {
+        if (cat === 'All') {
+            counts[cat] = rentalItems.length;
+        } else {
+            counts[cat] = rentalItems.filter(item => item.category === cat).length;
+        }
+    });
+
     // Trigger initial refresh
     setTimeout(() => {
         if (window.refreshRentalsUI) window.refreshRentalsUI();
@@ -697,9 +715,13 @@ function renderRentals() {
                 link.classList.remove('active');
             }
         });
-    }, 0);
 
-    const categories = ['All', 'Chairs', 'Tables', 'Buffet Sets', 'Tents', 'Backdrops', 'Marquee Letters', 'Neon Signs', 'Traditional Decor'];
+        // Smooth scroll the active category pill into center on load
+        const activePill = document.querySelector('.category-pill.active');
+        if (activePill && typeof activePill.scrollIntoView === 'function') {
+            activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+    }, 50);
 
     return `
         <div class="container">
@@ -726,7 +748,12 @@ function renderRentals() {
             <div class="category-filter-bar">
                 ${categories.map(cat => {
                     const isActive = selectedCategory === cat;
-                    return `<button onclick="window.selectRentalsCategory('${cat}')" class="category-pill ${isActive ? 'active' : ''}">${cat}</button>`;
+                    const count = counts[cat] || 0;
+                    return `
+                        <button onclick="window.selectRentalsCategory('${cat}', this)" class="category-pill ${isActive ? 'active' : ''}">
+                            ${cat} <span class="pill-count">${count}</span>
+                        </button>
+                    `;
                 }).join('')}
             </div>
 
