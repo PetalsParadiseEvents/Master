@@ -1,0 +1,92 @@
+/*
+Theme Name: Event Decor Child
+Theme URI: https://github.com/PetalsParadiseEvents/Master
+Description: Child theme for the Event Decor site adding interactive components (carousel, lightbox, parallax, etc.).
+Author: Antigravity AI
+Template: twentytwentyone
+Version: 1.0.0
+*/
+
+/* Import parent theme styles */
+@import url("../twentytwentyone/style.css");
+
+/* --- Design Tokens --- */
+:root {
+  --color-primary: hsl(190, 80%, 40%);   /* teal */
+  --color-secondary: hsl(45, 80%, 55%);  /* gold */
+  --color-bg: hsl(210, 15%, 95%);
+  --color-bg-dark: hsl(210, 15%, 10%);
+  --color-text: hsl(210, 10%, 15%);
+  --font-primary: "Inter", system-ui, sans-serif;
+  --transition-fast: 0.2s ease;
+  --radius: 0.75rem;
+}
+
+body {
+  font-family: var(--font-primary);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* Glassmorphism cards */
+.glass-card {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin: 1rem 0;
+}
+
+/* Hover micro‑animation for buttons */
+button, .btn {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+button:hover, .btn:hover {
+  transform: translateY(-2px);
+  background: hsl(190, 80%, 45%);
+}
+
+/* Swiper navigation arrows style */
+.swiper-button-next,
+.swiper-button-prev {
+  color: var(--color-primary) !important;
+}
+
+/* Lightbox overlay customization */
+.glightbox .glightbox-container {
+  border-radius: var(--radius);
+}
+
+/* Parallax section */
+.parallax {
+  position: relative;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  min-height: 300px;
+}
+.parallax::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+}
+.parallax > .content {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  padding: 4rem 2rem;
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .parallax > .content { padding: 2rem 1rem; }
+  .glass-card { padding: 1rem; }
+}

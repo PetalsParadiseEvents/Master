@@ -24,7 +24,8 @@ function saveCart(skipRouter = false) {
 window.handleSearch = (e) => {
     // Handle both input events and form submit events
     const val = e.target.value !== undefined ? e.target.value : (e.target.querySelector ? e.target.querySelector('input').value : searchQuery);
-    searchQuery = val.toLowerCase();
+    // Sanitize: strip HTML tags before storing
+    searchQuery = val.replace(/<[^>]*>/g, '').toLowerCase();
     if (window.refreshRentalsUI) window.refreshRentalsUI();
 };
 
@@ -68,10 +69,12 @@ window.refreshRentalsUI = () => {
     });
 
     if (filtered.length === 0) {
+        // Escape displayed query to prevent XSS
+        const safeQuery = searchQuery.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         grid.innerHTML = `
             <div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem;">
                 <i data-feather="search" style="width: 48px; height: 48px; color: var(--border-color); margin-bottom: 1rem;"></i>
-                <h3 style="color: var(--text-secondary);">No items found for "${searchQuery}"</h3>
+                <h3 style="color: var(--text-secondary);">No items found for &#8220;${safeQuery}&#8221;</h3>
                 <p style="color: var(--text-secondary); margin-top: 0.5rem;">Try searching for something else or browse all categories.</p>
             </div>
         `;
@@ -1764,30 +1767,48 @@ function initImageModal() {
 
     if (!modal || !modalImg) return;
 
-    // Global listener for image clicks
-    document.addEventListener('click', (e) => {
-        if (e.target.tagName === 'IMG' && !e.target.classList.contains('no-zoom') && !e.target.closest('.sms-btn')) {
-            modal.classList.add('active');
-            modalImg.src = e.target.src;
-            document.body.style.overflow = 'hidden'; // Prevent scroll
-        }
-    });
+    // Track the element that opened the modal for focus restoration
+    let lastFocused = null;
+
+    const openModal = (src, altText) => {
+        lastFocused = document.activeElement;
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        modalImg.src = src;
+        modalImg.alt = altText || 'Rental item photo';
+        document.body.style.overflow = 'hidden';
+        // Move focus to close button for keyboard users
+        if (closeBtn) setTimeout(() => closeBtn.focus(), 50);
+    };
 
     // Close modal
     const closeModal = () => {
         modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
+        // Restore focus
+        if (lastFocused) lastFocused.focus();
     };
 
-    closeBtn.addEventListener('click', closeModal);
+    // Global listener for image clicks
+    document.addEventListener('click', (e) => {
+        if (e.target.tagName === 'IMG' && !e.target.classList.contains('no-zoom') && !e.target.closest('.sms-btn')) {
+            openModal(e.target.src, e.target.alt);
+        }
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => {
         if (e.target === modal) closeModal();
     });
 
     // ESC key to close
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeModal();
+        if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
     });
+
+    // Expose so card inline-onclick can call it
+    window.openImageModal = openModal;
 }
 
 function renderSMSWidget() {

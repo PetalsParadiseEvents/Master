@@ -1440,3 +1440,51 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
     opacity: 1;
 }
 
+/* ===== Modal Close Button Base Styles ===== */
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #fff;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    line-height: 1;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+.modal-close:hover {
+    background: rgba(255,255,255,0.15);
+}
+.modal-close:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* ===== Button & Interactive Focus Rings ===== */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 3px;
+}
+
+/* ===== Reduced Motion Support ===== */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ===== Print Styles ===== */
+@media print {
+    #navbar, #top-banner, #footer, .sticky-mobile-action,
+    #sms-widget, .btn, .modal-close, #image-modal { display: none !important; }
+    body { background: #fff; color: #000; }
+    a { color: #000; text-decoration: underline; }
+    h1, h2, h3 { color: #000; }
+}
