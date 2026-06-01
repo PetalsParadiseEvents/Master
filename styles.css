@@ -969,113 +969,102 @@ footer {
     padding-left: 0.25rem;
   }
 
-  /* Desktop Rental Filters Styling */
-  @media (min-width: 769px) {
+  /* ===== DESKTOP RENTAL FILTERS - ADD THIS TO styles.css ===== */
 
-    /* Filter Container */
-    .filter-section {
-      background: var(--surface-color);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.5rem;
-      align-items: center;
-    }
-
-    /* Filter Group */
-    .filter-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      flex: 1;
-      min-width: 200px;
-    }
-
-    /* Filter Label */
-    .filter-label {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    /* Filter Select/Checkbox Wrapper */
-    .filter-options {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    /* Filter Checkbox/Radio Styles */
-    .filter-options input[type="checkbox"],
-    .filter-options input[type="radio"] {
-      cursor: pointer;
-    }
-
-    .filter-option-label {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-      transition: var(--transition);
-    }
-
-    .filter-option-label:hover {
-      color: var(--primary-color);
-    }
-
-    .filter-option-label input:checked~span {
-      color: var(--primary-color);
-      font-weight: 600;
-    }
-
-    /* Filter Button */
-    .filter-btn {
-      background: var(--primary-color);
-      color: var(--bg-color);
-      padding: 0.8rem 2rem;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      align-self: flex-end;
-      font-size: 0.9rem;
-    }
-
-    .filter-btn:hover {
-      background: var(--primary-hover);
-      transform: translateY(-2px);
-    }
-
-    /* Clear Filters Button */
-    .clear-filters-btn {
-      background: transparent;
-      color: var(--text-secondary);
-      border: 1px solid var(--border-color);
-      padding: 0.8rem 1.5rem;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: var(--transition);
-      font-size: 0.9rem;
-    }
-
-    .clear-filters-btn:hover {
-      border-color: var(--primary-color);
-      color: var(--primary-color);
-    }
+  /* Category Filter Bar */
+  .category-filter-bar {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding: 1.5rem 0;
+    margin-bottom: 2rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) transparent;
+    scroll-behavior: smooth;
   }
 
-  /* Keep Mobile Filters Hidden on Desktop */
-  @media (min-width: 769px) {
-    .mobile-filter-toggle {
-      display: none;
+  .category-filter-bar::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .category-filter-bar::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+  }
+
+  /* Category Pills */
+  .category-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--surface-color);
+    border: 2px solid var(--border-color);
+    border-radius: 25px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    font-family: var(--font-nav);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+
+  .category-pill:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: rgba(212, 175, 55, 0.05);
+    transform: translateY(-2px);
+  }
+
+  .category-pill.active {
+    background: var(--primary-color);
+    color: var(--bg-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    font-weight: 600;
+  }
+
+  .pill-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .category-pill.active .pill-count {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--bg-color);
+  }
+
+  /* Filter Scroll Prompt */
+  .filter-scroll-prompt {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    animation: fadeIn 0.6s ease-out;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  @media (max-width: 768px) {
+    .filter-scroll-prompt {
+      display: flex;
+    }
+
+    .category-filter-bar {
+      margin-top: 1rem;
     }
   }
 
