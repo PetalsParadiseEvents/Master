@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Rentals Near Me | Northern Virginia &amp; DMV Service Areas | Petals Paradise Events</title>
+    <meta name="description" content="Petals Paradise Events serves all of Northern Virginia &amp; the DMV area. Find party rentals and event decor near you in Ashburn, Aldie, Leesburg, Chantilly, Sterling, Herndon, Reston, Fairfax &amp; Loudoun County.">
+    <link rel="canonical" href="https://petalsparadiseevents.com/locations/">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://petalsparadiseevents.com/locations/">
+    <meta property="og:title" content="Event Rentals Near Me | Northern Virginia Service Areas | Petals Paradise Events">
+    <meta property="og:description" content="Premium party rentals and event decor serving all of Northern Virginia and the DMV area. Find us in Ashburn, Aldie, Leesburg, Chantilly, Sterling, Herndon, Reston, Fairfax &amp; Loudoun County.">
+    <meta property="og:image" content="https://petalsparadiseevents.com/wp-content/uploads/2025/07/IMG_9901-1-scaled.jpg">
+
+    <!-- JSON-LD: BreadcrumbList -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://petalsparadiseevents.com/"},
+        {"@type": "ListItem", "position": 2, "name": "Service Areas", "item": "https://petalsparadiseevents.com/locations/"}
+      ]
+    }
+    </script>
+
+    <!-- JSON-LD: ItemList of location pages -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "Petals Paradise Events Service Areas",
+      "description": "Party rental and event decor service areas across Northern Virginia and the DMV area.",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Event Rentals Aldie VA", "url": "https://petalsparadiseevents.com/locations/aldie-va.html"},
+        {"@type": "ListItem", "position": 2, "name": "Event Rentals Ashburn VA", "url": "https://petalsparadiseevents.com/locations/ashburn-va.html"},
+        {"@type": "ListItem", "position": 3, "name": "Event Rentals South Riding VA", "url": "https://petalsparadiseevents.com/locations/south-riding-va.html"},
+        {"@type": "ListItem", "position": 4, "name": "Event Rentals Chantilly VA", "url": "https://petalsparadiseevents.com/locations/chantilly-va.html"},
+        {"@type": "ListItem", "position": 5, "name": "Event Rentals Leesburg VA", "url": "https://petalsparadiseevents.com/locations/leesburg-va.html"},
+        {"@type": "ListItem", "position": 6, "name": "Event Rentals Sterling VA", "url": "https://petalsparadiseevents.com/locations/sterling-va.html"},
+        {"@type": "ListItem", "position": 7, "name": "Event Rentals Herndon VA", "url": "https://petalsparadiseevents.com/locations/herndon-va.html"},
+        {"@type": "ListItem", "position": 8, "name": "Event Rentals Reston VA", "url": "https://petalsparadiseevents.com/locations/reston-va.html"},
+        {"@type": "ListItem", "position": 9, "name": "Event Rentals Fairfax VA", "url": "https://petalsparadiseevents.com/locations/fairfax-va.html"},
+        {"@type": "ListItem", "position": 10, "name": "Event Rentals Loudoun County VA", "url": "https://petalsparadiseevents.com/locations/loudoun-county-va.html"}
+      ]
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        /* Hub-page specific styles */
+        .locations-hero {
+            padding-top: calc(var(--banner-height) + 90px + 4rem);
+            padding-bottom: 4rem;
+            text-align: center;
+            background: radial-gradient(ellipse at top, rgba(212,175,55,0.12) 0%, transparent 65%);
+        }
+        .locations-hero h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            background: linear-gradient(to right, #b8860b, #d4af37, #f1c40f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+        .locations-hero p {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 680px;
+            margin: 0 auto 2.5rem;
+        }
+        .locations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .location-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .location-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(to right, #b8860b, #d4af37, #f1c40f);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+        .location-card:hover::before { transform: scaleX(1); }
+        .location-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary-color);
+            box-shadow: 0 12px 40px rgba(212,175,55,0.15);
+        }
+        .location-card .loc-icon {
+            font-size: 2rem;
+            margin-bottom: 0.25rem;
+        }
+        .location-card h2 {
+            font-family: var(--font-nav);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        .location-card p {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        .location-card .loc-arrow {
+            margin-top: auto;
+            font-size: 0.85rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .hub-cta {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(212,175,55,0.02));
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            margin: 2rem 0;
+        }
+        .hub-cta h2 {
+            font-family: var(--font-heading);
+            font-size: clamp(1.6rem, 3vw, 2.4rem);
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        .hub-cta p { color: var(--text-secondary); max-width: 560px; margin: 0 auto 2rem; }
+        .hub-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 0.85rem 2rem; border-radius: 50px; font-weight: 700; font-size: 0.95rem; transition: all 0.3s ease; cursor: pointer; text-decoration: none; }
+        .btn-primary { background: linear-gradient(135deg, #d4af37, #f1c40f); color: #0d0f12; box-shadow: 0 4px 20px rgba(212,175,55,0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(212,175,55,0.5); }
+        .btn-outline { border: 2px solid var(--primary-color); color: var(--primary-color); }
+        .btn-outline:hover { background: var(--primary-color); color: #0d0f12; }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Promo Banner -->
+    <a href="https://petalsparadiseevents.com/#contact" class="promo-banner" aria-label="Book your event — contact us today">
+        <div class="ticker-wrap">
+            <div class="ticker">
+                <span class="ticker-item">🌸 Serving ALL of Northern Virginia &amp; DMV &nbsp;|&nbsp; 📞 848-448-6993 &nbsp;|&nbsp; ✨ Premium Party Rentals from $2 &nbsp;|&nbsp; 🎓 Graduation 2026 Packages Available &nbsp;|&nbsp; 💛 Chair Rentals · Table Rentals · Tent Rentals · Backdrop Rentals &nbsp;|&nbsp;</span>
+                <span class="ticker-item">🌸 Serving ALL of Northern Virginia &amp; DMV &nbsp;|&nbsp; 📞 848-448-6993 &nbsp;|&nbsp; ✨ Premium Party Rentals from $2 &nbsp;|&nbsp; 🎓 Graduation 2026 Packages Available &nbsp;|&nbsp; 💛 Chair Rentals · Table Rentals · Tent Rentals · Backdrop Rentals &nbsp;|&nbsp;</span>
+            </div>
+        </div>
+    </a>
+
+    <!-- Navbar -->
+    <nav class="glass-nav" aria-label="Main navigation">
+        <a href="https://petalsparadiseevents.com/" class="logo-text" aria-label="Petals Paradise Events — Home">Petals Paradise Events</a>
+        <div class="nav-links" style="display:flex;gap:1.5rem;align-items:center;font-family:var(--font-nav);font-size:0.85rem;font-weight:600;">
+            <a href="https://petalsparadiseevents.com/#rentals" style="color:var(--text-secondary);text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;">Rentals</a>
+            <a href="https://petalsparadiseevents.com/#services" style="color:var(--text-secondary);text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;">Services</a>
+            <a href="https://petalsparadiseevents.com/#gallery" style="color:var(--text-secondary);text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;">Gallery</a>
+            <a href="https://petalsparadiseevents.com/#contact" style="color:var(--text-secondary);text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;">Contact</a>
+        </div>
+    </nav>
+
+    <main id="main-content">
+        <!-- Hero -->
+        <section class="locations-hero">
+            <nav aria-label="Breadcrumb" style="margin-bottom:1.5rem;">
+                <ol style="display:flex;justify-content:center;gap:0.5rem;list-style:none;font-size:0.85rem;color:var(--text-secondary);">
+                    <li><a href="https://petalsparadiseevents.com/" style="color:var(--primary-color);">Home</a></li>
+                    <li aria-hidden="true" style="color:var(--border-color);">›</li>
+                    <li aria-current="page" style="color:var(--text-secondary);">Service Areas</li>
+                </ol>
+            </nav>
+            <h1>Event Rentals Near You in Northern Virginia &amp; DMV</h1>
+            <p>Petals Paradise Events proudly delivers premium party rentals and exquisite event decor across the entire Northern Virginia and DC Metro area. Find your city below to explore what we offer near you.</p>
+            <div class="hub-btns">
+                <a href="https://petalsparadiseevents.com/#rentals" class="btn btn-primary">Browse All Rentals</a>
+                <a href="tel:+18484486993" class="btn btn-outline">📞 Call Us Now</a>
+            </div>
+        </section>
+
+        <!-- Location Cards Grid -->
+        <section aria-labelledby="areas-heading">
+            <h2 id="areas-heading" style="text-align:center;font-family:var(--font-heading);font-size:1.8rem;color:var(--primary-color);padding:1rem 2rem 0;">Our Service Areas</h2>
+            <div class="locations-grid">
+
+                <a href="./aldie-va.html" class="location-card">
+                    <div class="loc-icon">📍</div>
+                    <h2>Aldie, VA</h2>
+                    <p>Our home base in western Loudoun County. We're your neighbors — delivering exceptional rentals right from Aldie's doorstep.</p>
+                    <div class="loc-arrow">View Aldie Rentals →</div>
+                </a>
+
+                <a href="./ashburn-va.html" class="location-card">
+                    <div class="loc-icon">🏙️</div>
+                    <h2>Ashburn, VA</h2>
+                    <p>Serving Broadlands, Brambleton, Ashburn Village, Willowsford and all of Ashburn's vibrant communities with premium event rentals.</p>
+                    <div class="loc-arrow">View Ashburn Rentals →</div>
+                </a>
+
+                <a href="./south-riding-va.html" class="location-card">
+                    <div class="loc-icon">🏘️</div>
+                    <h2>South Riding, VA</h2>
+                    <p>Serving South Riding's close-knit community with chair, table, tent, and backdrop rentals for every occasion.</p>
+                    <div class="loc-arrow">View South Riding Rentals →</div>
+                </a>
+
+                <a href="./chantilly-va.html" class="location-card">
+                    <div class="loc-icon">🌟</div>
+                    <h2>Chantilly, VA</h2>
+                    <p>Premium rentals for Chantilly's diverse community — including traditional South Asian ceremony decor for Seemantham, Haldi &amp; Mehandi events.</p>
+                    <div class="loc-arrow">View Chantilly Rentals →</div>
+                </a>
+
+                <a href="./leesburg-va.html" class="location-card">
+                    <div class="loc-icon">🏛️</div>
+                    <h2>Leesburg, VA</h2>
+                    <p>From historic downtown Leesburg events to vineyard gatherings and Lansdowne Resort parties — we've got your rentals covered.</p>
+                    <div class="loc-arrow">View Leesburg Rentals →</div>
+                </a>
+
+                <a href="./sterling-va.html" class="location-card">
+                    <div class="loc-icon">🌿</div>
+                    <h2>Sterling, VA</h2>
+                    <p>Serving Sterling's diverse Cascades, Countryside, and Sterling Park communities with affordable premium rentals.</p>
+                    <div class="loc-arrow">View Sterling Rentals →</div>
+                </a>
+
+                <a href="./herndon-va.html" class="location-card">
+                    <div class="loc-icon">✈️</div>
+                    <h2>Herndon, VA</h2>
+                    <p>Event rentals for downtown Herndon's charming community — serving birthday parties, South Asian ceremonies, graduation setups and more.</p>
+                    <div class="loc-arrow">View Herndon Rentals →</div>
+                </a>
+
+                <a href="./reston-va.html" class="location-card">
+                    <div class="loc-icon">🏞️</div>
+                    <h2>Reston, VA</h2>
+                    <p>Upscale event rentals for Reston Town Center gatherings, Lake Anne events, and all of Reston's planned community neighborhoods.</p>
+                    <div class="loc-arrow">View Reston Rentals →</div>
+                </a>
+
+                <a href="./fairfax-va.html" class="location-card">
+                    <div class="loc-icon">🎓</div>
+                    <h2>Fairfax, VA</h2>
+                    <p>Serving GMU graduation parties, multicultural weddings, and community celebrations across Fairfax City and County.</p>
+                    <div class="loc-arrow">View Fairfax Rentals →</div>
+                </a>
+
+                <a href="./loudoun-county-va.html" class="location-card">
+                    <div class="loc-icon">🍷</div>
+                    <h2>Loudoun County, VA</h2>
+                    <p>Comprehensive event rentals across all of Loudoun County — from vineyard weddings in wine country to suburban celebrations.</p>
+                    <div class="loc-arrow">View Loudoun County Rentals →</div>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- CTA Band -->
+        <section class="hub-cta">
+            <h2>Ready to Elevate Your Next Event?</h2>
+            <p>Contact Petals Paradise Events today to check availability and get a custom quote for your event rentals anywhere in Northern Virginia.</p>
+            <div class="hub-btns">
+                <a href="https://petalsparadiseevents.com/#contact" class="btn btn-primary">Get a Free Quote</a>
+                <a href="tel:+18484486993" class="btn btn-outline">📞 848-448-6993</a>
+            </div>
+        </section>
+
+        <!-- What We Rent -->
+        <section style="max-width:1100px;margin:0 auto;padding:3rem 2rem;">
+            <h2 style="font-family:var(--font-heading);font-size:1.8rem;color:var(--primary-color);text-align:center;margin-bottom:0.5rem;">What We Offer Across Northern Virginia</h2>
+            <p style="text-align:center;color:var(--text-secondary);margin-bottom:2.5rem;">Premium party rental inventory delivered to your door throughout the DMV area</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1.5rem;">
+                <div style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:12px;padding:1.5rem;text-align:center;">
+                    <div style="font-size:2rem;margin-bottom:0.75rem;">🪑</div>
+                    <h3 style="color:var(--primary-color);font-family:var(--font-nav);font-size:1rem;margin-bottom:0.5rem;">Chair Rentals</h3>
+                    <p style="font-size:0.85rem;color:var(--text-secondary);">From $2.00/each. Adult folding chairs, accent chairs, loveseats.</p>
+                </div>
+                <div style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:12px;padding:1.5rem;text-align:center;">
+                    <div style="font-size:2rem;margin-bottom:0.75rem;">🍽️</div>
+                    <h3 style="color:var(--primary-color);font-family:var(--font-nav);font-size:1rem;margin-bottom:0.5rem;">Table Rentals</h3>
+                    <p style="font-size:0.85rem;color:var(--text-secondary);">From $8/each. Round, rectangular, cocktail tables with cloths.</p>
+                </div>
+                <div style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:12px;padding:1.5rem;text-align:center;">
+                    <div style="font-size:2rem;margin-bottom:0.75rem;">⛺</div>
+                    <h3 style="color:var(--primary-color);font-family:var(--font-nav);font-size:1rem;margin-bottom:0.5rem;">Tent Rentals</h3>
+                    <p style="font-size:0.85rem;color:var(--text-secondary);">Wedding tents (16×26) and canopy tents (10×20) for outdoor events.</p>
+                </div>
+                <div style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:12px;padding:1.5rem;text-align:center;">
+                    <div style="font-size:2rem;margin-bottom:0.75rem;">🎨</div>
+                    <h3 style="color:var(--primary-color);font-family:var(--font-nav);font-size:1rem;margin-bottom:0.5rem;">Backdrops &amp; Decor</h3>
+                    <p style="font-size:0.85rem;color:var(--text-secondary);">Photo backdrops, pipe &amp; drape, Seemantham/baby shower backdrops.</p>
+                </div>
+                <div style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:12px;padding:1.5rem;text-align:center;">
+                    <div style="font-size:2rem;margin-bottom:0.75rem;">✨</div>
+                    <h3 style="color:var(--primary-color);font-family:var(--font-nav);font-size:1rem;margin-bottom:0.5rem;">Neon Signs &amp; Marquees</h3>
+                    <p style="font-size:0.85rem;color:var(--text-secondary);">GRAD marquee letters, 4FT numbers, birthday &amp; graduation neon signs.</p>
+                </div>
+                <div style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:12px;padding:1.5rem;text-align:center;">
+                    <div style="font-size:2rem;margin-bottom:0.75rem;">🪷</div>
+                    <h3 style="color:var(--primary-color);font-family:var(--font-nav);font-size:1rem;margin-bottom:0.5rem;">Traditional Decor</h3>
+                    <p style="font-size:0.85rem;color:var(--text-secondary);">Haldi Urli, Maiyan Tub, Mehandi umbrellas for South Asian ceremonies.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer style="background:var(--surface-color);border-top:1px solid var(--border-color);padding:3rem 2rem 1.5rem;">
+        <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2rem;">
+            <div>
+                <p class="logo-text" style="font-size:1.4rem;margin-bottom:1rem;">Petals Paradise Events</p>
+                <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.7;">Crafting unforgettable moments with premium party rentals &amp; exquisite decor across Northern Virginia &amp; the DMV.</p>
+            </div>
+            <div>
+                <h3 style="font-family:var(--font-nav);font-size:1rem;color:var(--primary-color);margin-bottom:1rem;">Quick Links</h3>
+                <nav aria-label="Footer navigation" style="display:flex;flex-direction:column;gap:0.5rem;">
+                    <a href="https://petalsparadiseevents.com/" style="color:var(--text-secondary);font-size:0.9rem;">Home</a>
+                    <a href="https://petalsparadiseevents.com/#rentals" style="color:var(--text-secondary);font-size:0.9rem;">Rentals</a>
+                    <a href="https://petalsparadiseevents.com/#graduation" style="color:var(--text-secondary);font-size:0.9rem;">Graduation 2026</a>
+                    <a href="https://petalsparadiseevents.com/#gallery" style="color:var(--text-secondary);font-size:0.9rem;">Gallery</a>
+                    <a href="https://petalsparadiseevents.com/#contact" style="color:var(--text-secondary);font-size:0.9rem;">Contact Us</a>
+                </nav>
+            </div>
+            <div>
+                <h3 style="font-family:var(--font-nav);font-size:1rem;color:var(--primary-color);margin-bottom:1rem;">Service Areas</h3>
+                <nav aria-label="Service areas" style="display:flex;flex-direction:column;gap:0.4rem;">
+                    <a href="./aldie-va.html" style="color:var(--text-secondary);font-size:0.85rem;">Event Rentals Aldie VA</a>
+                    <a href="./ashburn-va.html" style="color:var(--text-secondary);font-size:0.85rem;">Event Rentals Ashburn VA</a>
+                    <a href="./south-riding-va.html" style="color:var(--text-secondary);font-size:0.85rem;">Event Rentals South Riding VA</a>
+                    <a href="./chantilly-va.html" style="color:var(--text-secondary);font-size:0.85rem;">Event Rentals Chantilly VA</a>
+                    <a href="./leesburg-va.html" style="color:var(--text-secondary);font-size:0.85rem;">Event Rentals Leesburg VA</a>
+                    <a href="./sterling-va.html" style="color:var(--text-secondary);font-size:0.85rem;">Event Rentals Sterling VA</a>
+                    <a href="./herndon-va.html" style="color:var(--text-secondary);font-size:0.85rem;">Event Rentals Herndon VA</a>
+                    <a href="./reston-va.html" style="color:var(--text-secondary);font-size:0.85rem;">Event Rentals Reston VA</a>
+                    <a href="./fairfax-va.html" style="color:var(--text-secondary);font-size:0.85rem;">Event Rentals Fairfax VA</a>
+                    <a href="./loudoun-county-va.html" style="color:var(--text-secondary);font-size:0.85rem;">Event Rentals Loudoun County VA</a>
+                </nav>
+            </div>
+            <div>
+                <h3 style="font-family:var(--font-nav);font-size:1rem;color:var(--primary-color);margin-bottom:1rem;">Contact Us</h3>
+                <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:0.5rem;">📞 <a href="tel:+18484486993" style="color:inherit;">+1 848-448-6993</a></p>
+                <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:0.5rem;">📧 <a href="mailto:contact@petalsparadiseevents.com" style="color:inherit;">contact@petalsparadiseevents.com</a></p>
+                <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:1rem;">📍 Aldie, VA 20105 | Mon–Sun 9AM–9PM</p>
+                <div style="display:flex;gap:1rem;">
+                    <a href="https://www.facebook.com/people/Petals-Paradise-Events/61574977307091/" target="_blank" rel="noopener noreferrer" style="color:var(--primary-color);font-size:1.2rem;" aria-label="Facebook">f</a>
+                    <a href="https://www.instagram.com/petalsparadiseevents/" target="_blank" rel="noopener noreferrer" style="color:var(--primary-color);font-size:1.2rem;" aria-label="Instagram">ig</a>
+                </div>
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border-color);color:var(--text-secondary);font-size:0.82rem;">
+            <p>© 2026 Petals Paradise Events. All Rights Reserved. | Serving Loudoun County, Fairfax County &amp; All of Northern Virginia.</p>
+        </div>
+    </footer>
+
+    <!-- SMS Widget -->
+    <div id="sms-widget" style="position:fixed;bottom:100px;right:24px;z-index:999;">
+        <a href="sms:+18484486993?body=Hi%20Petals%20Paradise%20Events!%20I'm%20interested%20in%20event%20rentals."
+           style="display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#d4af37,#f1c40f);color:#0d0f12;padding:14px 20px;border-radius:50px;font-weight:700;font-size:0.9rem;text-decoration:none;box-shadow:0 4px 20px rgba(212,175,55,0.4);"
+           aria-label="Text us on SMS">
+            💬 Text Us
+        </a>
+    </div>
+</body>
+</html>

@@ -560,10 +560,18 @@ function renderFooter() {
                 <a href="#gallery">Gallery</a>
             </div>
             <div class="footer-col">
+                <h3>Service Areas</h3>
+                <a href="./locations/">All Service Areas</a>
+                <a href="./locations/aldie-va.html">Aldie, VA</a>
+                <a href="./locations/ashburn-va.html">Ashburn, VA</a>
+                <a href="./locations/leesburg-va.html">Leesburg, VA</a>
+                <a href="./locations/loudoun-county-va.html">Loudoun County, VA</a>
+            </div>
+            <div class="footer-col">
                 <h3>Contact Us</h3>
                 <p style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;"><i data-feather="phone" style="width: 20px; height: 20px; flex-shrink: 0; color: var(--primary-color);"></i> <a href="tel:+18484486993" class="phone-link" style="color: inherit; text-decoration: none; line-height: 1;">+1 848-448-6993</a></p>
                 <p style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;"><i data-feather="mail" style="width: 20px; height: 20px; flex-shrink: 0; color: var(--primary-color);"></i> <a href="mailto:contact@petalsparadiseevents.com" style="color: inherit; text-decoration: none; word-break: break-word; line-height: 1;">contact@petalsparadiseevents.com</a></p>
-                <p style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;"><i data-feather="map-pin" style="width: 20px; height: 20px; flex-shrink: 0; color: var(--primary-color);"></i> <span style="line-height: 1;">Serving Ashburn, Aldie & DMV Area</span></p>
+                <p style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;"><i data-feather="map-pin" style="width: 20px; height: 20px; flex-shrink: 0; color: var(--primary-color);"></i> <span style="line-height: 1;"><a href="./locations/" style="color: inherit; text-decoration: none; margin: 0; display: inline;">Serving Ashburn, Aldie & DMV Area</a></span></p>
             </div>
         </div>
         <div class="footer-bottom">
