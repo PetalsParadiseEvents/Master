@@ -1,2 +1,8 @@
-# Ignore API Key Configuration
-api/config.php
+# Node / build artifacts
+node_modules/
+
+# OS artifacts
+.DS_Store
+
+# No longer needed here — config.php is now secret-free (uses getenv())
+# api/config.php
