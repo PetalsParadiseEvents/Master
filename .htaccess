@@ -17,17 +17,30 @@
     
     # Content Security Policy (CSP)
     # Allows trusted CDNs for scripts, styles, and images used in the site
-    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.jsdelivr.net https://maps.googleapis.com https://cdn.emailjs.com https://api.emailjs.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https://images.unsplash.com https://maps.gstatic.com https://maps.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.emailjs.com https://maps.googleapis.com;"
+    # connect-src updated to allow Gemini AI API calls from the PHP backend
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.jsdelivr.net https://maps.googleapis.com https://cdn.emailjs.com https://api.emailjs.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https://images.unsplash.com https://maps.gstatic.com https://maps.googleapis.com https://www.petalsparadiseevents.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.emailjs.com https://maps.googleapis.com https://generativelanguage.googleapis.com https://www.petalsparadiseevents.com;"
 
     # Permissions Policy - Disable unused browser capabilities
     Header set Permissions-Policy "geolocation=(self 'https://maps.googleapis.com'), camera=(), microphone=(), payment=(), usb=()"
 </IfModule>
 
+# ─────────────────────────────────────────────────────────────
+# Environment Variables (Secure API Keys)
+# These are injected into PHP via getenv() — never hardcoded in source code
+# ─────────────────────────────────────────────────────────────
+SetEnv GEMINI_API_KEY AQ.Ab8RN6JXuxoDSS9xpCWGO2pf3kPPm51ZRCC-zrfQJuFZfFHcgA
+
 # Disable Directory Browsing
 Options -Indexes
 
-# Protect .htaccess file
+# Protect .htaccess file itself
 <Files .htaccess>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Protect PHP config files from direct browser access
+<Files "config.php">
     Order Allow,Deny
     Deny from all
 </Files>
