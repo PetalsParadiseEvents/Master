@@ -1766,6 +1766,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('hashchange', router);
     renderSMSWidget();
     initImageModal();
+    initAIChatbot();
 });
 
 function initImageModal() {
@@ -1838,3 +1839,197 @@ function renderSMSWidget() {
     document.body.appendChild(widget);
     if (window.feather) feather.replace();
 }
+
+/**
+ * AI Chatbot integration
+ */
+function initAIChatbot() {
+    const chatWidget = document.getElementById('ai-chat-widget');
+    const chatTrigger = document.getElementById('ai-chat-trigger');
+    const chatWindow = document.getElementById('ai-chat-window');
+    const chatClose = document.getElementById('ai-chat-close');
+    const chatMessages = document.getElementById('ai-chat-messages');
+    const chatForm = document.getElementById('ai-chat-input-form');
+    const chatInput = document.getElementById('ai-chat-input');
+    
+    if (!chatWidget || !chatTrigger || !chatWindow || !chatMessages || !chatForm || !chatInput) return;
+
+    let chatHistory = [];
+    let isOpen = false;
+
+    // Toggle chatbot window
+    const toggleChat = (forceState) => {
+        isOpen = forceState !== undefined ? forceState : !isOpen;
+        if (isOpen) {
+            chatWindow.style.display = 'flex';
+            setTimeout(() => {
+                chatWindow.classList.add('active');
+                chatWindow.setAttribute('aria-hidden', 'false');
+                chatInput.focus();
+            }, 10);
+            chatTrigger.style.display = 'none';
+        } else {
+            chatWindow.classList.remove('active');
+            chatWindow.setAttribute('aria-hidden', 'true');
+            setTimeout(() => {
+                chatWindow.style.display = 'none';
+                chatTrigger.style.display = 'flex';
+            }, 300);
+        }
+    };
+
+    chatTrigger.addEventListener('click', () => toggleChat(true));
+    chatClose.addEventListener('click', () => toggleChat(false));
+
+    // Handle suggestion chips
+    const chips = document.querySelectorAll('.chat-suggestion-chip');
+    chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            const query = chip.getAttribute('data-query');
+            if (query) {
+                chatInput.value = query;
+                chatForm.dispatchEvent(new Event('submit'));
+            }
+        });
+    });
+
+    // Helper: format markdown text
+    const formatResponseText = (text) => {
+        // Escape HTML
+        let formatted = text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+
+        // Format bold markdown (**text**)
+        formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Format bullet points
+        formatted = formatted.replace(/(?:^|\n)[-*]\s+(.+)/g, '<br>• $1');
+        
+        // Clean linebreaks
+        formatted = formatted.replace(/\n/g, '<br>');
+        
+        return formatted;
+    };
+
+    // Helper: append message element to chat
+    const appendMessage = (sender, htmlContent) => {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${sender === 'user' ? 'user-msg' : 'system-msg'}`;
+        msgDiv.innerHTML = `<div class="message-bubble">${htmlContent}</div>`;
+        chatMessages.appendChild(msgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return msgDiv;
+    };
+
+    // Helper: parse [ADD_TO_CART:id] brackets and render item recommendation cards
+    const parseRecommendations = (text, messageBubbleContainer) => {
+        const regex = /\[ADD_TO_CART:(\d+)\]/g;
+        let match;
+        const itemIds = [];
+        
+        while ((match = regex.exec(text)) !== null) {
+            itemIds.push(parseInt(match[1], 10));
+        }
+
+        // Clean brackets from text message
+        const cleanedText = text.replace(regex, '').trim();
+        messageBubbleContainer.querySelector('.message-bubble').innerHTML = formatResponseText(cleanedText);
+
+        // Append interactive recommendation cards for matching catalog items
+        itemIds.forEach(id => {
+            const item = rentalItems.find(i => i.id === id);
+            if (item) {
+                const card = document.createElement('div');
+                card.className = 'chat-recommendation-card';
+                // Adjust images to live production if running local web view environment
+                const imgUrl = item.img.startsWith('./') ? `https://www.petalsparadiseevents.com/${item.img.substring(2)}` : item.img;
+                
+                card.innerHTML = `
+                    <img src="${imgUrl}" class="chat-recommendation-img no-zoom" alt="${item.title}">
+                    <div class="chat-recommendation-info">
+                        <div class="chat-recommendation-title">${item.title}</div>
+                        <div class="chat-recommendation-price">$${item.price} / day</div>
+                        <button class="chat-recommendation-btn" onclick="window.handleAddToCart(${item.id})">Add to Cart</button>
+                    </div>
+                `;
+                messageBubbleContainer.appendChild(card);
+            }
+        });
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    };
+
+    // Submit form handler
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const query = chatInput.value.trim();
+        if (!query) return;
+
+        chatInput.value = '';
+        appendMessage('user', query);
+
+        // Add loading indicator bubble
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'message system-msg';
+        loadingDiv.innerHTML = `
+            <div class="message-bubble">
+                <div class="chat-loading-bubble">
+                    <span class="loading-dot"></span>
+                    <span class="loading-dot"></span>
+                    <span class="loading-dot"></span>
+                </div>
+            </div>
+        `;
+        chatMessages.appendChild(loadingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // API Endpoint routing: Redirect to production if inside the Capacitor/localhost app wrapper
+        const isMobileApp = window.location.origin.includes('localhost') || 
+                            window.location.protocol.startsWith('file:') || 
+                            window.location.hostname === '';
+        const endpoint = isMobileApp ? 'https://www.petalsparadiseevents.com/api/chat.php' : './api/chat.php';
+
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: json_encode_mock({ message: query, history: chatHistory })
+            });
+
+            const data = await response.json();
+            
+            // Remove loading bubble
+            chatMessages.removeChild(loadingDiv);
+
+            if (data.error && !data.response) {
+                appendMessage('system', '🌸 Sorry, I am having trouble connecting to my servers right now. Please try again later.');
+            } else {
+                const reply = data.response;
+                
+                // Save conversation history (limit to last 12 messages to optimize performance)
+                chatHistory.push({ role: 'user', text: query });
+                chatHistory.push({ role: 'model', text: reply });
+                if (chatHistory.length > 12) {
+                    chatHistory.shift();
+                    chatHistory.shift();
+                }
+
+                // Render assistant bubble and parse any item cart integration brackets
+                const botBubble = appendMessage('system', '');
+                parseRecommendations(reply, botBubble);
+            }
+        } catch (err) {
+            console.error('Chat API Error:', err);
+            chatMessages.removeChild(loadingDiv);
+            appendMessage('system', '🌸 Network connection error. Please make sure you are connected to the internet.');
+        }
+    });
+
+    // Helper: simple JSON stringify because of environment dependencies
+    function json_encode_mock(obj) {
+        return JSON.stringify(obj);
+    }
+}
+

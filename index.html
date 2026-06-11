@@ -367,6 +367,54 @@
         </div>
     </div>
     
+    <!-- AI Chatbot Container -->
+    <div id="ai-chat-widget" class="ai-chat-widget">
+        <!-- Chat Trigger Badge -->
+        <button id="ai-chat-trigger" class="ai-chat-trigger" aria-label="Open AI Assistant" title="Open AI Assistant">
+            <span class="chat-badge-icon">🌸</span>
+            <span class="chat-badge-text">Ask AI Assistant</span>
+        </button>
+
+        <!-- Chat Window -->
+        <div id="ai-chat-window" class="ai-chat-window" aria-hidden="true" style="display: none;">
+            <div class="ai-chat-header">
+                <div class="ai-chat-title-area">
+                    <span class="chat-avatar">🌸</span>
+                    <div>
+                        <h4>Paradise Assistant</h4>
+                        <span class="chat-status"><span class="status-dot"></span> Online</span>
+                    </div>
+                </div>
+                <button id="ai-chat-close" class="ai-chat-close-btn" aria-label="Close Chat">&times;</button>
+            </div>
+            
+            <div id="ai-chat-messages" class="ai-chat-messages">
+                <div class="message system-msg">
+                    <div class="message-bubble">
+                        🌸 Hello! I am your <strong>Petals Paradise Assistant</strong>. How can I help you plan your event rentals today? Ask me about package estimations, pricing, or delivery areas!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Suggestions -->
+            <div class="ai-chat-suggestions">
+                <button class="chat-suggestion-chip" data-query="Suggest a package for 50 people">🎉 50 Guests Package</button>
+                <button class="chat-suggestion-chip" data-query="What traditional South Asian decor do you rent?">🏵️ Traditional Decor</button>
+                <button class="chat-suggestion-chip" data-query="How does delivery and chair pricing work?">💰 Delivery & Rates</button>
+            </div>
+
+            <form id="ai-chat-input-form" class="ai-chat-input-area">
+                <input type="text" id="ai-chat-input" placeholder="Type your question..." aria-label="Type message" required autocomplete="off">
+                <button type="submit" id="ai-chat-send" aria-label="Send message">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Toast Container -->
     <div id="toast-container" class="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
     
