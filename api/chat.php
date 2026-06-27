@@ -111,8 +111,8 @@ $payload = [
     ]
 ];
 
-// 6. Execute cURL request to Gemini API
-$url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . GEMINI_API_KEY;
+// 6. Execute cURL request to Gemini API (using gemini-2.0-flash)
+$url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . GEMINI_API_KEY;
 
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -140,11 +140,11 @@ if ($curlError) {
 $responseDecoded = json_decode($response, true);
 
 if ($httpStatus !== 200) {
-    $errorMessage = isset($responseDecoded['error']['message']) ? $responseDecoded['error']['message'] : 'API Error';
+    $errorMessage = isset($responseDecoded['error']['message']) ? $responseDecoded['error']['message'] : 'Unknown API Error';
     echo json_encode([
         'error' => "Gemini API returned status $httpStatus",
         'debug' => $errorMessage,
-        'response' => 'Sorry, I encountered an internal error. Please make sure my API key in config.php is valid!'
+        'response' => "⚠️ API Error ($httpStatus): $errorMessage"
     ]);
     exit(0);
 }
