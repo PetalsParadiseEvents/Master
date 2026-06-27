@@ -4,7 +4,8 @@ node_modules/
 # OS artifacts
 .DS_Store
 
-# API secrets — these files contain the actual API key
+# API secrets — these files contain the actual API key or diagnostics
 # They must be created manually on the server, NEVER pushed to GitHub
 api/.htaccess
 api/secrets.php
+api/debug.php
