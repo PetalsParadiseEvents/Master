@@ -2,26 +2,26 @@
 /**
  * Petals Paradise Events AI Chatbot Config
  *
- * The API key is loaded securely from the server environment variable
- * 'GEMINI_API_KEY'. It is NEVER hardcoded here.
+ * The API key is loaded securely from the server environment.
+ * It is set via SetEnv in .htaccess and read here automatically.
  *
- * HOW TO SET THE ENVIRONMENT VARIABLE:
- * ─────────────────────────────────────
- * Option A — cPanel Hosting:
- *   Go to cPanel → Software → PHP Config → Environment Variables
- *   Add: Name = GEMINI_API_KEY, Value = your_actual_key
- *
- * Option B — .env file (local dev):
- *   Create a .env file in the project root (already in .gitignore) with:
- *   GEMINI_API_KEY=your_actual_key
- *   Then load it with: putenv("GEMINI_API_KEY=your_actual_key") or vlucas/phpdotenv
- *
- * Option C — Direct server injection (VPS/Dedicated):
- *   Add to /etc/environment or your Apache/Nginx vhost config:
- *   SetEnv GEMINI_API_KEY your_actual_key
+ * On Hostinger, Apache SetEnv places the value in $_SERVER,
+ * so we check $_SERVER, $_ENV, and getenv() for compatibility.
  *
  * Get a free API Key from: https://aistudio.google.com/
  */
 
-// Read from environment — never hardcoded
-define('GEMINI_API_KEY', getenv('GEMINI_API_KEY') ?: '');
+// Check all sources where Hostinger/Apache may inject SetEnv values
+$apiKey = '';
+if (!empty($_SERVER['GEMINI_API_KEY'])) {
+    $apiKey = $_SERVER['GEMINI_API_KEY'];
+} elseif (!empty($_ENV['GEMINI_API_KEY'])) {
+    $apiKey = $_ENV['GEMINI_API_KEY'];
+} elseif (getenv('GEMINI_API_KEY')) {
+    $apiKey = getenv('GEMINI_API_KEY');
+} elseif (!empty($_SERVER['REDIRECT_GEMINI_API_KEY'])) {
+    // Apache sometimes prefixes with REDIRECT_ after internal rewrites
+    $apiKey = $_SERVER['REDIRECT_GEMINI_API_KEY'];
+}
+
+define('GEMINI_API_KEY', $apiKey);
