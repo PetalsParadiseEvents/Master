@@ -112,15 +112,26 @@ $payload = [
 ];
 
 // 6. Execute cURL request to Gemini API (using gemini-2.0-flash)
-$url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . GEMINI_API_KEY;
+// Google 2026: New auth keys (AQ. prefix) use Bearer token; legacy keys (AIza) use ?key= param
+$isAuthKey = str_starts_with(GEMINI_API_KEY, 'AQ.');
+if ($isAuthKey) {
+    $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+    $headers = [
+        'Content-Type: application/json',
+        'Authorization: Bearer ' . GEMINI_API_KEY
+    ];
+} else {
+    $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . GEMINI_API_KEY;
+    $headers = [
+        'Content-Type: application/json'
+    ];
+}
 
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Content-Type: application/json'
-]);
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 
 $response = curl_exec($ch);

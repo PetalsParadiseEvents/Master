@@ -4,5 +4,6 @@ node_modules/
 # OS artifacts
 .DS_Store
 
-# No longer needed here — config.php is now secret-free (uses getenv())
-# api/config.php
+# API secrets — these files contain the actual API key via SetEnv
+# They must be uploaded to the server manually, NEVER pushed to GitHub
+api/.htaccess
