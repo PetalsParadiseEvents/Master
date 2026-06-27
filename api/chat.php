@@ -141,10 +141,13 @@ $responseDecoded = json_decode($response, true);
 
 if ($httpStatus !== 200) {
     $errorMessage = isset($responseDecoded['error']['message']) ? $responseDecoded['error']['message'] : 'Unknown API Error';
+    // Diagnostic: show key prefix (first 6 chars) + length to help debug
+    $keyLen = strlen(GEMINI_API_KEY);
+    $keyPreview = $keyLen > 6 ? substr(GEMINI_API_KEY, 0, 6) . '...' : '(empty)';
     echo json_encode([
         'error' => "Gemini API returned status $httpStatus",
         'debug' => $errorMessage,
-        'response' => "⚠️ API Error ($httpStatus): $errorMessage"
+        'response' => "⚠️ API Error ($httpStatus): $errorMessage | Key loaded: {$keyPreview} (length: {$keyLen})"
     ]);
     exit(0);
 }
