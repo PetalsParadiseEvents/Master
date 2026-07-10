@@ -61,7 +61,7 @@ This website is built with a focus on performance, user experience, and visual e
 
 ## 📞 Contact Us
 Ready to plan your next event? 
-- **Location:** Aldie, VA (Serving the entire DMV)
+- **Location:** Ashburn, VA (Serving the entire DMV)
 - **Website:** [petalsparadiseevents.com](https://petalsparadiseevents.com/)
 
 ---

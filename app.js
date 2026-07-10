@@ -621,7 +621,7 @@ function renderHome() {
             <div class="text-center" style="max-width: 800px; margin: 0 auto;">
                 <h2 class="section-title" style="font-size: 2rem; margin-bottom: 1rem;">About Petals Paradise</h2>
                 <p class="section-subtitle" style="font-size: 1.1rem; line-height: 1.8; color: var(--text-secondary); margin-bottom: 0;">
-                    Welcome to Petals Paradise Events! Based in Aldie, VA, we are a premium event decor and party rental company serving Loudoun County and the entire DMV area. Our passion is transforming your vision into reality—whether it's an elegant wedding, a joyful baby shower, or a milestone graduation. We pride ourselves on providing high-quality inventory, impeccable service, and a personal touch to make your celebrations unforgettable.
+                    Welcome to Petals Paradise Events! Based in Ashburn, VA, we are a premium event decor and party rental company serving Loudoun County and the entire DMV area. Our passion is transforming your vision into reality—whether it's an elegant wedding, a joyful baby shower, or a milestone graduation. We pride ourselves on providing high-quality inventory, impeccable service, and a personal touch to make your celebrations unforgettable.
                 </p>
             </div>
         </section>
@@ -1405,7 +1405,7 @@ function renderCheckout() {
                         </div>
                         <div id="venue-location-section" class="form-group">
                             <label class="form-label">Venue Location (Name/City)</label>
-                            <input type="text" name="location" class="form-control" placeholder="e.g. Westfields Marriott or Aldie, VA" required>
+                            <input type="text" name="location" class="form-control" placeholder="e.g. Westfields Marriott or Ashburn, VA" required>
                         </div>
                         
                         <div class="form-group">
