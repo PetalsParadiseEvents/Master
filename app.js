@@ -403,15 +403,16 @@ function renderBanner() {
         <div class="promo-banner">
             <div class="ticker-wrap">
                 <div class="ticker">
+                    <span class="ticker-item">☀️ SUMMER CELEBRATION SPECIAL ☀️</span>
+                    <span class="ticker-item">✨ CELEBRATE EVERY MOMENT THIS SUMMER! ✨</span>
+                    <span class="ticker-item">🌸 WEDDINGS • BIRTHDAYS • BABY SHOWERS • CORPORATE EVENTS 🌸</span>
                     <span class="ticker-item">📞 QUESTIONS? CALL US AT +1 848-448-6993</span>
-                    <span class="ticker-item">✨ EXCLUSIVE GRAD DECOR NOW AVAILABLE! ✨</span>
-                    <span class="ticker-item">🎊 <a href="#graduation">EXPLORE GRAD COLLECTION</a> 🎊</span>
                     <span class="ticker-item">🚚 WE OFFER DELIVERY & PICKUP OPTIONS! 🚚</span>
                     <!-- Duplicate for seamless loop -->
-                    <span class="ticker-item">🎓 CONGRATULATIONS CLASS OF 2026! 🎓</span>
+                    <span class="ticker-item">☀️ SUMMER CELEBRATION SPECIAL ☀️</span>
+                    <span class="ticker-item">✨ CELEBRATE EVERY MOMENT THIS SUMMER! ✨</span>
+                    <span class="ticker-item">🌸 WEDDINGS • BIRTHDAYS • BABY SHOWERS • CORPORATE EVENTS 🌸</span>
                     <span class="ticker-item">📞 QUESTIONS? CALL US AT +1 848-448-6993</span>
-                    <span class="ticker-item">✨ EXCLUSIVE GRAD DECOR NOW AVAILABLE! ✨</span>
-                    <span class="ticker-item">🎊 <a href="#graduation">EXPLORE GRAD COLLECTION</a> 🎊</span>
                 </div>
             </div>
         </div>
