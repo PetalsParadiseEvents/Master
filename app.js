@@ -352,7 +352,7 @@ const rentalItems = [
     { id: 13, title: '4FT Marquee Numbers', price: 20, img: './wp-content/uploads/2025/07/image-7.png', desc: 'Giant Marquee Numbers for birthdays, anniversaries, or graduations.' },
     { id: 14, title: 'Photo/Any Event Backdrop', price: 150, img: './wp-content/uploads/2025/06/image-2.png', desc: 'Celebrate the beauty of your Mehendi ceremony with our elegant and artistic backdrops, perfect for creating a stunning photo-worthy setting.' },
     { id: 15, title: 'New Born Baby Photo Prop', price: 20, img: './wp-content/uploads/2025/05/Baby-backdrop-1-scaled.jpg', desc: 'Dreamy Moon Swing Photo Prop for cozy gatherings.' },
-    { id: 16, title: 'Custom Graduation Setup', price: 'Varies', img: './wp-content/uploads/2025/07/IMG_9906-1-scaled.jpg', desc: 'Personalized graduation decor setup tailored to your school colors and theme. Contact us for a quote.' },
+    { id: 16, title: 'Custom Graduation Setup', price: 'Varies', img: './wp-content/uploads/2026/07/graddecor 2026.jpg', desc: 'Personalized graduation decor setup tailored to your school colors and theme. Contact us for a quote.' },
     { id: 17, title: 'Premium GRAD Decor', price: 'Varies', img: './wp-content/uploads/2025/07/IMG_9901-1-scaled.jpg', desc: 'Exquisite graduation celebration setup with premium backdrops and floral arrangements. Price varies by request.' },
     { id: 18, title: 'Seemantham/Baby Shower Backdrop', price: 150, img: './wp-content/uploads/2025/07/Seemantham-2.jpg', desc: 'Traditional Seemantham or Baby Shower backdrop for your special occasion.' },
     { id: 19, title: 'VEVOR Metal Wedding Centerpiece (2PCS)', price: 25, img: './wp-content/uploads/2025/04/image-19-908x1024.png', desc: 'Gold crystal metal centerpiece (55cm / 21.65\") - Set of 2 pieces.' },
@@ -837,6 +837,7 @@ function renderServices() {
 function renderGallery() {
     const gallery = {
         "Graduation 2026": [
+            "./wp-content/uploads/2026/07/graddecor 2026.jpg",
             "./wp-content/uploads/2025/07/IMG_9906-scaled.jpg",
             "./wp-content/uploads/2025/07/IMG_9901-1-scaled.jpg",
             "./wp-content/uploads/2025/07/image-2-scaled.png"
