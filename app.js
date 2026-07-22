@@ -923,6 +923,7 @@ function renderGallery() {
 
 function renderVideos() {
     const videos = [
+        { url: "./wp-content/uploads/2026/07/Washington DC Fireworks.mov", title: "Washington DC Fireworks 🎆" },
         { url: "./wp-content/uploads/2025/09/Wedding-Set-up-@dcwarmemorial-petalsparadiseevents-eventrentals-eventdecor-weddingsetup-dcw.mp4", title: "Wedding Set-up @ DC War Memorial" },
         { url: "./wp-content/uploads/2025/12/IMG_0560.mov", title: "Elegant Event Highlight" },
         { url: "./wp-content/uploads/2025/09/Winnie-the-Pooh-Themed-Birthday-DecorThank-you-@tdupexperience-It-was-great-collaborating-with-y.mp4", title: "Winnie the Pooh Themed Birthday" },
