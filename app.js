@@ -985,12 +985,26 @@ function renderContact() {
         const email = form.querySelector('input[type="email"]').value;
         const msg = form.querySelector('textarea').value;
 
+        // Save lead confidentially to backend API
+        fetch('./api/lead.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                notes: msg,
+                source: 'Website Contact Form'
+            })
+        }).catch(err => console.error("Lead logging error:", err));
+
         const subject = encodeURIComponent(`New Inquiry from ${name}`);
         const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${msg}`);
+        
+        // Open mailto as fallback
         window.location.href = `mailto:contact@petalsparadiseevents.com?subject=${subject}&body=${body}`;
 
         form.reset();
-        showToast('Opening your email client to send the message...');
+        showToast('Thank you! Your inquiry has been submitted confidentially.');
     };
 
     return `
@@ -1015,6 +1029,9 @@ function renderContact() {
                             <textarea class="form-control" required></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+                        <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 12px; text-align: center;">
+                            🔒 <strong>Confidentiality Guarantee:</strong> We respect your privacy. Your information is strictly used for your event inquiry and exclusive Petals Paradise offer updates.
+                        </p>
                     </form>
                 </div>
                 <div>
@@ -1288,6 +1305,21 @@ function renderCheckout() {
         }
         
         body += `Thank you!`;
+
+        // Log lead confidentially to database API
+        fetch('./api/lead.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: details.name,
+                email: details.email,
+                phone: details.phone,
+                event_date: details.date,
+                location: details.fulfillment === 'Delivery' ? (details.delivery_address || 'Delivery requested') : 'Self Pickup',
+                notes: body,
+                source: 'Website Rental Inquiry'
+            })
+        }).catch(err => console.error("Rental lead log error:", err));
 
         const subject = encodeURIComponent(`Rental Request: ${details.name} - ${details.date}`);
         window.location.href = `mailto:contact@petalsparadiseevents.com?subject=${subject}&body=${encodeURIComponent(body)}`;
