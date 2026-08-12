@@ -1842,22 +1842,24 @@ textarea:focus-visible {
 }
 
 /* Responsive Overrides */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .ai-chat-widget {
-        bottom: 20px;
-        right: auto;
-        left: 20px; /* Float on bottom-left on mobile to avoid overlapping SMS button */
+        bottom: 85px;
+        right: 15px;
+        z-index: 99990;
     }
     
     .ai-chat-window {
         position: fixed;
-        bottom: 0;
+        top: 0;
         left: 0;
         right: 0;
+        bottom: 0;
         width: 100% !important;
         height: 100% !important;
+        max-height: 100vh;
         border-radius: 0;
-        z-index: 100000;
+        z-index: 200000 !important;
     }
     
     .ai-chat-window.active {

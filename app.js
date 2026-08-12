@@ -1867,7 +1867,9 @@ function initAIChatbot() {
     // Toggle chatbot window
     const toggleChat = (forceState) => {
         isOpen = forceState !== undefined ? forceState : !isOpen;
+        const smsWidget = document.getElementById('sms-widget');
         if (isOpen) {
+            if (smsWidget) smsWidget.style.display = 'none';
             chatWindow.style.display = 'flex';
             setTimeout(() => {
                 chatWindow.classList.add('active');
@@ -1881,6 +1883,7 @@ function initAIChatbot() {
             setTimeout(() => {
                 chatWindow.style.display = 'none';
                 chatTrigger.style.display = 'flex';
+                if (smsWidget) smsWidget.style.display = 'block';
             }, 300);
         }
     };
