@@ -15,13 +15,32 @@ if ($providedKey !== $adminSecret) {
 }
 
 $leadsFile = __DIR__ . '/leads.json';
+$leads = [];
 
-if (!file_exists($leadsFile)) {
-    die('No leads found yet.');
+if (file_exists($leadsFile)) {
+    $fileContent = file_get_contents($leadsFile);
+    $leads = json_decode($fileContent, true) ?: [];
 }
 
-$fileContent = file_get_contents($leadsFile);
-$leads = json_decode($fileContent, true) ?: [];
+// Optional test lead generator: ?key=ppe_admin_2026&test=1
+if (isset($_GET['test']) && $_GET['test'] == '1') {
+    $testLead = [
+        'id'         => 'lead_sample_001',
+        'date_added' => date('Y-m-d H:i:s'),
+        'name'       => 'Sample Customer',
+        'email'      => 'sample@example.com',
+        'phone'      => '+1 848-448-6993',
+        'event_type' => 'Graduation 2026',
+        'event_date' => date('Y-m-d', strtotime('+30 days')),
+        'location'   => 'Ashburn, VA',
+        'source'     => 'FB Marketplace / Website',
+        'notes'      => 'Sample lead generated for testing CSV download.'
+    ];
+    if (empty($leads)) {
+        $leads = [$testLead];
+        file_put_contents($leadsFile, json_encode($leads, JSON_PRETTY_PRINT));
+    }
+}
 
 $format = isset($_GET['format']) ? strtolower($_GET['format']) : 'csv';
 
