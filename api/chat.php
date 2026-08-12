@@ -111,8 +111,8 @@ $payload = [
     ]
 ];
 
-// 6. Execute cURL request to Gemini API (using gemini-2.0-flash)
-$url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+// 6. Execute cURL request to Gemini API (using gemini-1.5-flash)
+$url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 $headers = [
     'Content-Type: application/json',
     'x-goog-api-key: ' . GEMINI_API_KEY
