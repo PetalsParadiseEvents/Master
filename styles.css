@@ -1541,9 +1541,9 @@ textarea:focus-visible {
 
 /* Chat Window */
 .ai-chat-window {
-    position: absolute;
-    bottom: 0;
-    right: 0;
+    position: fixed;
+    bottom: 110px;
+    right: 20px;
     width: 380px;
     height: 520px;
     background: rgba(18, 20, 24, 0.95);
@@ -1555,6 +1555,7 @@ textarea:focus-visible {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    z-index: 9995;
     transform: translateY(20px) scale(0.95);
     opacity: 0;
     pointer-events: none;
@@ -1562,7 +1563,7 @@ textarea:focus-visible {
 }
 
 .ai-chat-window.active {
-    transform: translateY(-70px) scale(1);
+    transform: translateY(0) scale(1);
     opacity: 1;
     pointer-events: all;
 }
@@ -1612,18 +1613,27 @@ textarea:focus-visible {
 }
 
 .ai-chat-close-btn {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 1.8rem;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 50%;
+    color: var(--text-primary);
+    font-size: 1.4rem;
     cursor: pointer;
     line-height: 1;
-    transition: color 0.2s;
-    padding: 0 5px;
+    transition: all 0.2s;
+    padding: 2px 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 .ai-chat-close-btn:hover {
-    color: var(--primary-color);
+    background: var(--primary-color);
+    color: #000;
+    border-color: var(--primary-color);
 }
 
 /* Chat Messages */
