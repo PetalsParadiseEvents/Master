@@ -589,7 +589,7 @@ function renderHome() {
         <!-- HERO -->
         <section class="hero">
             <div class="hero-content">
-                <div class="hero-eyebrow">🌸 Serving Loudoun County &amp; the DMV Since 2023</div>
+                <div class="hero-eyebrow">🌸 Serving Loudoun County &amp; the DMV Since 2025</div>
                 <h1>Your Celebration Partner,<br>For Every Chapter of Life</h1>
                 <p>From your baby's first birthday to your dream wedding — Petals Paradise Events is with you at every milestone. One team. One call. Every celebration.</p>
                 <div class="hero-btns">
