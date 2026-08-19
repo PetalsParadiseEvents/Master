@@ -391,6 +391,7 @@ const services = [
     { title: 'Birthday Party', desc: 'From vibrant balloon garlands to elegant tablescapes, we create magical setups tailored to your theme.', img: './wp-content/uploads/2026/08/1st_birthday_pic.jpg' },
     { title: 'Baby Shower', desc: 'Dreamy and elegant décor featuring soft pastels, enchanting backdrops, and custom-themed setups.', img: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80' },
     { title: 'Haldi / Mehandi Parties', desc: 'Vibrant and traditional décor with beautiful backdrops, marigold arrangements, and artistic seating for your special ceremonies.', img: './wp-content/uploads/2025/05/Haldi-backdrop-3-2-scaled.jpg' },
+    { title: 'Retirement Party', desc: 'Celebrate a career milestone with sophisticated décor, backdrop displays, and custom balloon arrangements.', img: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80' },
     { title: 'Festival Parties & Events', desc: 'Celebrate Diwali, Eid, Christmas, or any festive occasion with our specialized themed décor and lighting solutions.', img: 'https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?auto=format&fit=crop&w=800&q=80' }
 ];
 
@@ -627,6 +628,8 @@ function renderHome() {
                         <a href="#contact" class="life-stage-card"><span class="life-stage-icon">🏠</span><span class="life-stage-label">Housewarming</span></a>
                         <div class="life-stage-arrow">→</div>
                         <a href="#contact" class="life-stage-card"><span class="life-stage-icon">🎉</span><span class="life-stage-label">Anniversary</span></a>
+                        <div class="life-stage-arrow">→</div>
+                        <a href="#contact" class="life-stage-card life-stage-highlight"><span class="life-stage-icon">🌴</span><span class="life-stage-label">Retirement</span></a>
                     </div>
                 </div>
                 <div class="text-center" style="margin-top: 2rem;">
@@ -1294,6 +1297,7 @@ function renderContact() {
                                     <option value="Wedding / Reception">💒 Wedding / Reception</option>
                                     <option value="Housewarming (Griha Pravesh)">🏠 Housewarming (Griha Pravesh)</option>
                                     <option value="Anniversary">🎉 Anniversary</option>
+                                    <option value="Retirement Party">🌴 Retirement Party</option>
                                     <option value="Corporate / Community Event">🏢 Corporate / Community Event</option>
                                     <option value="Other Celebration">✨ Other Celebration</option>
                                 </select>
