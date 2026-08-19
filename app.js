@@ -1271,7 +1271,7 @@ function renderContact() {
                             <label class="form-label">Full Name *</label>
                             <input type="text" id="contact-name" class="form-control" placeholder="Your Full Name" required>
                         </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-row-2">
                             <div class="form-group">
                                 <label class="form-label">Email Address *</label>
                                 <input type="email" id="contact-email" class="form-control" placeholder="name@example.com" required>
@@ -1282,7 +1282,7 @@ function renderContact() {
                             </div>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-row-2">
                             <div class="form-group">
                                 <label class="form-label">Event Type / Milestone *</label>
                                 <select id="contact-event-type" class="form-control" required>
@@ -1314,7 +1314,7 @@ function renderContact() {
                             </div>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                        <div class="form-row-3">
                             <div class="form-group">
                                 <label class="form-label">Event Date</label>
                                 <input type="date" id="contact-event-date" class="form-control">
