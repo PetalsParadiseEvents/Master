@@ -429,10 +429,9 @@ function renderNavbar() {
         <div class="nav-links">
             <a href="#" class="nav-link">Home</a>
             <a href="#rentals" class="nav-link">Rentals</a>
-            <a href="#graduation" class="nav-link" style="color: #f1c40f; font-weight: 700;">GRAD 2026</a>
             <a href="#services" class="nav-link">Services</a>
-            <a href="#videos" class="nav-link">Videos</a>
             <a href="#gallery" class="nav-link">Gallery</a>
+            <a href="#videos" class="nav-link">Videos</a>
             <a href="#contact" class="nav-link">Contact Us</a>
             <a href="#contact" class="nav-link nav-plan-btn">✨ Plan My Event</a>
         </div>
@@ -472,16 +471,16 @@ function renderNavbar() {
                 </div>
             </div>
 
-            <a href="#graduation" class="nav-link" style="color: #f1c40f;">GRAD 2026</a>
             <a href="#services" class="nav-link">Services</a>
-            <a href="#videos" class="nav-link">Videos</a>
             <a href="#gallery" class="nav-link">Gallery</a>
+            <a href="#videos" class="nav-link">Videos</a>
             <a href="#contact" class="nav-link">Contact Us</a>
-            <a href="#contact" class="nav-link" style="color: var(--primary-color); font-weight: 700;">✨ Plan My Event</a>
+            <a href="#contact" class="nav-link mobile-plan-btn" style="color: var(--primary-color); font-weight: 700; margin-top: 0.5rem; display: inline-block;">✨ Plan My Event</a>
         </div>
     `;
     feather.replace();
     updateCartBadge();
+
 
     // Toggle Mobile Menu
     const menuBtn = document.getElementById('mobile-menu-btn');
