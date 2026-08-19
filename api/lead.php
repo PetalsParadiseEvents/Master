@@ -23,14 +23,17 @@ if (!$inputData) {
 }
 
 // 2. Sanitize fields
-$name       = isset($inputData['name']) ? trim(filter_var($inputData['name'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
-$email      = isset($inputData['email']) ? trim(filter_var($inputData['email'], FILTER_SANITIZE_EMAIL)) : '';
-$phone      = isset($inputData['phone']) ? trim(filter_var($inputData['phone'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
-$eventType  = isset($inputData['event_type']) ? trim(filter_var($inputData['event_type'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : 'General Inquiry';
-$eventDate  = isset($inputData['event_date']) ? trim(filter_var($inputData['event_date'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
-$location   = isset($inputData['location']) ? trim(filter_var($inputData['location'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
-$source     = isset($inputData['source']) ? trim(filter_var($inputData['source'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : 'Website Contact';
-$notes      = isset($inputData['notes']) ? trim(filter_var($inputData['notes'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
+$name        = isset($inputData['name']) ? trim(filter_var($inputData['name'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
+$email       = isset($inputData['email']) ? trim(filter_var($inputData['email'], FILTER_SANITIZE_EMAIL)) : '';
+$phone       = isset($inputData['phone']) ? trim(filter_var($inputData['phone'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
+$eventType   = isset($inputData['event_type']) ? trim(filter_var($inputData['event_type'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : 'General Inquiry';
+$serviceTier = isset($inputData['service_tier']) ? trim(filter_var($inputData['service_tier'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
+$guestCount  = isset($inputData['guest_count']) ? trim(filter_var($inputData['guest_count'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
+$budget      = isset($inputData['budget']) ? trim(filter_var($inputData['budget'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
+$eventDate   = isset($inputData['event_date']) ? trim(filter_var($inputData['event_date'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
+$location    = isset($inputData['location']) ? trim(filter_var($inputData['location'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
+$source      = isset($inputData['source']) ? trim(filter_var($inputData['source'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : 'Website Contact';
+$notes       = isset($inputData['notes']) ? trim(filter_var($inputData['notes'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
 
 if (empty($name) && empty($email) && empty($phone)) {
     http_response_code(400);
@@ -40,17 +43,21 @@ if (empty($name) && empty($email) && empty($phone)) {
 
 // 3. Prepare Lead Record
 $leadRecord = [
-    'id'         => uniqid('lead_', true),
-    'date_added' => date('Y-m-d H:i:s'),
-    'name'       => $name,
-    'email'      => $email,
-    'phone'      => $phone,
-    'event_type' => $eventType,
-    'event_date' => $eventDate,
-    'location'   => $location,
-    'source'     => $source,
-    'notes'      => $notes
+    'id'           => uniqid('lead_', true),
+    'date_added'   => date('Y-m-d H:i:s'),
+    'name'         => $name,
+    'email'        => $email,
+    'phone'        => $phone,
+    'event_type'   => $eventType,
+    'service_tier' => $serviceTier,
+    'guest_count'  => $guestCount,
+    'budget'       => $budget,
+    'event_date'   => $eventDate,
+    'location'     => $location,
+    'source'       => $source,
+    'notes'        => $notes
 ];
+
 
 // 4. Save to Confidential leads.json
 $leadsFile = __DIR__ . '/leads.json';

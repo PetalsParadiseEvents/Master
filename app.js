@@ -434,6 +434,7 @@ function renderNavbar() {
             <a href="#videos" class="nav-link">Videos</a>
             <a href="#gallery" class="nav-link">Gallery</a>
             <a href="#contact" class="nav-link">Contact Us</a>
+            <a href="#contact" class="nav-link nav-plan-btn">✨ Plan My Event</a>
         </div>
         <a href="#cart" class="cart-icon-container" aria-label="View cart with ${cart.reduce((sum, item) => sum + item.quantity, 0)} items">
             <i data-feather="shopping-bag"></i>
@@ -476,6 +477,7 @@ function renderNavbar() {
             <a href="#videos" class="nav-link">Videos</a>
             <a href="#gallery" class="nav-link">Gallery</a>
             <a href="#contact" class="nav-link">Contact Us</a>
+            <a href="#contact" class="nav-link" style="color: var(--primary-color); font-weight: 700;">✨ Plan My Event</a>
         </div>
     `;
     feather.replace();
@@ -585,22 +587,152 @@ function renderFooter() {
 // Views
 function renderHome() {
     return `
+        <!-- HERO -->
         <section class="hero">
             <div class="hero-content">
-                <h1>Crafting Unforgettable Moments</h1>
-                <p>We specialize in transforming your celebrations into beautiful memories with elegant decor and personalized touches for every occasion.</p>
+                <div class="hero-eyebrow">🌸 Serving Loudoun County &amp; the DMV Since 2023</div>
+                <h1>Your Celebration Partner,<br>For Every Chapter of Life</h1>
+                <p>From your baby's first birthday to your dream wedding — Petals Paradise Events is with you at every milestone. One team. One call. Every celebration.</p>
                 <div class="hero-btns">
                     <a href="#rentals" class="btn btn-primary">Explore Rentals</a>
-                    <a href="#contact" class="btn btn-outline">Contact Us</a>
+                    <a href="#contact" class="btn btn-outline">✨ Plan My Event</a>
                 </div>
             </div>
         </section>
 
+        <!-- LIFE STAGES JOURNEY TIMELINE -->
+        <section class="life-stages-section">
+            <div class="container">
+                <div class="text-center">
+                    <h2 class="section-title">We're With You At Every Milestone</h2>
+                    <p class="section-subtitle">Families return to us year after year — because life never stops celebrating.</p>
+                </div>
+                <div class="life-stages-track">
+                    <div class="life-stages-scroll">
+                        <a href="#contact" class="life-stage-card"><span class="life-stage-icon">🤰</span><span class="life-stage-label">Baby Shower</span></a>
+                        <div class="life-stage-arrow">→</div>
+                        <a href="#contact" class="life-stage-card"><span class="life-stage-icon">🎂</span><span class="life-stage-label">1st Birthday</span></a>
+                        <div class="life-stage-arrow">→</div>
+                        <a href="#contact" class="life-stage-card"><span class="life-stage-icon">🎈</span><span class="life-stage-label">Birthdays</span></a>
+                        <div class="life-stage-arrow">→</div>
+                        <a href="#contact" class="life-stage-card life-stage-highlight"><span class="life-stage-icon">💫</span><span class="life-stage-label">Sweet 16</span></a>
+                        <div class="life-stage-arrow">→</div>
+                        <a href="#contact" class="life-stage-card"><span class="life-stage-icon">🌺</span><span class="life-stage-label">Haldi / Mehndi</span></a>
+                        <div class="life-stage-arrow">→</div>
+                        <a href="#contact" class="life-stage-card"><span class="life-stage-icon">🎓</span><span class="life-stage-label">Graduation</span></a>
+                        <div class="life-stage-arrow">→</div>
+                        <a href="#contact" class="life-stage-card"><span class="life-stage-icon">💍</span><span class="life-stage-label">Bridal Shower</span></a>
+                        <div class="life-stage-arrow">→</div>
+                        <a href="#contact" class="life-stage-card life-stage-highlight"><span class="life-stage-icon">💒</span><span class="life-stage-label">Wedding</span></a>
+                        <div class="life-stage-arrow">→</div>
+                        <a href="#contact" class="life-stage-card"><span class="life-stage-icon">🏠</span><span class="life-stage-label">Housewarming</span></a>
+                        <div class="life-stage-arrow">→</div>
+                        <a href="#contact" class="life-stage-card"><span class="life-stage-icon">🎉</span><span class="life-stage-label">Anniversary</span></a>
+                    </div>
+                </div>
+                <div class="text-center" style="margin-top: 2rem;">
+                    <a href="#contact" class="btn btn-primary">Start Planning Your Next Milestone →</a>
+                </div>
+            </div>
+        </section>
 
+        <!-- HOW WE WORK WITH YOU -->
+        <section class="how-we-work-section">
+            <div class="container">
+                <div class="text-center">
+                    <h2 class="section-title">How We Work With You</h2>
+                    <p class="section-subtitle">Three simple steps to your perfect celebration.</p>
+                </div>
+                <div class="how-we-work-grid">
+                    <div class="how-step">
+                        <div class="how-step-number">01</div>
+                        <div class="how-step-icon">💬</div>
+                        <h3>Tell Us Your Vision</h3>
+                        <p>Share your occasion, guest count, budget and ideas. Whether you have a full vision or just a theme in mind — we'll guide you from there.</p>
+                    </div>
+                    <div class="how-step-connector">→</div>
+                    <div class="how-step">
+                        <div class="how-step-number">02</div>
+                        <div class="how-step-icon">🎨</div>
+                        <h3>We Build Your Plan</h3>
+                        <p>Our team designs your décor, sources the right pieces, coordinates logistics and creates a timeline so nothing is left to chance.</p>
+                    </div>
+                    <div class="how-step-connector">→</div>
+                    <div class="how-step">
+                        <div class="how-step-number">03</div>
+                        <div class="how-step-icon">🥂</div>
+                        <h3>You Simply Celebrate</h3>
+                        <p>Arrive to a beautifully transformed space. Our team handles setup, coordinates vendors and manages breakdown — you enjoy every moment.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- THREE SERVICE TIERS -->
+        <section class="tiers-section">
+            <div class="container">
+                <div class="text-center">
+                    <h2 class="section-title">Choose Your Experience</h2>
+                    <p class="section-subtitle">Whether you need beautiful décor or want us to handle everything — we have the right package for you.</p>
+                </div>
+                <div class="tiers-grid">
+                    <div class="tier-card">
+                        <div class="tier-badge">✨ Décor Only</div>
+                        <div class="tier-icon">🎀</div>
+                        <h3>Décor &amp; Rentals</h3>
+                        <p class="tier-tagline">Beautiful décor, delivered and set up.</p>
+                        <ul class="tier-features">
+                            <li>✅ Premium rental inventory</li>
+                            <li>✅ Professional setup &amp; installation</li>
+                            <li>✅ Balloon garlands &amp; backdrops</li>
+                            <li>✅ Centerpieces &amp; tablescapes</li>
+                            <li>✅ Teardown &amp; pickup</li>
+                        </ul>
+                        <p class="tier-best-for">Best for: DIY planners who need stunning décor without the planning work.</p>
+                        <a href="#rentals" class="btn btn-outline" style="width:100%; text-align:center; margin-top: auto;">Browse Rentals</a>
+                    </div>
+                    <div class="tier-card tier-card-featured">
+                        <div class="tier-featured-label">Most Popular</div>
+                        <div class="tier-badge">🌸 Planning + Décor</div>
+                        <div class="tier-icon">🌸</div>
+                        <h3>Planning &amp; Décor</h3>
+                        <p class="tier-tagline">We plan it. We design it. You enjoy it.</p>
+                        <ul class="tier-features">
+                            <li>✅ Everything in Décor Only</li>
+                            <li>✅ Personal event consultation</li>
+                            <li>✅ Theme &amp; color palette design</li>
+                            <li>✅ Vendor referral network</li>
+                            <li>✅ Event timeline creation</li>
+                            <li>✅ Day-of coordination support</li>
+                        </ul>
+                        <p class="tier-best-for">Best for: Busy families who want help planning but don't need full event management.</p>
+                        <a href="#contact" class="btn btn-primary" style="width:100%; text-align:center; margin-top: auto;">Get a Quote</a>
+                    </div>
+                    <div class="tier-card">
+                        <div class="tier-badge">👑 Full-Service</div>
+                        <div class="tier-icon">👑</div>
+                        <h3>Full Celebration Management</h3>
+                        <p class="tier-tagline">Say "we have an event" — we handle the rest.</p>
+                        <ul class="tier-features">
+                            <li>✅ Everything in Planning + Décor</li>
+                            <li>✅ Dedicated event planner</li>
+                            <li>✅ Venue research &amp; coordination</li>
+                            <li>✅ Full vendor booking &amp; management</li>
+                            <li>✅ Guest management support</li>
+                            <li>✅ Complete event-day management</li>
+                        </ul>
+                        <p class="tier-best-for">Best for: Families who want a completely stress-free, premium celebration experience.</p>
+                        <a href="#contact" class="btn btn-outline" style="width:100%; text-align:center; margin-top: auto;">Inquire Now</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURED SERVICES -->
         <section class="container mt-2">
             <div class="text-center">
-                <h2 class="section-title">Our Featured Services</h2>
-                <p class="section-subtitle">Let us add a touch of paradise to your next celebration.</p>
+                <h2 class="section-title">Events We Specialize In</h2>
+                <p class="section-subtitle">From intimate baby showers to grand weddings — we bring every vision to life.</p>
             </div>
             <div class="grid">
                 ${services.map(s => `
@@ -611,23 +743,68 @@ function renderHome() {
                         <div class="card-body">
                             <h3 class="card-title">${s.title}</h3>
                             <p class="card-desc">${s.desc}</p>
-                            <a href="#services" class="btn btn-outline" style="width:100%; text-align:center;" aria-label="Learn more about ${s.title}">Learn More</a>
+                            <a href="#contact" class="btn btn-outline" style="width:100%; text-align:center;" aria-label="Plan a ${s.title}">Plan This Event</a>
                         </div>
                     </div>
                 `).join('')}
             </div>
         </section>
 
-        <section class="container" style="background: var(--surface-color); border-radius: 12px; padding: 3rem 2rem; margin-top: 3rem; margin-bottom: 2rem; border-top: 4px solid var(--primary-color);">
-            <div class="text-center" style="max-width: 800px; margin: 0 auto;">
-                <h2 class="section-title" style="font-size: 2rem; margin-bottom: 1rem;">About Petals Paradise</h2>
-                <p class="section-subtitle" style="font-size: 1.1rem; line-height: 1.8; color: var(--text-secondary); margin-bottom: 0;">
-                    Welcome to Petals Paradise Events! Based in Ashburn, VA, we are a premium event decor and party rental company serving Loudoun County and the entire DMV area. Our passion is transforming your vision into reality—whether it's an elegant wedding, a joyful baby shower, or a milestone graduation. We pride ourselves on providing high-quality inventory, impeccable service, and a personal touch to make your celebrations unforgettable.
-                </p>
+        <!-- ABOUT -->
+        <section class="about-section">
+            <div class="container">
+                <div class="about-grid">
+                    <div class="about-text">
+                        <h2 class="section-title" style="text-align: left;">More Than Décor.<br>We're Your Celebration Partner.</h2>
+                        <p style="font-size: 1.05rem; line-height: 1.9; color: var(--text-secondary); margin-bottom: 1.5rem;">
+                            We're not just a décor company. We're the team families in Ashburn, Aldie, and across the DMV call for every celebration — year after year. Our goal isn't just to make your event look beautiful; it's to become the trusted partner your family relies on for every chapter of life.
+                        </p>
+                        <p style="font-size: 1.05rem; line-height: 1.9; color: var(--text-secondary); margin-bottom: 2rem;">
+                            When a customer says <em>"My daughter is turning 16. Around 100 guests. She wants something elegant, but I don't know where to start"</em> — we say <strong style="color: var(--primary-color);">"We'll take care of it."</strong>
+                        </p>
+                        <div class="about-stats">
+                            <div class="about-stat">
+                                <span class="about-stat-num">200+</span>
+                                <span class="about-stat-label">Events Decorated</span>
+                            </div>
+                            <div class="about-stat">
+                                <span class="about-stat-num">50+</span>
+                                <span class="about-stat-label">Rental Items</span>
+                            </div>
+                            <div class="about-stat">
+                                <span class="about-stat-num">DMV</span>
+                                <span class="about-stat-label">Wide Coverage</span>
+                            </div>
+                        </div>
+                        <a href="#contact" class="btn btn-primary" style="margin-top: 1.5rem;">Start Your Journey With Us →</a>
+                    </div>
+                    <div class="about-promise">
+                        <div class="promise-card">
+                            <h3 style="color: var(--primary-color); margin-bottom: 1.5rem; font-size: 1.2rem;">The Petals Paradise Promise</h3>
+                            <div class="promise-item">
+                                <span class="promise-icon">🤝</span>
+                                <div><strong>One Point of Contact</strong><p>You call us. We coordinate everything. No juggling 10 different vendors.</p></div>
+                            </div>
+                            <div class="promise-item">
+                                <span class="promise-icon">🎯</span>
+                                <div><strong>Tailored To Your Vision</strong><p>Every event is designed around your unique style, culture and budget.</p></div>
+                            </div>
+                            <div class="promise-item">
+                                <span class="promise-icon">✨</span>
+                                <div><strong>Premium Quality, Always</strong><p>We maintain high-quality inventory and never compromise on the details.</p></div>
+                            </div>
+                            <div class="promise-item">
+                                <span class="promise-icon">🔄</span>
+                                <div><strong>A Relationship, Not a Transaction</strong><p>We celebrate your milestones with you — for years to come.</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     `;
 }
+
 
 function refreshRentalsUI() {
     rentalItems.forEach(item => {
@@ -815,7 +992,62 @@ function renderServices() {
         <div class="container">
             <div class="text-center">
                 <h2 class="section-title">Our Services</h2>
-                <p class="section-subtitle">Comprehensive decor solutions tailored for your unique celebrations.</p>
+                <p class="section-subtitle">Comprehensive décor and planning solutions tailored for every chapter of your life.</p>
+            </div>
+
+            <!-- Service Tiers -->
+            <div class="tiers-grid" style="margin-bottom: 4rem;">
+                <div class="tier-card">
+                    <div class="tier-badge">✨ Tier 1</div>
+                    <div class="tier-icon">🎀</div>
+                    <h3>Décor &amp; Rentals</h3>
+                    <p class="tier-tagline">Beautiful décor, delivered and set up.</p>
+                    <ul class="tier-features">
+                        <li>✅ Premium rental inventory</li>
+                        <li>✅ Professional setup &amp; installation</li>
+                        <li>✅ Balloon garlands &amp; backdrops</li>
+                        <li>✅ Centerpieces &amp; tablescapes</li>
+                        <li>✅ Teardown &amp; pickup</li>
+                    </ul>
+                    <a href="#rentals" class="btn btn-outline" style="width:100%; text-align:center; margin-top: auto;">Browse Rentals</a>
+                </div>
+                <div class="tier-card tier-card-featured">
+                    <div class="tier-featured-label">Most Popular</div>
+                    <div class="tier-badge">🌸 Tier 2</div>
+                    <div class="tier-icon">🌸</div>
+                    <h3>Planning &amp; Décor</h3>
+                    <p class="tier-tagline">We plan it. We design it. You enjoy it.</p>
+                    <ul class="tier-features">
+                        <li>✅ Everything in Décor Only</li>
+                        <li>✅ Personal event consultation</li>
+                        <li>✅ Theme &amp; color palette design</li>
+                        <li>✅ Vendor referral network</li>
+                        <li>✅ Event timeline creation</li>
+                        <li>✅ Day-of coordination support</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-primary" style="width:100%; text-align:center; margin-top: auto;">Get a Quote</a>
+                </div>
+                <div class="tier-card">
+                    <div class="tier-badge">👑 Tier 3</div>
+                    <div class="tier-icon">👑</div>
+                    <h3>Full Celebration Management</h3>
+                    <p class="tier-tagline">Say "we have an event" — we handle the rest.</p>
+                    <ul class="tier-features">
+                        <li>✅ Everything in Planning + Décor</li>
+                        <li>✅ Dedicated event planner</li>
+                        <li>✅ Venue research &amp; coordination</li>
+                        <li>✅ Full vendor booking &amp; management</li>
+                        <li>✅ Guest management support</li>
+                        <li>✅ Complete event-day management</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-outline" style="width:100%; text-align:center; margin-top: auto;">Inquire Now</a>
+                </div>
+            </div>
+
+            <!-- Event Types -->
+            <div class="text-center" style="margin-bottom: 2rem;">
+                <h2 class="section-title" style="font-size: 1.8rem;">Events We Celebrate</h2>
+                <p class="section-subtitle">Every occasion deserves to be extraordinary.</p>
             </div>
             <div class="grid">
                 ${services.map(s => `
@@ -826,6 +1058,7 @@ function renderServices() {
                         <div class="card-body">
                             <h3 class="card-title">${s.title}</h3>
                             <p class="card-desc">${s.desc}</p>
+                            <a href="#contact" class="btn btn-outline" style="width:100%; text-align:center;">Plan This Event</a>
                         </div>
                     </div>
                 `).join('')}
@@ -833,6 +1066,7 @@ function renderServices() {
         </div>
     `;
 }
+
 
 function renderGallery() {
     const gallery = {
@@ -982,9 +1216,17 @@ function renderContact() {
     window.handleContactSubmit = (e) => {
         e.preventDefault();
         const form = e.target;
-        const name = form.querySelector('input[type="text"]').value;
-        const email = form.querySelector('input[type="email"]').value;
-        const msg = form.querySelector('textarea').value;
+        const name = form.querySelector('#contact-name').value;
+        const email = form.querySelector('#contact-email').value;
+        const phone = form.querySelector('#contact-phone')?.value || '';
+        const eventType = form.querySelector('#contact-event-type')?.value || '';
+        const serviceTier = form.querySelector('#contact-service-tier')?.value || '';
+        const guestCount = form.querySelector('#contact-guest-count')?.value || '';
+        const eventDate = form.querySelector('#contact-event-date')?.value || '';
+        const budget = form.querySelector('#contact-budget')?.value || '';
+        const msg = form.querySelector('#contact-msg').value;
+
+        const leadNotes = `Event: ${eventType}\nService Level: ${serviceTier}\nDate: ${eventDate}\nGuests: ${guestCount}\nBudget: ${budget}\nPhone: ${phone}\n\nDetails:\n${msg}`;
 
         // Save lead confidentially to backend API
         fetch('./api/lead.php', {
@@ -993,13 +1235,19 @@ function renderContact() {
             body: JSON.stringify({
                 name: name,
                 email: email,
-                notes: msg,
-                source: 'Website Contact Form'
+                phone: phone,
+                event_type: eventType,
+                service_tier: serviceTier,
+                guest_count: guestCount,
+                event_date: eventDate,
+                budget: budget,
+                notes: leadNotes,
+                source: 'Website Plan My Event Form'
             })
         }).catch(err => console.error("Lead logging error:", err));
 
-        const subject = encodeURIComponent(`New Inquiry from ${name}`);
-        const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${msg}`);
+        const subject = encodeURIComponent(`New Event Inquiry: ${eventType || 'General'} - ${name}`);
+        const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nEvent Type: ${eventType}\nService Level: ${serviceTier}\nEvent Date: ${eventDate}\nGuest Count: ${guestCount}\nBudget: ${budget}\n\nVision & Details:\n${msg}`);
         
         // Open mailto as fallback
         window.location.href = `mailto:contact@petalsparadiseevents.com?subject=${subject}&body=${body}`;
@@ -1011,42 +1259,118 @@ function renderContact() {
     return `
         <div class="container">
             <div class="text-center">
-                <h2 class="section-title">Contact Us</h2>
-                <p class="section-subtitle">We would love to hear from you. Let's start planning your dream event.</p>
+                <h2 class="section-title">✨ Plan Your Celebration</h2>
+                <p class="section-subtitle">Tell us about your event. Whether you need décor rentals or full planning — we're here to help.</p>
             </div>
             <div class="cart-layout">
                 <div class="cart-summary" style="position: static;">
                     <form onsubmit="handleContactSubmit(event)">
                         <div class="form-group">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" class="form-control" required>
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" id="contact-name" class="form-control" placeholder="Your Full Name" required>
                         </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Email Address *</label>
+                                <input type="email" id="contact-email" class="form-control" placeholder="name@example.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" id="contact-phone" class="form-control" placeholder="(703) 555-0199">
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Event Type / Milestone *</label>
+                                <select id="contact-event-type" class="form-control" required>
+                                    <option value="">Select Milestone...</option>
+                                    <option value="Baby Shower / Seemantham">🤰 Baby Shower / Seemantham</option>
+                                    <option value="1st Birthday / Cradle Ceremony">🎂 1st Birthday / Cradle Ceremony</option>
+                                    <option value="Birthday Party">🎈 Birthday Party</option>
+                                    <option value="Sweet 16 / Quinceañera">💫 Sweet 16 / Quinceañera</option>
+                                    <option value="Haldi / Mehndi / Sangeet">🌺 Haldi / Mehndi / Sangeet</option>
+                                    <option value="Graduation Party">🎓 Graduation Party</option>
+                                    <option value="Bridal Shower / Engagement">💍 Bridal Shower / Engagement</option>
+                                    <option value="Wedding / Reception">💒 Wedding / Reception</option>
+                                    <option value="Housewarming (Griha Pravesh)">🏠 Housewarming (Griha Pravesh)</option>
+                                    <option value="Anniversary">🎉 Anniversary</option>
+                                    <option value="Corporate / Community Event">🏢 Corporate / Community Event</option>
+                                    <option value="Other Celebration">✨ Other Celebration</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Desired Service Tier *</label>
+                                <select id="contact-service-tier" class="form-control" required>
+                                    <option value="">Select Package...</option>
+                                    <option value="Tier 1: Décor Only / Rentals">✨ Tier 1: Décor Only & Rentals</option>
+                                    <option value="Tier 2: Planning + Décor">🌸 Tier 2: Planning & Décor (Recommended)</option>
+                                    <option value="Tier 3: Full Celebration Management">👑 Tier 3: Full Celebration Management</option>
+                                    <option value="Not Sure Yet / Need Advice">❓ Not Sure Yet - Need Advice</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Event Date</label>
+                                <input type="date" id="contact-event-date" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Estimated Guests</label>
+                                <select id="contact-guest-count" class="form-control">
+                                    <option value="Under 25">Under 25</option>
+                                    <option value="25 - 50">25 - 50</option>
+                                    <option value="50 - 100" selected>50 - 100</option>
+                                    <option value="100 - 200">100 - 200</option>
+                                    <option value="200+">200+</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Estimated Budget</label>
+                                <select id="contact-budget" class="form-control">
+                                    <option value="Under $500">Under $500</option>
+                                    <option value="$500 - $1,500" selected>$500 - $1,500</option>
+                                    <option value="$1,500 - $3,000">$1,500 - $3,000</option>
+                                    <option value="$3,000 - $5,000">$3,000 - $5,000</option>
+                                    <option value="$5,000+">$5,000+</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="form-group">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" required>
+                            <label class="form-label">Tell Us About Your Vision &amp; Requirements</label>
+                            <textarea id="contact-msg" class="form-control" rows="4" placeholder="Share any specific theme ideas, color preferences, venue location, or questions you have..." required></textarea>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Message</label>
-                            <textarea class="form-control" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.05rem; padding: 14px;">✨ Submit Event Inquiry</button>
                         <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 12px; text-align: center;">
                             🔒 <strong>Confidentiality Guarantee:</strong> We respect your privacy. Your information is strictly used for your event inquiry and exclusive Petals Paradise offer updates.
                         </p>
                     </form>
                 </div>
                 <div>
-                    <div class="card" style="padding: 2rem; background: var(--surface-color);">
+                    <div class="card" style="padding: 2rem; background: var(--surface-color); position: sticky; top: 100px;">
                         <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">Contact Information</h3>
-                        <p style="margin-bottom: 1rem;"><i data-feather="phone"></i> <a href="tel:+18484486993" style="color: inherit; text-decoration: none;">+1 848-448-6993</a></p>
+                        <p style="margin-bottom: 1rem;"><i data-feather="phone"></i> <a href="tel:+18484486993" style="color: inherit; text-decoration: none; font-weight: 600;">+1 848-448-6993</a></p>
                         <p style="margin-bottom: 1rem;"><i data-feather="mail"></i> <a href="mailto:contact@petalsparadiseevents.com" style="color: inherit; text-decoration: none;">contact@petalsparadiseevents.com</a></p>
-                        <p style="margin-bottom: 1rem;"><i data-feather="map-pin"></i> Serving Ashburn, Aldie & DMV Area</p>
+                        <p style="margin-bottom: 1.5rem;"><i data-feather="map-pin"></i> Serving Ashburn, Aldie &amp; Loudoun County, VA</p>
+
+                        <hr style="border: none; border-top: 1fr solid var(--border-color); margin: 1.5rem 0;">
+
+                        <h4 style="color: var(--text-primary); margin-bottom: 0.8rem; font-size: 0.95rem;">Why Choose Petals Paradise?</h4>
+                        <ul style="list-style: none; padding: 0; font-size: 0.88rem; line-height: 1.8; color: var(--text-secondary);">
+                            <li>🌸 <strong>One Partner</strong> for all life milestones</li>
+                            <li>🚚 <strong>Prompt Delivery &amp; Setup</strong> across DMV</li>
+                            <li>✨ <strong>Customized</strong> to your budget &amp; style</li>
+                            <li>💬 <strong>Fast Response</strong> within 24 hours</li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
     `;
 }
+
 
 function renderCart() {
     window.handlePromo = (e) => {
