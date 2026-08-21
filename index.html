@@ -228,6 +228,9 @@
       a{color:inherit;text-decoration:none}
       .skip-link{position:absolute;top:-100px;left:0;background:#d4af37;color:#0d0f12;padding:1rem;z-index:2000}
       .skip-link:focus{top:0}
+      /* CLS Fix: Reserve exact heights for fixed banner+nav so page content never shifts */
+      #top-banner { height: 40px; }
+      #navbar { height: 72px; }
       main{min-height:calc(100vh - 80px);padding-top:calc(80px + 40px)}
       .promo-banner{height:40px;background:linear-gradient(90deg,#b8860b,#d4af37,#f1c40f,#d4af37,#b8860b);background-size:200% auto;color:#0d0f12;display:flex;align-items:center;position:fixed;top:0;left:0;width:100%;z-index:1100;overflow:hidden}
       .glass-nav{position:fixed;top:40px;width:100%;background:rgba(26,29,36,0.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.12);z-index:1000;padding:0.6rem 1.5rem;display:flex;justify-content:space-between;align-items:center;height:72px}
@@ -252,7 +255,7 @@
     <!-- Full stylesheet loads non-blocking (print trick) -->
     <link rel="stylesheet" href="styles.css?v=1.2.0" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="styles.css?v=1.2.0"></noscript>
-    <link rel="preload" href="app.js?v=1.2.0" as="script" crossorigin="anonymous">
+    <link rel="preload" href="app.js?v=1.3.0" as="script" crossorigin="anonymous">
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -460,10 +463,10 @@
     <!-- Sticky Mobile Action Container -->
     <div id="sticky-action-container" class="sticky-mobile-action" aria-live="polite"></div>
 
-    <!-- Feather Icons for lightweight SVGs -->
-    <script src="https://unpkg.com/feather-icons" defer></script>
-    <!-- Google Maps: loaded LAZILY only when user scrolls to contact section --
-         Eliminates 374 KiB from initial page load (was blocking with 30min cache TTL) -->
+    <!-- canvas-confetti: loaded only when needed -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
+    <script src="app.js?v=1.3.0" type="module"></script>
+    <!-- Google Maps: loaded LAZILY only when user scrolls to contact section -->
     <script>
     (function(){
         var mapsLoaded = false;

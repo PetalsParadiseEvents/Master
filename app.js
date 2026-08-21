@@ -1,3 +1,92 @@
+// ═══════════════════════════════════════════════════════════
+// INLINE SVG ICON SYSTEM — Replaces feather-icons CDN entirely
+// Zero forced-reflow: SVGs are injected synchronously, no layout reads
+// ═══════════════════════════════════════════════════════════
+const ICONS = {
+  'menu':          '<polyline points="3 12 21 12"/><polyline points="3 6 21 6"/><polyline points="3 18 21 18"/>',
+  'x':             '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  'shopping-bag':  '<path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>',
+  'chevron-down':  '<polyline points="6 9 12 15 18 9"/>',
+  'grid':          '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
+  'check':         '<polyline points="20 6 9 17 4 12"/>',
+  'check-circle':  '<path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+  'minus':         '<line x1="5" y1="12" x2="19" y2="12"/>',
+  'coffee':        '<path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>',
+  'home':          '<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+  'image':         '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>',
+  'type':          '<polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/>',
+  'zap':           '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  'award':         '<circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>',
+  'facebook':      '<path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>',
+  'instagram':     '<rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>',
+  'message-circle':'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>',
+  'message-square':'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>',
+  'phone':         '<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.22 1.22 2 2 0 012.22 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.16 6.16l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>',
+  'mail':          '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>',
+  'map-pin':       '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>',
+  'search':        '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  'zoom-in':       '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/>',
+  'arrow-right':   '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>',
+  'help-circle':   '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  'shopping-bag2': '<path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>',
+  'trash-2':       '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>',
+  'truck':         '<rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>',
+  'info':          '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+  'star':          '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+};
+
+/**
+ * Returns an inline SVG string for the given icon name.
+ * Accepts optional width/height/style/class overrides via the element's attributes.
+ */
+function renderIcon(name, opts = {}) {
+  const paths = ICONS[name];
+  if (!paths) return '';
+  const w = opts.width  || opts.w || 16;
+  const h = opts.height || opts.h || 16;
+  const cls = opts.class ? ` class="${opts.class}"` : '';
+  const style = opts.style ? ` style="${opts.style}"` : '';
+  const sw = opts.strokeWidth || 2;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"${cls}${style} aria-hidden="true">${paths}</svg>`;
+}
+
+/**
+ * Scans a root element (default: document) for [data-feather] elements and
+ * replaces them with inline SVGs. No layout reads = zero forced reflow.
+ */
+function replaceFeatherIcons(root = document) {
+  root.querySelectorAll('[data-feather]').forEach(el => {
+    const name = el.getAttribute('data-feather');
+    const style = el.getAttribute('style') || '';
+    // Extract width/height from inline style if present
+    const wMatch = style.match(/width:\s*([\d.]+)px/);
+    const hMatch = style.match(/height:\s*([\d.]+)px/);
+    const w = wMatch ? wMatch[1] : 16;
+    const h = hMatch ? hMatch[1] : 16;
+    const sw = el.getAttribute('stroke-width') || 2;
+    const cls = el.getAttribute('class') || '';
+    const paths = ICONS[name];
+    if (!paths) return;
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('stroke-width', sw);
+    svg.setAttribute('stroke-linecap', 'round');
+    svg.setAttribute('stroke-linejoin', 'round');
+    svg.setAttribute('aria-hidden', 'true');
+    if (style) svg.setAttribute('style', style);
+    if (cls) svg.setAttribute('class', cls);
+    svg.innerHTML = paths;
+    el.replaceWith(svg);
+  });
+}
+
+// Shim: make feather.replace() a no-op to avoid errors if anything still calls it
+window.feather = { replace: replaceFeatherIcons };
+
 // State Management
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let appliedPromo = JSON.parse(localStorage.getItem('appliedPromo')) || null;
