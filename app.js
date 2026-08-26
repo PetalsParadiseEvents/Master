@@ -3099,9 +3099,15 @@ window.handleTrackOrder = async function() {
         const isMobileApp = window.location.origin.includes('localhost') || 
                             window.location.protocol.startsWith('file:') || 
                             window.location.hostname === '';
-        const endpoint = (isMobileApp ? 'https://www.petalsparadiseevents.com/api/get_order_status.php' : '/api/get_order_status.php') + `?q=${encodeURIComponent(query)}`;
+        const endpoint = (isMobileApp ? 'https://www.petalsparadiseevents.com/api/get_order_status.php' : '/api/get_order_status.php') + `?q=${encodeURIComponent(query)}&_t=${Date.now()}`;
         
-        const res = await fetch(endpoint);
+        const res = await fetch(endpoint, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            }
+        });
         const rawText = await res.text();
         let data = null;
         try {
