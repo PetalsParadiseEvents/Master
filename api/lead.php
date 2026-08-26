@@ -75,8 +75,13 @@ array_unshift($existingLeads, $leadRecord);
 // Save back atomically
 file_put_contents($leadsFile, json_encode($existingLeads, JSON_PRETTY_PRINT));
 
-// 5. Send Notification Email to Owner
-$to = 'contact@petalsparadiseevents.com';
+// 5. Send Notification Email to Owners / Sales Team
+// Add any additional notification email addresses to this array:
+$notificationEmails = [
+    'contact@petalsparadiseevents.com',
+    // 'sales@petalsparadiseevents.com', // Uncomment or add more emails here
+];
+
 $subject = "🌸 New Lead Received: {$name} ({$eventType})";
 $message = "You received a new customer lead on Petals Paradise Events!\n\n"
          . "----------------------------------------\n"
@@ -91,13 +96,18 @@ $message = "You received a new customer lead on Petals Paradise Events!\n\n"
          . "Date Received: " . date('Y-m-d H:i:s') . "\n"
          . "----------------------------------------\n\n"
          . "This lead has been saved confidentially to your website lead database.\n"
-         . "Export all leads at: https://petalsparadiseevents.com/api/leads_export.php?key=ppe_admin_2026\n";
+         . "View and export all leads at: https://petalsparadiseevents.com/api/leads_export.php\n";
 
 $headers = "From: Petals Paradise Website <contact@petalsparadiseevents.com>\r\n"
-         . "Reply-To: {$email}\r\n"
+         . "Reply-To: " . (!empty($email) ? $email : 'contact@petalsparadiseevents.com') . "\r\n"
          . "X-Mailer: PHP/" . phpversion();
 
-@mail($to, $subject, $message, $headers);
+// Send email to all configured notification recipient addresses
+foreach ($notificationEmails as $recipientEmail) {
+    if (!empty($recipientEmail)) {
+        @mail($recipientEmail, $subject, $message, $headers);
+    }
+}
 
 // 6. Return Response
 echo json_encode([
