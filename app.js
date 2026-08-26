@@ -3009,7 +3009,8 @@ function initAIChatbot() {
                 const reply = (data.response || '').trim();
                 
                 if (!reply) {
-                    appendMessage('system', '🌸 I received an empty response from the server. Please try asking again.');
+                    const detail = data.error || data.debug || 'No text returned';
+                    appendMessage('system', `🌸 AI Notice: ${escapeHtml(detail)}. Please try rephrasing your prompt.`);
                     return;
                 }
 

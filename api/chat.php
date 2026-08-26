@@ -190,7 +190,9 @@ CORE RULES:
         $botResponse = $responseDecoded['candidates'][0]['text'];
     }
 
-    if (!empty($botResponse)) {
+    $botResponse = trim($botResponse);
+
+    if ($botResponse !== '') {
         echo json_encode(['response' => $botResponse]);
     } else {
         $finishReason = isset($responseDecoded['candidates'][0]['finishReason']) ? $responseDecoded['candidates'][0]['finishReason'] : 'No text content returned';
