@@ -8,8 +8,8 @@
  */
 
 // 1. Default Configurations
-$adminUser   = 'biragonimounika@gmail.com';
-$adminPass   = 'Mounika@65';
+$adminUser   = 'admin@petalsparadiseevents.com'; // Override this in api/secrets.php on your server
+$adminPass   = 'ReplaceWithSecurePassword123!';  // Override this in api/secrets.php on your server
 $adminSecret = 'ppe_admin_2026';
 $notificationEmails = [
     'contact@petalsparadiseevents.com',
