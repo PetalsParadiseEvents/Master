@@ -27,6 +27,6 @@ return [
         'biragonimounika@gmail.com'
     ],
 
-    // Gemini AI Chatbot API Key
-    'GEMINI_API_KEY' => ''
+    // Gemini AI Chatbot API Key (From https://aistudio.google.com/)
+    'GEMINI_API_KEY' => 'YOUR_GEMINI_API_KEY_HERE'
 ];
