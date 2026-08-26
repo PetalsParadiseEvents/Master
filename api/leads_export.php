@@ -461,13 +461,14 @@ if ($format === 'json') {
                                 <th>Fulfillment &amp; Logistics</th>
                                 <th>Items Requested</th>
                                 <th>Financials</th>
+                                <th>Status &amp; Actions</th>
                                 <th>Special Notes</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($orders)): ?>
                                 <tr>
-                                    <td colspan="7" class="empty-state">No rental orders placed yet.</td>
+                                    <td colspan="8" class="empty-state">No rental orders placed yet.</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($orders as $order): ?>
@@ -525,7 +526,38 @@ if ($format === 'json') {
                                             Disc: -$<?php echo htmlspecialchars(number_format((float)($order['discount'] ?? 0), 2)); ?><br>
                                             <strong>Total: $<?php echo htmlspecialchars(number_format((float)($order['total'] ?? 0), 2)); ?></strong>
                                         </td>
-                                        <td style="max-width: 220px; font-size: 0.8rem; color: var(--text-muted); white-space: pre-wrap;"><?php echo htmlspecialchars($order['special_requests'] ?? '-'); ?></td>
+                                        <td style="white-space: nowrap; width: 170px;">
+                                            <?php
+                                            $currentStatus = $order['status'] ?? 'Pending';
+                                            $statusColors = [
+                                                'Pending' => 'background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-color: rgba(245, 158, 11, 0.4);',
+                                                'Confirmed' => 'background: rgba(59, 130, 246, 0.15); color: #3b82f6; border-color: rgba(59, 130, 246, 0.4);',
+                                                'Order Picked Up' => 'background: rgba(139, 92, 246, 0.15); color: #8b5cf6; border-color: rgba(139, 92, 246, 0.4);',
+                                                'Out for Delivery' => 'background: rgba(99, 102, 241, 0.15); color: #6366f1; border-color: rgba(99, 102, 241, 0.4);',
+                                                'Delivered' => 'background: rgba(16, 185, 129, 0.15); color: #10b981; border-color: rgba(16, 185, 129, 0.4);',
+                                                'Returned' => 'background: rgba(100, 116, 139, 0.15); color: #94a3b8; border-color: rgba(100, 116, 139, 0.4);',
+                                                'Cancelled' => 'background: rgba(239, 68, 68, 0.15); color: #ef4444; border-color: rgba(239, 68, 68, 0.4);'
+                                            ];
+                                            $badgeStyle = $statusColors[$currentStatus] ?? $statusColors['Pending'];
+                                            ?>
+                                            <div style="margin-bottom: 0.4rem;">
+                                                <span class="badge" id="badge-<?php echo htmlspecialchars($order['id']); ?>" style="<?php echo $badgeStyle; ?>">
+                                                    ● <?php echo htmlspecialchars($currentStatus); ?>
+                                                </span>
+                                            </div>
+                                            
+                                            <select class="form-control" style="font-size: 0.8rem; padding: 0.4rem 0.5rem; min-height: auto; width: 100%; border-radius: 6px; cursor: pointer; background: var(--bg);" onchange="changeOrderStatus('<?php echo htmlspecialchars($order['id']); ?>', this.value)">
+                                                <?php 
+                                                $statuses = ['Pending', 'Confirmed', 'Order Picked Up', 'Out for Delivery', 'Delivered', 'Returned', 'Cancelled'];
+                                                foreach ($statuses as $st): 
+                                                    $selected = ($st === $currentStatus) ? 'selected' : '';
+                                                    echo "<option value=\"{$st}\" {$selected}>{$st}</option>";
+                                                endforeach;
+                                                ?>
+                                            </select>
+                                            <div id="status-msg-<?php echo htmlspecialchars($order['id']); ?>" style="font-size: 0.72rem; margin-top: 0.3rem; color: #10b981; display: none;"></div>
+                                        </td>
+                                        <td style="max-width: 200px; font-size: 0.8rem; color: var(--text-muted); white-space: pre-wrap;"><?php echo htmlspecialchars($order['special_requests'] ?? '-'); ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -575,6 +607,62 @@ if ($format === 'json') {
                 const text = row.innerText.toLowerCase();
                 row.style.display = text.includes(query) ? '' : 'none';
             });
+        }
+
+        async function changeOrderStatus(orderId, newStatus) {
+            const msgDiv = document.getElementById('status-msg-' + orderId);
+            const badge = document.getElementById('badge-' + orderId);
+            
+            if (msgDiv) {
+                msgDiv.style.display = 'block';
+                msgDiv.style.color = '#cbd5e1';
+                msgDiv.innerText = 'Updating...';
+            }
+
+            try {
+                const res = await fetch('update_order_status.php' + (window.location.search || ''), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ order_id: orderId, status: newStatus, notify: true })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    if (msgDiv) {
+                        msgDiv.style.color = '#10b981';
+                        msgDiv.innerText = data.email_sent ? '✅ Status Updated & Email Sent!' : '✅ Status Updated!';
+                        setTimeout(() => { msgDiv.style.display = 'none'; }, 3500);
+                    }
+                    
+                    if (badge) {
+                        badge.innerText = '● ' + newStatus;
+                        const colors = {
+                            'Pending': { bg: 'rgba(245, 158, 11, 0.15)', col: '#f59e0b', bd: 'rgba(245, 158, 11, 0.4)' },
+                            'Confirmed': { bg: 'rgba(59, 130, 246, 0.15)', col: '#3b82f6', bd: 'rgba(59, 130, 246, 0.4)' },
+                            'Order Picked Up': { bg: 'rgba(139, 92, 246, 0.15)', col: '#8b5cf6', bd: 'rgba(139, 92, 246, 0.4)' },
+                            'Out for Delivery': { bg: 'rgba(99, 102, 241, 0.15)', col: '#6366f1', bd: 'rgba(99, 102, 241, 0.4)' },
+                            'Delivered': { bg: 'rgba(16, 185, 129, 0.15)', col: '#10b981', bd: 'rgba(16, 185, 129, 0.4)' },
+                            'Returned': { bg: 'rgba(100, 116, 139, 0.15)', col: '#94a3b8', bd: 'rgba(100, 116, 139, 0.4)' },
+                            'Cancelled': { bg: 'rgba(239, 68, 68, 0.15)', col: '#ef4444', bd: 'rgba(239, 68, 68, 0.4)' }
+                        };
+                        const styleObj = colors[newStatus] || colors['Pending'];
+                        badge.style.background = styleObj.bg;
+                        badge.style.color = styleObj.col;
+                        badge.style.borderColor = styleObj.bd;
+                    }
+                } else {
+                    if (msgDiv) {
+                        msgDiv.style.color = '#ef4444';
+                        msgDiv.innerText = '❌ ' + (data.error || 'Update failed');
+                    }
+                }
+            } catch (e) {
+                if (msgDiv) {
+                    msgDiv.style.color = '#ef4444';
+                    msgDiv.innerText = '❌ Network error';
+                }
+            }
         }
     </script>
 </body>

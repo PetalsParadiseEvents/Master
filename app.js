@@ -2589,9 +2589,11 @@ function router(preserveScroll = false) {
             pageTitle = 'Cookie Policy | Petals Paradise Events';
             metaDesc = 'Learn about our cookie usage and manage your consent preferences for Petals Paradise Events website.';
             break;
-        case '#confirmation':
-            content = renderConfirmation();
-            pageTitle = 'Order Confirmed | Petals Paradise Events';
+        case '#track':
+        case '#track-order':
+            content = renderTrackOrderView();
+            pageTitle = 'Track My Order | Petals Paradise Events';
+            metaDesc = 'Check live status updates for your rental order with Petals Paradise Events.';
             break;
         default: 
             content = renderHome();
@@ -3039,4 +3041,111 @@ function initAIChatbot() {
         return JSON.stringify(obj);
     }
 }
+
+// ═══════════════════════════════════════════════════════════
+// LIVE ORDER TRACKER VIEW
+// ═══════════════════════════════════════════════════════════
+function renderTrackOrderView() {
+    return `
+        <div class="container text-center" style="max-width: 800px; margin: 0 auto; padding-top: calc(112px + 2rem); padding-bottom: 4rem;">
+            <h2 class="section-title">Track Your Rental Order</h2>
+            <p class="section-subtitle">Enter your Order Confirmation ID (e.g., PPE-20260826-123), Email, or Phone Number to check live order status and logistics updates.</p>
+
+            <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; box-shadow: var(--shadow-md); margin-top: 2rem;">
+                <form onsubmit="event.preventDefault(); window.handleTrackOrder();" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <input type="text" id="track-query-input" class="form-control" placeholder="Enter Order ID (e.g. PPE-20260826-123) or Phone..." style="flex: 1; min-width: 240px; height: 52px; font-size: 1rem; border-radius: 30px; padding-left: 1.5rem;" required>
+                    <button type="submit" id="track-submit-btn" class="btn btn-primary" style="height: 52px; padding: 0 2rem; border-radius: 30px;">
+                        🔍 Track Order
+                    </button>
+                </form>
+                <div id="track-result-area" style="margin-top: 2rem; text-align: left;"></div>
+            </div>
+        </div>
+    `;
+}
+
+window.handleTrackOrder = async function() {
+    const input = document.getElementById('track-query-input');
+    const resultArea = document.getElementById('track-result-area');
+    const btn = document.getElementById('track-submit-btn');
+
+    if (!input || !resultArea) return;
+    const query = input.value.trim();
+    if (!query) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Searching...';
+    resultArea.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 1.5rem;">🔍 Searching order database...</p>';
+
+    try {
+        const isMobileApp = window.location.origin.includes('localhost') || 
+                            window.location.protocol.startsWith('file:') || 
+                            window.location.hostname === '';
+        const endpoint = (isMobileApp ? 'https://www.petalsparadiseevents.com/api/get_order_status.php' : '/api/get_order_status.php') + `?q=${encodeURIComponent(query)}`;
+        
+        const res = await fetch(endpoint);
+        const data = await res.json();
+        btn.disabled = false;
+        btn.textContent = '🔍 Track Order';
+
+        if (!data.found || !data.orders || data.orders.length === 0) {
+            resultArea.innerHTML = `
+                <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; padding: 1.25rem; border-radius: 12px; text-align: center;">
+                    🌸 No order found matching "<strong>${escapeHtml(query)}</strong>". Please double check your Confirmation ID or Phone Number.
+                </div>
+            `;
+            return;
+        }
+
+        resultArea.innerHTML = data.orders.map(order => {
+            const currentStatus = order.status || 'Pending';
+            const isDelivery = order.fulfillment_method === 'Delivery';
+            const statusColors = {
+                'Pending': 'background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4);',
+                'Confirmed': 'background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.4);',
+                'Order Picked Up': 'background: rgba(139, 92, 246, 0.15); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.4);',
+                'Out for Delivery': 'background: rgba(99, 102, 241, 0.15); color: #6366f1; border: 1px solid rgba(99, 102, 241, 0.4);',
+                'Delivered': 'background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4);',
+                'Returned': 'background: rgba(100, 116, 139, 0.15); color: #94a3b8; border: 1px solid rgba(100, 116, 139, 0.4);',
+                'Cancelled': 'background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4);'
+            };
+            const badgeStyle = statusColors[currentStatus] || statusColors['Pending'];
+            
+            return `
+                <div style="background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+                        <div>
+                            <span style="font-family: monospace; font-size: 1.1rem; font-weight: 700; color: var(--primary-color);">${escapeHtml(order.id)}</span>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;">Placed on ${escapeHtml(order.date_added)}</div>
+                        </div>
+                        <span class="badge" style="${badgeStyle} font-size: 0.85rem; padding: 0.4rem 0.8rem; border-radius: 20px; font-weight: 600;">
+                            ● ${escapeHtml(currentStatus)}
+                        </span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
+                        <div><strong>Customer:</strong> ${escapeHtml(order.name)}</div>
+                        <div><strong>Event Date:</strong> ${escapeHtml(order.event_date || 'TBD')}</div>
+                        <div><strong>Fulfillment:</strong> ${escapeHtml(order.fulfillment_method)}</div>
+                        ${isDelivery && order.delivery_address ? `<div><strong>Address:</strong> ${escapeHtml(order.delivery_address)}</div>` : ''}
+                    </div>
+
+                    <div style="background: rgba(212,175,55,0.05); border: 1px solid rgba(212,175,55,0.2); border-radius: 10px; padding: 1rem; margin-top: 1rem;">
+                        <h4 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 0.95rem;">Requested Items:</h4>
+                        <ul style="padding-left: 1.2rem; font-size: 0.88rem; color: var(--text-primary); margin: 0; line-height: 1.5;">
+                            ${(Array.isArray(order.items) ? order.items : []).map(it => `
+                                <li>${escapeHtml(it.quantity || 1)}x ${escapeHtml(it.title || 'Item')} (@ $${it.price || 0})</li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+    } catch (err) {
+        btn.disabled = false;
+        btn.textContent = '🔍 Track Order';
+        resultArea.innerHTML = '<p style="color: #ef4444; text-align: center;">❌ Unable to connect to order server. Please try again later.</p>';
+    }
+};
 
