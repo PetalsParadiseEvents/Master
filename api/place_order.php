@@ -26,14 +26,21 @@ if (!$inputData) {
     exit;
 }
 
-// 2. Extract and Sanitize fields
+// 2. Extract and Sanitize fields (supports web forms & AI chatbot payload aliases)
 $name         = isset($inputData['name']) ? trim(filter_var($inputData['name'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
 $email        = isset($inputData['email']) ? trim(filter_var($inputData['email'], FILTER_SANITIZE_EMAIL)) : '';
 $phone        = isset($inputData['phone']) ? trim(filter_var($inputData['phone'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
-$eventDate    = isset($inputData['date']) ? trim(filter_var($inputData['date'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
-$venue        = isset($inputData['location']) ? trim(filter_var($inputData['location'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
-$fulfillment  = isset($inputData['fulfillment']) ? trim(filter_var($inputData['fulfillment'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : 'Pickup';
-$deliveryAddr = isset($inputData['delivery_address']) ? trim(filter_var($inputData['delivery_address'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
+
+$eventDateRaw = isset($inputData['event_date']) ? $inputData['event_date'] : (isset($inputData['date']) ? $inputData['date'] : '');
+$eventDate    = trim(filter_var($eventDateRaw, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
+
+$venueRaw     = isset($inputData['delivery_address']) ? $inputData['delivery_address'] : (isset($inputData['location']) ? $inputData['location'] : (isset($inputData['venue_location']) ? $inputData['venue_location'] : ''));
+$venue        = trim(filter_var($venueRaw, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
+
+$fulfillRaw   = isset($inputData['fulfillment_method']) ? $inputData['fulfillment_method'] : (isset($inputData['fulfillment']) ? $inputData['fulfillment'] : 'Pickup');
+$fulfillment  = trim(filter_var($fulfillRaw, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
+
+$deliveryAddr = isset($inputData['delivery_address']) ? trim(filter_var($inputData['delivery_address'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : $venue;
 $specialReqs  = isset($inputData['special_requests']) ? trim(filter_var($inputData['special_requests'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : '';
 
 // Logistics details

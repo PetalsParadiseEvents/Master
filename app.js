@@ -2798,22 +2798,30 @@ function initAIChatbot() {
 
     // Helper: parse [PLACE_ORDER: {json}] tag and execute automated checkout
     const parseOrderTag = async (text, messageBubbleContainer) => {
-        const orderTagRegex = /\[PLACE_ORDER:(.*?)\]/s;
-        const match = orderTagRegex.exec(text);
-        
-        if (!match) return;
-        
-        const rawJsonStr = match[1].trim();
+        const tagIndex = text.indexOf('[PLACE_ORDER:');
+        if (tagIndex === -1) return;
+
+        const jsonStartIndex = tagIndex + '[PLACE_ORDER:'.length;
+        const lastBracketIndex = text.lastIndexOf(']');
+        if (lastBracketIndex <= jsonStartIndex) return;
+
+        const rawJsonStr = text.substring(jsonStartIndex, lastBracketIndex).trim();
         let orderData = null;
         try {
             orderData = JSON.parse(rawJsonStr);
         } catch (e) {
-            console.error('Failed to parse PLACE_ORDER JSON tag:', e);
+            console.error('Failed to parse PLACE_ORDER JSON tag:', e, rawJsonStr);
             return;
         }
 
-        // Clean [PLACE_ORDER:...] from the text response
-        const cleanedText = text.replace(orderTagRegex, '').trim();
+        // Populate field aliases for place_order.php backend compatibility
+        if (orderData.event_date && !orderData.date) orderData.date = orderData.event_date;
+        if (orderData.fulfillment_method && !orderData.fulfillment) orderData.fulfillment = orderData.fulfillment_method;
+        if (orderData.delivery_address && !orderData.location) orderData.location = orderData.delivery_address;
+
+        // Clean [PLACE_ORDER:...] tag from the displayed text message
+        const fullTag = text.substring(tagIndex, lastBracketIndex + 1);
+        const cleanedText = text.replace(fullTag, '').trim();
         if (messageBubbleContainer && messageBubbleContainer.querySelector('.message-bubble')) {
             messageBubbleContainer.querySelector('.message-bubble').innerHTML = formatResponseText(cleanedText);
         }
