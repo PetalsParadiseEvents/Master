@@ -26,16 +26,20 @@ if (!isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['HTTP_AUTHORIZATION'])) 
 // ═══════════════════════════════════════════════════════════
 $adminUser = ADMIN_USER;
 $adminPass = ADMIN_PASS;
-
-if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']) || 
-    $_SERVER['PHP_AUTH_USER'] !== $adminUser || $_SERVER['PHP_AUTH_PW'] !== $adminPass) {
-    header('WWW-Authenticate: Basic realm="Petals Paradise Events Portal"');
-    header('HTTP/1.0 401 Unauthorized');
-    echo '🌸 Access denied: Invalid username or password.';
-    exit;
-}
+$adminSecret = ADMIN_SECRET;
 
 $providedKey = isset($_GET['key']) ? $_GET['key'] : '';
+$isBypassed = (!empty($adminSecret) && $providedKey === $adminSecret);
+
+if (!$isBypassed) {
+    if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']) || 
+        $_SERVER['PHP_AUTH_USER'] !== $adminUser || $_SERVER['PHP_AUTH_PW'] !== $adminPass) {
+        header('WWW-Authenticate: Basic realm="Petals Paradise Events Portal"');
+        header('HTTP/1.0 401 Unauthorized');
+        echo '🌸 Access denied: Invalid username or password.';
+        exit;
+    }
+}
 
 // ═══════════════════════════════════════════════════════════
 // 2. LOAD DATA (From MySQL Database or fallback to JSON files)
@@ -250,13 +254,13 @@ if ($format === 'json') {
             <p>Leads &amp; Customer Orders — End-to-End Admin Dashboard</p>
         </div>
         <div class="action-btns">
-            <a href="?format=csv&type=leads" id="downloadLeadsCsvBtn" class="btn btn-primary">
+            <a href="?format=csv&type=leads<?php echo !empty($providedKey) ? '&key=' . urlencode($providedKey) : ''; ?>" id="downloadLeadsCsvBtn" class="btn btn-primary">
                 📥 Download Leads CSV
             </a>
-            <a href="?format=csv&type=orders" id="downloadOrdersCsvBtn" class="btn btn-primary" style="display:none;">
+            <a href="?format=csv&type=orders<?php echo !empty($providedKey) ? '&key=' . urlencode($providedKey) : ''; ?>" id="downloadOrdersCsvBtn" class="btn btn-primary" style="display:none;">
                 📥 Download Orders CSV
             </a>
-            <a href="?format=json" class="btn btn-outline" target="_blank">
+            <a href="?format=json<?php echo !empty($providedKey) ? '&key=' . urlencode($providedKey) : ''; ?>" class="btn btn-outline" target="_blank">
                 JSON API
             </a>
         </div>
