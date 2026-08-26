@@ -95,6 +95,16 @@ let rentalDays = parseInt(localStorage.getItem('rentalDays')) || 1;
 let searchQuery = '';
 let selectedCategory = 'All';
 
+function getCart() {
+    try {
+        const stored = JSON.parse(localStorage.getItem('cart'));
+        if (Array.isArray(stored)) {
+            cart = stored;
+        }
+    } catch (e) {}
+    return cart || [];
+}
+
 function saveCart(skipRouter = false) {
     localStorage.setItem('cart', JSON.stringify(cart));
     localStorage.setItem('appliedPromo', JSON.stringify(appliedPromo));
@@ -124,7 +134,8 @@ window.removeItem = (id) => removeFromCart(id);
 window.handleClearCart = () => clearCart();
 window.goToCheckout = (e) => {
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
-    if (!cart || cart.length === 0) {
+    const currentCart = getCart();
+    if (!currentCart || currentCart.length === 0) {
         showToast('Your cart is empty. Add items before checking out!');
         return;
     }
@@ -1524,7 +1535,8 @@ function renderCart() {
 
     setTimeout(() => window.initCartStickyObserver('cart-checkout-btn', 'sticky-checkout'), 100);
 
-    if (cart.length === 0) {
+    const activeCart = getCart();
+    if (activeCart.length === 0) {
         return `
             <div class="container">
                 <h2 class="section-title">Your Cart</h2>
@@ -1676,7 +1688,8 @@ function renderCart() {
 }
 
 function renderCheckout() {
-    if (cart.length === 0) {
+    const activeCart = getCart();
+    if (!activeCart || activeCart.length === 0) {
         window.location.hash = '#cart';
         return '';
     }
