@@ -22,7 +22,7 @@ $adminSecret = ADMIN_SECRET;
 // Handle Form Submission Login
 $loginError = '';
 if (isset($_POST['username']) && isset($_POST['password'])) {
-    if ($_POST['username'] === $adminUser && $_POST['password'] === $adminPass) {
+    if (strtolower(trim($_POST['username'])) === strtolower(trim($adminUser)) && $_POST['password'] === $adminPass) {
         $_SESSION['admin_logged_in'] = true;
         header('Location: leads_export.php' . (!empty($_GET['key']) ? '?key=' . urlencode($_GET['key']) : ''));
         exit;
