@@ -97,13 +97,13 @@ $totalAmount   = isset($orderRecord['total']) ? number_format((float)$orderRecor
 // Format items list for email
 $rawItems = $orderRecord['items'] ?? [];
 $itemsArr = is_string($rawItems) ? json_decode($rawItems, true) : (is_array($rawItems) ? $rawItems : []);
-$itemsText = "";
+$itemsHtml = "";
 if (is_array($itemsArr) && !empty($itemsArr)) {
     foreach ($itemsArr as $it) {
-        $title = $it['title'] ?? 'Rental Item';
-        $qty   = $it['quantity'] ?? 1;
+        $title = htmlspecialchars($it['title'] ?? 'Rental Item');
+        $qty   = (int)($it['quantity'] ?? 1);
         $price = isset($it['price']) ? number_format((float)$it['price'], 2) : '0.00';
-        $itemsText .= "- {$qty}x {$title} (@ \${$price} each)\n";
+        $itemsHtml .= "<li style='margin-bottom: 4px;'><strong>{$qty}x</strong> {$title} (@ \${$price} each)</li>";
     }
 }
 
@@ -119,29 +119,71 @@ if ($notifyCustomer && !empty($customerEmail)) {
     ];
 
     $statusMsgText = $statusMessages[$newStatus] ?? "Your rental order {$orderId} status has been updated to: {$newStatus}.";
+    $trackUrl = "https://petalsparadiseevents.com/#track";
 
     $subject = "🌸 Order Status Update: {$orderId} is now {$newStatus}";
-    $message = "Hi {$customerName},\n\n"
-             . "{$statusMsgText}\n\n"
-             . "ORDER DETAILS SUMMARY:\n"
-             . "----------------------------------------\n"
-             . "Order Confirmation ID: {$orderId}\n"
-             . "Current Status: {$newStatus}\n"
-             . "Fulfillment Method: {$fulfillment}\n"
-             . (!empty($eventDate) ? "Event Date: {$eventDate}\n" : "")
-             . "Total Estimate: \${$totalAmount}\n"
-             . "----------------------------------------\n\n"
-             . "ITEMS IN YOUR RENTAL REQUEST:\n"
-             . "----------------------------------------\n"
-             . (!empty($itemsText) ? $itemsText : "No item details listed.\n")
-             . "----------------------------------------\n\n"
-             . "You can track your order status anytime on our website or reply directly to this email if you have questions.\n\n"
-             . "Warm regards,\n"
-             . "Petals Paradise Events Team\n"
-             . "Phone: +1 848-448-6993\n"
-             . "Website: https://petalsparadiseevents.com\n";
+    $message = "
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset='utf-8'>
+        <title>Order Status Update</title>
+        <style>
+            body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333333; line-height: 1.6; background-color: #f9f9f9; margin: 0; padding: 20px; }
+            .container { max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0; }
+            .header { text-align: center; border-bottom: 2px solid #d4af37; padding-bottom: 15px; margin-bottom: 20px; }
+            .header h2 { color: #1a202c; margin: 0; font-size: 22px; }
+            .status-badge { display: inline-block; background: rgba(212, 175, 55, 0.15); color: #d4af37; border: 1px solid #d4af37; font-weight: bold; padding: 6px 18px; border-radius: 20px; margin-top: 10px; font-size: 14px; }
+            .box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 18px; border-radius: 8px; margin: 18px 0; }
+            .track-btn { display: inline-block; background-color: #d4af37; color: #ffffff !important; padding: 14px 32px; text-decoration: none; border-radius: 30px; font-weight: bold; font-size: 16px; margin: 15px 0; text-align: center; }
+            .footer { font-size: 13px; color: #718096; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 15px; text-align: center; }
+        </style>
+    </head>
+    <body>
+        <div class='container'>
+            <div class='header'>
+                <h2>🌸 Petals Paradise Events</h2>
+                <div class='status-badge'>Status: " . htmlspecialchars($newStatus) . "</div>
+            </div>
+            
+            <p>Hi <strong>" . htmlspecialchars($customerName) . "</strong>,</p>
+            <p>" . htmlspecialchars($statusMsgText) . "</p>
+            
+            <div style='text-align: center; margin: 25px 0;'>
+                <a href='{$trackUrl}' class='track-btn' target='_blank'>📦 Track Your Order Live</a>
+            </div>
 
-    $headers = "From: Petals Paradise Events <contact@petalsparadiseevents.com>\r\n"
+            <div class='box'>
+                <h3 style='margin-top:0; color:#2d3748; font-size:16px;'>📋 Order Details Summary</h3>
+                <p style='margin: 5px 0;'><strong>Order Confirmation ID:</strong> <span style='font-family: monospace; font-weight: bold; color: #d4af37;'>" . htmlspecialchars($orderId) . "</span></p>
+                <p style='margin: 5px 0;'><strong>Current Status:</strong> " . htmlspecialchars($newStatus) . "</p>
+                <p style='margin: 5px 0;'><strong>Fulfillment Method:</strong> " . htmlspecialchars($fulfillment) . "</p>" .
+                (!empty($eventDate) ? "<p style='margin: 5px 0;'><strong>Event Date:</strong> " . htmlspecialchars($eventDate) . "</p>" : "") . "
+                <p style='margin: 5px 0;'><strong>Total Estimate:</strong> \$" . htmlspecialchars($totalAmount) . "</p>
+            </div>
+
+            <div class='box'>
+                <h3 style='margin-top:0; color:#2d3748; font-size:16px;'>🛍️ Requested Items</h3>
+                <ul style='padding-left: 20px; margin-bottom: 0;'>" . 
+                (!empty($itemsHtml) ? $itemsHtml : "<li>No item details listed.</li>") . "
+                </ul>
+            </div>
+
+            <p style='font-size: 14px; color: #4a5568;'>Direct tracking link:<br>
+            <a href='{$trackUrl}' style='color: #d4af37; text-decoration: underline; word-break: break-all;'>{$trackUrl}</a></p>
+
+            <div class='footer'>
+                <p><strong>Petals Paradise Events</strong><br>
+                Crafting Unforgettable Moments in Loudoun County & DMV<br>
+                Phone: +1 848-448-6993 | Website: <a href='https://petalsparadiseevents.com' style='color:#d4af37;'>petalsparadiseevents.com</a></p>
+            </div>
+        </div>
+    </body>
+    </html>";
+
+    $headers = "MIME-Version: 1.0\r\n"
+             . "Content-Type: text/html; charset=UTF-8\r\n"
+             . "From: Petals Paradise Events <contact@petalsparadiseevents.com>\r\n"
              . "Reply-To: contact@petalsparadiseevents.com\r\n"
              . "X-Mailer: PHP/" . phpversion();
 
