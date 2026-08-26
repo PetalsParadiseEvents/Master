@@ -133,9 +133,17 @@ CORE RULES:
         ]
     ];
 
-    // 6. Execute Dual Engine HTTP Request (cURL primary, stream_context fallback)
-    $apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
-    $apiResult = makeGeminiRequest($apiUrl, $payload, GEMINI_API_KEY);
+    // 6. Execute Dual Engine HTTP Request with automatic model fallback
+    $modelsToTry = ['gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-2.5-flash', 'gemini-pro'];
+    $apiResult = null;
+    
+    foreach ($modelsToTry as $modelName) {
+        $apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/{$modelName}:generateContent";
+        $apiResult = makeGeminiRequest($apiUrl, $payload, GEMINI_API_KEY);
+        if ($apiResult['status'] === 200) {
+            break;
+        }
+    }
 
     $httpStatus = $apiResult['status'];
     $rawResponseBody = $apiResult['body'];
