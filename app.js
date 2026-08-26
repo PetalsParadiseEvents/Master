@@ -543,6 +543,7 @@ function renderNavbar() {
             <a href="#gallery" class="nav-link">Gallery</a>
             <a href="#videos" class="nav-link">Videos</a>
             <a href="#contact" class="nav-link">Contact Us</a>
+            <a href="#track" class="nav-link">Track Order</a>
             <a href="#contact" class="nav-link nav-plan-btn">✨ Plan My Event</a>
         </div>
         <a href="#cart" class="cart-icon-container" aria-label="View cart with ${cart.reduce((sum, item) => sum + item.quantity, 0)} items">
@@ -585,6 +586,7 @@ function renderNavbar() {
             <a href="#gallery" class="nav-link">Gallery</a>
             <a href="#videos" class="nav-link">Videos</a>
             <a href="#contact" class="nav-link">Contact Us</a>
+            <a href="#track" class="nav-link">Track Order</a>
             <a href="#contact" class="nav-link mobile-plan-btn" style="color: var(--primary-color); font-weight: 700; margin-top: 0.5rem; display: inline-block;">✨ Plan My Event</a>
         </div>
     `;
@@ -670,6 +672,7 @@ function renderFooter() {
                 <a href="#rentals">Rentals</a>
                 <a href="#services">Services</a>
                 <a href="#gallery">Gallery</a>
+                <a href="#track">Track Order</a>
             </div>
             <div class="footer-col">
                 <h3>Service Areas</h3>
