@@ -11,6 +11,7 @@ require_once __DIR__ . '/config.php';
 if (isset($_GET['logout'])) {
     unset($_SESSION['admin_logged_in']);
     session_destroy();
+    setcookie('ppe_auth', '', time() - 3600, '/');
     header('Location: leads_export.php');
     exit;
 }
@@ -19,11 +20,14 @@ $adminUser = ADMIN_USER;
 $adminPass = ADMIN_PASS;
 $adminSecret = ADMIN_SECRET;
 
+$cookieHash = md5($adminUser . $adminPass . $adminSecret);
+
 // Handle Form Submission Login
 $loginError = '';
 if (isset($_POST['username']) && isset($_POST['password'])) {
     if (strtolower(trim($_POST['username'])) === strtolower(trim($adminUser)) && $_POST['password'] === $adminPass) {
         $_SESSION['admin_logged_in'] = true;
+        setcookie('ppe_auth', $cookieHash, time() + 86400 * 30, '/', '', true, true);
         header('Location: leads_export.php' . (!empty($_GET['key']) ? '?key=' . urlencode($_GET['key']) : ''));
         exit;
     } else {
@@ -33,8 +37,9 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
 $providedKey = isset($_GET['key']) ? $_GET['key'] : '';
 $isBypassed = (!empty($adminSecret) && $providedKey === $adminSecret);
+$isCookieValid = (isset($_COOKIE['ppe_auth']) && $_COOKIE['ppe_auth'] === $cookieHash);
 
-$isAuthenticated = $isBypassed || (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true);
+$isAuthenticated = $isBypassed || (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) || $isCookieValid;
 
 if (!$isAuthenticated) {
     // Render a premium, styled login page matching the site's dark/gold theme
