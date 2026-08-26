@@ -1500,7 +1500,7 @@ function renderCart() {
         });
     };
 
-    window.initStickyObserver = (buttonId, stickyId) => {
+    window.initCartStickyObserver = (buttonId, stickyId) => {
         const btn = document.getElementById(buttonId);
         const sticky = document.getElementById(stickyId);
         if (btn && sticky) {
@@ -1513,7 +1513,7 @@ function renderCart() {
         }
     };
 
-    setTimeout(() => window.initStickyObserver('cart-checkout-btn', 'sticky-checkout'), 100);
+    setTimeout(() => window.initCartStickyObserver('cart-checkout-btn', 'sticky-checkout'), 100);
 
     if (cart.length === 0) {
         return `
@@ -1631,7 +1631,7 @@ function renderCart() {
                         <span style="font-size: 1rem; color: var(--text-secondary);">Total Estimate:</span>
                         <span style="font-size: 1.25rem; font-weight: 700; color: var(--primary-color); text-align: right;">$${subtotal - discount}${fulfillmentMethod === 'Delivery' ? ' + Delivery (TBD)' : ''}</span>
                     </div>
-                    <a href="#checkout" id="cart-checkout-btn" class="btn btn-primary" style="width: 100%; text-align: center; margin-top: 1.5rem; display: block; padding: 1.2rem;">
+                    <a href="#checkout" id="cart-checkout-btn" class="btn btn-primary" style="width: 100%; text-align: center; margin-top: 1.5rem; display: block; padding: 1.2rem;" onclick="window.location.hash='#checkout';">
                         Proceed to Checkout
                     </a>
                     <a href="#rentals" class="btn btn-outline" style="width: 100%; text-align:center; margin-top:1rem;">Continue Shopping</a>
@@ -1660,7 +1660,7 @@ function renderCart() {
             
             <!-- Sticky Checkout Button for Mobile -->
             <div id="sticky-checkout" class="sticky-checkout-container">
-                <a href="#checkout" class="btn btn-primary" style="width: 100%; text-align:center;">Proceed to Checkout</a>
+                <a href="#checkout" class="btn btn-primary" style="width: 100%; text-align:center;" onclick="window.location.hash='#checkout';">Proceed to Checkout</a>
             </div>
         </div>
     `;
