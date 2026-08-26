@@ -2589,6 +2589,10 @@ function router(preserveScroll = false) {
             pageTitle = 'Cookie Policy | Petals Paradise Events';
             metaDesc = 'Learn about our cookie usage and manage your consent preferences for Petals Paradise Events website.';
             break;
+        case '#confirmation':
+            content = renderConfirmation();
+            pageTitle = 'Order Confirmed | Petals Paradise Events';
+            break;
         case '#track':
         case '#track-order':
             content = renderTrackOrderView();
