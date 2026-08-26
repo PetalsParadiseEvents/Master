@@ -64,14 +64,29 @@ if (!$isAuthenticated) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// 2. LOAD LEADS DATA
+// 2. LOAD LEADS DATA (From MySQL Database or fallback to JSON)
 // ═══════════════════════════════════════════════════════════
-$leadsFile = __DIR__ . '/leads.json';
 $leads = [];
+$pdo = getDbConnection();
 
-if (file_exists($leadsFile)) {
-    $fileContent = file_get_contents($leadsFile);
-    $leads = json_decode($fileContent, true) ?: [];
+if ($pdo) {
+    try {
+        $stmt = $pdo->query("SELECT * FROM `leads` ORDER BY `date_added` DESC");
+        $dbLeads = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (!empty($dbLeads)) {
+            $leads = $dbLeads;
+        }
+    } catch (Exception $e) {
+        // Silently fallback to JSON
+    }
+}
+
+if (empty($leads)) {
+    $leadsFile = __DIR__ . '/leads.json';
+    if (file_exists($leadsFile)) {
+        $fileContent = file_get_contents($leadsFile);
+        $leads = json_decode($fileContent, true) ?: [];
+    }
 }
 
 // Optional test lead generator: ?test=1

@@ -61,7 +61,32 @@ $leadRecord = [
 ];
 
 
-// 4. Save to Confidential leads.json
+// 4a. Save to MySQL Database (Hostinger phpMyAdmin)
+$pdo = getDbConnection();
+if ($pdo) {
+    try {
+        $stmt = $pdo->prepare("INSERT INTO `leads` (`id`, `date_added`, `name`, `email`, `phone`, `event_type`, `service_tier`, `guest_count`, `budget`, `event_date`, `location`, `source`, `notes`) VALUES (:id, :date_added, :name, :email, :phone, :event_type, :service_tier, :guest_count, :budget, :event_date, :location, :source, :notes)");
+        $stmt->execute([
+            ':id'           => $leadRecord['id'],
+            ':date_added'   => $leadRecord['date_added'],
+            ':name'         => $leadRecord['name'],
+            ':email'        => $leadRecord['email'],
+            ':phone'        => $leadRecord['phone'],
+            ':event_type'   => $leadRecord['event_type'],
+            ':service_tier' => $leadRecord['service_tier'],
+            ':guest_count'  => $leadRecord['guest_count'],
+            ':budget'       => $leadRecord['budget'],
+            ':event_date'   => $leadRecord['event_date'],
+            ':location'     => $leadRecord['location'],
+            ':source'       => $leadRecord['source'],
+            ':notes'        => $leadRecord['notes']
+        ]);
+    } catch (Exception $e) {
+        // Silently fallback to leads.json
+    }
+}
+
+// 4b. Save to Confidential leads.json (File backup)
 $leadsFile = __DIR__ . '/leads.json';
 $existingLeads = [];
 
@@ -73,8 +98,6 @@ if (file_exists($leadsFile)) {
 }
 
 array_unshift($existingLeads, $leadRecord);
-
-// Save back atomically
 file_put_contents($leadsFile, json_encode($existingLeads, JSON_PRETTY_PRINT));
 
 // 5. Send Notification Email to Owners / Sales Team
