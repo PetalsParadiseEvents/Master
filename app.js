@@ -686,8 +686,15 @@ function renderFooter() {
                 <p style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;"><i data-feather="map-pin" style="width: 20px; height: 20px; flex-shrink: 0; color: var(--primary-color);"></i> <span style="line-height: 1;"><a href="./locations/" style="color: inherit; text-decoration: none; margin: 0; display: inline;">Serving Ashburn, Aldie & DMV Area</a></span></p>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; ${new Date().getFullYear()} Petals Paradise Events. All Rights Reserved.</p>
+        <div class="footer-bottom" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1.5rem;">
+            <p style="margin: 0;">&copy; ${new Date().getFullYear()} Petals Paradise Events. All Rights Reserved.</p>
+            <div style="display: flex; gap: 1rem; font-size: 0.85rem;">
+                <a href="#privacy" style="color: var(--text-secondary); text-decoration: none; transition: var(--transition);" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='var(--text-secondary)'">Privacy Policy</a>
+                <span style="color: var(--border-color);">|</span>
+                <a href="#terms" style="color: var(--text-secondary); text-decoration: none; transition: var(--transition);" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='var(--text-secondary)'">Terms of Service</a>
+                <span style="color: var(--border-color);">|</span>
+                <a href="#cookies" style="color: var(--text-secondary); text-decoration: none; transition: var(--transition);" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='var(--text-secondary)'">Cookie Policy</a>
+            </div>
         </div>
     `;
     feather.replace();
@@ -1775,7 +1782,7 @@ function renderCheckout() {
             const input = document.querySelector('input[name="delivery_address"]');
             if (!input) return;
 
-            if (window.google && window.google.maps && window.google.maps.places) {
+            if (window.google && window.google.maps && window.google.maps.places && !window.googleMapsAuthFailed) {
                 if (!input.hasAttribute('data-autocomplete-init')) {
                     const autocomplete = new google.maps.places.Autocomplete(input, {
                         types: ['address'],
@@ -1790,8 +1797,17 @@ function renderCheckout() {
                         }
                     });
                 }
-            } else if (typeof window.loadGoogleMaps === 'function') {
-                window.loadGoogleMaps();
+            } else {
+                // If maps auth failed or script is missing, enforce manual address input
+                input.style.backgroundImage = 'none';
+                if (window.googleMapsAuthFailed) {
+                    input.placeholder = "Enter full address manually";
+                }
+                input.disabled = false;
+                input.readOnly = false;
+                input.removeAttribute('disabled');
+                input.removeAttribute('readonly');
+                input.classList.remove('pac-target-input');
             }
         } catch (error) {
             console.error("Google Maps Autocomplete failed to initialize:", error);
@@ -1800,6 +1816,7 @@ function renderCheckout() {
 
     // Global handler for Google Maps authentication failures
     window.gm_authFailure = () => {
+        window.googleMapsAuthFailed = true;
         console.warn("Google Maps authentication failed. Switching to manual address entry.");
         const input = document.querySelector('input[name="delivery_address"]');
         if (input) {
@@ -2158,6 +2175,346 @@ function renderConfirmation() {
     `;
 }
 
+// Render Legal Pages
+function renderPrivacy() {
+    return `
+        <div class="container legal-page-container">
+            <h1 class="section-title text-center">Privacy Policy</h1>
+            <p class="section-subtitle text-center">Last Updated: August 2026</p>
+            
+            <div class="legal-content-card">
+                <section class="legal-section">
+                    <h2>1. Introduction</h2>
+                    <p>At Petals Paradise Events, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website, use our rental cart, or contact us for inquiries.</p>
+                </section>
+
+                <section class="legal-section">
+                    <h2>2. Information We Collect</h2>
+                    <p>We only collect personal information that you voluntarily provide to us when submitting an event inquiry, placing a rental request, or communicating with us. This information includes:</p>
+                    <ul>
+                        <li><strong>Contact Information:</strong> Name, email address, phone number.</li>
+                        <li><strong>Event Details:</strong> Event date, estimated budget, estimated guest count, event type/milestone, and special design vision.</li>
+                        <li><strong>Fulfillment Details:</strong> Delivery address, venue location, pickup/delivery date and time, and return/collection date and time.</li>
+                        <li><strong>Cart Preferences:</strong> The list of party rental items you select.</li>
+                    </ul>
+                </section>
+
+                <section class="legal-section">
+                    <h2>3. How We Use Your Information</h2>
+                    <p>We use the collected information for the following business purposes:</p>
+                    <ul>
+                        <li>To review, quote, and fulfill your party rental and decor requests.</li>
+                        <li>To contact you regarding logistics (delivery, setup, pickup, and collection details).</li>
+                        <li>To respond to your questions, custom requests, and customer service inquiries.</li>
+                        <li>To send optional promotional updates, seasonal offers, and discounts (you can opt out at any time).</li>
+                        <li>To improve our website functionality, customer experience, and chatbot assistant responses.</li>
+                    </ul>
+                </section>
+
+                <section class="legal-section">
+                    <h2>4. Data Sharing and Protection</h2>
+                    <p>We value your trust and guarantee that **we do not sell, rent, or trade your personal information** to third parties. We only share information with third parties when necessary to operate our business or as required by law, such as:</p>
+                    <ul>
+                        <li><strong>Service Providers:</strong> Google Maps Places API for address autocomplete verification during checkout.</li>
+                        <li><strong>Legal Compliance:</strong> If required by law, subpoena, or to protect the safety and rights of Petals Paradise Events or others.</li>
+                    </ul>
+                    <p>We implement appropriate physical, technical, and administrative security measures to protect your personal data against unauthorized access, loss, or misuse.</p>
+                </section>
+
+                <section class="legal-section">
+                    <h2>5. Cookies and Local Storage</h2>
+                    <p>Our website uses cookies and browser local storage to provide essential services, including:</p>
+                    <ul>
+                        <li>Saving your rental cart items and rental duration preferences.</li>
+                        <li>Storing your fulfillment method selection (Pickup vs. Delivery).</li>
+                        <li>Recording your cookie consent preference settings.</li>
+                    </ul>
+                    <p>You can manage your cookie consent preferences at any time through our <a href="#cookies" style="color: var(--primary-color); text-decoration: underline;">Cookie Policy page</a>.</p>
+                </section>
+
+                <section class="legal-section">
+                    <h2>6. Your Rights</h2>
+                    <p>Depending on your location, you may have rights regarding your personal data under various data protection laws (such as GDPR or CCPA), including the right to access, correct, or request deletion of the personal data we hold about you. To exercise these rights, please contact us using the details below.</p>
+                </section>
+
+                <section class="legal-section">
+                    <h2>7. Contact Us</h2>
+                    <p>If you have any questions, concerns, or requests regarding this Privacy Policy, please reach out to us:</p>
+                    <div class="contact-box-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                        <div class="card no-zoom" style="padding: 1rem; background: var(--surface-color); border: 1px solid var(--border-color); text-align: center; cursor: default;">
+                            <i data-feather="mail" style="color: var(--primary-color); margin-bottom: 0.5rem;"></i>
+                            <p style="font-weight: 600; margin: 0;">Email Us</p>
+                            <a href="mailto:contact@petalsparadiseevents.com" style="color: var(--primary-color); text-decoration: underline;">contact@petalsparadiseevents.com</a>
+                        </div>
+                        <div class="card no-zoom" style="padding: 1rem; background: var(--surface-color); border: 1px solid var(--border-color); text-align: center; cursor: default;">
+                            <i data-feather="phone" style="color: var(--primary-color); margin-bottom: 0.5rem;"></i>
+                            <p style="font-weight: 600; margin: 0;">Call Us</p>
+                            <a href="tel:+18484486993" style="color: var(--primary-color); text-decoration: underline;">+1 848-448-6993</a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+            <div class="text-center" style="margin-top: 2rem; margin-bottom: 4rem;">
+                <a href="#" class="btn btn-outline">Back to Home</a>
+            </div>
+        </div>
+    `;
+}
+
+function renderTerms() {
+    return `
+        <div class="container legal-page-container">
+            <h1 class="section-title text-center">Terms of Service</h1>
+            <p class="section-subtitle text-center">Last Updated: August 2026</p>
+            
+            <div class="legal-content-card">
+                <section class="legal-section">
+                    <h2>1. Scope of Agreement</h2>
+                    <p>These Terms of Service govern the rental of party inventory and decoration services provided by Petals Paradise Events. By placing a rental request through our cart and checkout, you agree to comply with and be bound by these terms.</p>
+                </section>
+
+                <section class="legal-section">
+                    <h2>2. Booking, Deposit, and Confirmation</h2>
+                    <p>Submitting a rental request through this website **does not guarantee availability** of the requested items. Your order is not booked or confirmed until:</p>
+                    <ol>
+                        <li>Our team reviews your request and verifies inventory availability for your event date.</li>
+                        <li>We contact you to confirm logistics and provide the final price quote (including delivery fees, if applicable).</li>
+                        <li>A security deposit or full payment is received, and a formal rental agreement is signed.</li>
+                    </ol>
+                    <p>We reserve the right to decline rental requests for any reason, including scheduling conflicts or location constraints.</p>
+                </section>
+
+                <section class="legal-section">
+                    <h2>3. Rental Period and Late Returns</h2>
+                    <p>Unless agreed otherwise in writing, all rentals are for a standard duration of **1 day (24 hours)**. The customer agrees to pick up or receive delivery, and return or allow collection of the items, at the times specified during checkout or in the signed rental agreement.</p>
+                    <p>Late returns are subject to a late fee of **$50 per day** plus additional rental charges for each day the items are kept past the agreed return date.</p>
+                </section>
+
+                <section class="legal-section">
+                    <h2>4. Delivery, Setup, and Pick-up</h2>
+                    <p>For delivery orders, delivery fees are calculated based on mileage, logistics, and setup requirements. It is the customer's responsibility to:</p>
+                    <ul>
+                        <li>Ensure a safe, accessible, cleared, and flat area is ready for delivery and setup.</li>
+                        <li>Verify that the venue permits outside rental vendors and setup teams.</li>
+                        <li>Be present (or delegate an authorized representative) at the time of delivery to inspect and sign off on the condition of the rentals.</li>
+                    </ul>
+                </section>
+
+                <section class="legal-section">
+                    <h2>5. Customer Responsibility and Damages</h2>
+                    <p>From the time of receipt (delivery or pickup) until the time of return (collection or drop-off), the customer assumes full custody and responsibility for the rented items. The customer agrees that:</p>
+                    <ul>
+                        <li>Rentals must be used only for their intended purposes and protected from severe weather (rain, high winds, extreme heat).</li>
+                        <li>All items must be returned in the same clean, undamaged condition as received.</li>
+                        <li>**Damages, Stains, or Loss:** If items are returned damaged, stained, broken, or are lost/stolen, the customer is liable for the full cost of professional cleaning, repair, or complete replacement of the item. Replacement fees will be deducted from the security deposit or billed directly to the customer.</li>
+                    </ul>
+                </section>
+
+                <section class="legal-section">
+                    <h2>6. Cancellations and Refunds</h2>
+                    <p>We understand that event plans change. Our cancellation policy is as follows:</p>
+                    <ul>
+                        <li><strong>14+ Days Notice:</strong> Cancellations made 14 or more days before the scheduled event date are eligible for a **100% refund** of payments made (excluding non-refundable design deposits, if applicable).</li>
+                        <li><strong>7 to 13 Days Notice:</strong> Cancellations made between 7 and 13 days before the event date are eligible for a **50% refund**.</li>
+                        <li><strong>Under 7 Days Notice:</strong> Cancellations made less than 7 days before the event date are **non-refundable**.</li>
+                    </ul>
+                </section>
+
+                <section class="legal-section">
+                    <h2>7. Limitation of Liability</h2>
+                    <p>Petals Paradise Events is not liable for any injuries, accidents, property damage, or losses resulting from the setup, use, or failure of rented items (including tents, Loveseats, tables, neon signs, Urli tubs, or folding chairs). The customer agrees to indemnify and hold harmless Petals Paradise Events from any claims arising from the rental usage.</p>
+                </section>
+
+                <section class="legal-section">
+                    <h2>8. Governing Law</h2>
+                    <p>These terms and any rental agreement signed with Petals Paradise Events shall be governed by and construed in accordance with the laws of the Commonwealth of Virginia, USA.</p>
+                </section>
+            </div>
+            
+            <div class="text-center" style="margin-top: 2rem; margin-bottom: 4rem;">
+                <a href="#" class="btn btn-outline">Back to Home</a>
+            </div>
+        </div>
+    `;
+}
+
+function renderCookies() {
+    const consentVal = localStorage.getItem('cookie_consent') || 'Not Set';
+    let statusBadge = '<span class="cookie-status-badge status-declined">Non-Essential Declined / Not Set</span>';
+    if (consentVal === 'accepted') {
+        statusBadge = '<span class="cookie-status-badge status-accepted">All Cookies Allowed</span>';
+    } else if (consentVal === 'declined') {
+        statusBadge = '<span class="cookie-status-badge status-declined">Essential Only Allowed</span>';
+    }
+
+    setTimeout(() => {
+        const btn = document.getElementById('manage-cookies-trigger-btn');
+        if (btn) {
+            btn.onclick = (e) => {
+                e.preventDefault();
+                localStorage.removeItem('cookie_consent');
+                showCookieBanner();
+            };
+        }
+    }, 100);
+
+    return `
+        <div class="container legal-page-container">
+            <h1 class="section-title text-center">Cookie Policy</h1>
+            <p class="section-subtitle text-center">Last Updated: August 2026</p>
+            
+            <div class="legal-content-card">
+                <section class="legal-section">
+                    <h2>1. What Are Cookies?</h2>
+                    <p>Cookies are small text files stored on your computer or mobile device when you visit websites. They help the website remember your actions, preferences, and details over time (such as login states or items added to a cart) so you don't have to re-enter them whenever you return.</p>
+                </section>
+
+                <section class="legal-section">
+                    <h2>2. How We Use Cookies and Local Storage</h2>
+                    <p>At Petals Paradise Events, we respect your privacy and minimize the use of trackers. We do not use third-party marketing trackers or ad cookies. Instead, we use cookies and **local browser storage** to provide core website functionality:</p>
+                    <table class="cookies-table">
+                        <thead>
+                            <tr>
+                                <th>Name / Key</th>
+                                <th>Type</th>
+                                <th>Duration</th>
+                                <th>Purpose</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>cart</code></td>
+                                <td>Essential LocalStorage</td>
+                                <td>Persistent</td>
+                                <td>Saves the list of items you've added to your party rental cart.</td>
+                            </tr>
+                            <tr>
+                                <td><code>rental_days</code></td>
+                                <td>Essential LocalStorage</td>
+                                <td>Persistent</td>
+                                <td>Saves your selected rental duration preference (number of days).</td>
+                            </tr>
+                            <tr>
+                                <td><code>fulfillment_method</code></td>
+                                <td>Essential LocalStorage</td>
+                                <td>Persistent</td>
+                                <td>Remembers your preference for order Pickup vs. Delivery.</td>
+                            </tr>
+                            <tr>
+                                <td><code>cookie_consent</code></td>
+                                <td>Essential LocalStorage</td>
+                                <td>Persistent</td>
+                                <td>Saves your preference for cookie consent (Accepted or Declined).</td>
+                            </tr>
+                            <tr>
+                                <td><code>lastPlacedOrderId</code></td>
+                                <td>Essential LocalStorage</td>
+                                <td>Persistent</td>
+                                <td>Temporarily displays your confirmation ID on the order confirmation screen.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section class="legal-section">
+                    <h2>3. Third-Party Services We Use</h2>
+                    <p>We load external libraries from third-party providers who may place cookies or access your browser data for essential services:</p>
+                    <ul>
+                        <li><strong>Google Maps JavaScript API & Places Autocomplete:</strong> Used to verify delivery addresses at checkout. Google may place cookies or gather browser information to verify referrers and handle authentication.</li>
+                        <li><strong>Google Fonts:</strong> Used to load typography. No cookies are set, but your IP address is visible to Google to serve the font files.</li>
+                    </ul>
+                </section>
+
+                <section class="legal-section">
+                    <h2>4. Your Consent Status</h2>
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 8px; margin-top: 1rem; margin-bottom: 1.5rem;">
+                        <p style="margin-bottom: 0.8rem; font-weight: 500;">Current Cookie Preference Settings:</p>
+                        <div style="margin-bottom: 1.2rem;">
+                            ${statusBadge}
+                        </div>
+                        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1.2rem;">
+                            You can change or reset your cookie preferences at any time. Clicking the button below will clear your previous selection and reopen the cookie consent settings banner.
+                        </p>
+                        <button id="manage-cookies-trigger-btn" class="btn btn-outline" style="font-size: 0.85rem; padding: 8px 16px;">
+                            ⚙️ Reset Cookie Preferences
+                        </button>
+                    </div>
+                </section>
+
+                <section class="legal-section">
+                    <h2>5. Managing Cookies in Your Browser</h2>
+                    <p>You can block or delete cookies directly through your web browser's settings. Please note that if you block essential local storage/cookies, some features of our site (such as adding items to the rental cart and maintaining a checkout session) will not function correctly.</p>
+                </section>
+            </div>
+            
+            <div class="text-center" style="margin-top: 2rem; margin-bottom: 4rem;">
+                <a href="#" class="btn btn-outline">Back to Home</a>
+            </div>
+        </div>
+    `;
+}
+
+// Cookie Consent Banner Code
+function initCookieConsent() {
+    const consent = localStorage.getItem('cookie_consent');
+    if (!consent) {
+        setTimeout(showCookieBanner, 1500);
+    }
+}
+
+function showCookieBanner() {
+    if (document.getElementById('cookie-consent-banner')) return;
+
+    const banner = document.createElement('div');
+    banner.id = 'cookie-consent-banner';
+    banner.className = 'cookie-consent-banner';
+    banner.setAttribute('role', 'alert');
+    banner.setAttribute('aria-live', 'assertive');
+    
+    banner.innerHTML = `
+        <div class="cookie-consent-content">
+            <div class="cookie-consent-text">
+                <h3>🍪 Cookie Consent</h3>
+                <p>
+                    We use essential cookies and browser local storage to maintain your rental cart items, fulfill checkout details, and enhance your browsing experience. Read our <a href="#privacy" style="color: var(--primary-color); text-decoration: underline;">Privacy Policy</a> to learn more.
+                </p>
+            </div>
+            <div class="cookie-consent-actions">
+                <button id="cookie-decline-btn" class="btn btn-outline" style="padding: 8px 16px; font-size: 0.85rem; border-color: var(--border-color); color: var(--text-secondary);">Decline</button>
+                <button id="cookie-accept-btn" class="btn btn-primary" style="padding: 8px 20px; font-size: 0.85rem;">Accept All</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(banner);
+    
+    document.getElementById('cookie-accept-btn').onclick = () => {
+        localStorage.setItem('cookie_consent', 'accepted');
+        hideCookieBanner();
+    };
+    
+    document.getElementById('cookie-decline-btn').onclick = () => {
+        localStorage.setItem('cookie_consent', 'declined');
+        hideCookieBanner();
+    };
+}
+
+function hideCookieBanner() {
+    const banner = document.getElementById('cookie-consent-banner');
+    if (banner) {
+        banner.classList.add('hide');
+        setTimeout(() => {
+            if (banner.parentNode) {
+                banner.parentNode.removeChild(banner);
+            }
+            if (window.location.hash === '#cookies') {
+                router(true);
+            }
+        }, 400);
+    }
+}
+
 // Router
 function router(preserveScroll = false) {
     const hash = window.location.hash || '#';
@@ -2217,6 +2574,21 @@ function router(preserveScroll = false) {
             content = renderCheckout(); 
             pageTitle = 'Secure Checkout | Petals Paradise Events';
             break;
+        case '#privacy':
+            content = renderPrivacy();
+            pageTitle = 'Privacy Policy | Petals Paradise Events';
+            metaDesc = 'Read our Privacy Policy to understand how Petals Paradise Events handles your personal data, rental orders, and cookie preferences.';
+            break;
+        case '#terms':
+            content = renderTerms();
+            pageTitle = 'Terms of Service | Petals Paradise Events';
+            metaDesc = 'Review the Terms of Service and Rental Agreement details for booking with Petals Paradise Events.';
+            break;
+        case '#cookies':
+            content = renderCookies();
+            pageTitle = 'Cookie Policy | Petals Paradise Events';
+            metaDesc = 'Learn about our cookie usage and manage your consent preferences for Petals Paradise Events website.';
+            break;
         case '#confirmation':
             content = renderConfirmation();
             pageTitle = 'Order Confirmed | Petals Paradise Events';
@@ -2264,6 +2636,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderSMSWidget();
     initImageModal();
     initAIChatbot();
+    initCookieConsent();
 });
 
 function initImageModal() {

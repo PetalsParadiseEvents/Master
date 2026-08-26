@@ -470,6 +470,35 @@
     <script>
     (function(){
         window.mapsLoaded = false;
+        window.googleMapsAuthFailed = false;
+
+        // Define global handler for Google Maps authentication failures immediately
+        window.gm_authFailure = function() {
+            window.googleMapsAuthFailed = true;
+            console.warn("Google Maps authentication failed. Switching to manual address entry.");
+            var input = document.querySelector('input[name="delivery_address"]');
+            if (input) {
+                input.style.backgroundImage = 'none';
+                input.placeholder = "Enter full address manually";
+                input.disabled = false;
+                input.readOnly = false;
+                input.removeAttribute('disabled');
+                input.removeAttribute('readonly');
+                input.classList.remove('pac-target-input');
+            }
+        };
+
+        // Intercept window.alert to suppress Google Maps API error dialogs
+        const originalAlert = window.alert;
+        window.alert = function(message) {
+            if (message && (message.indexOf('Google Maps') !== -1 || message.indexOf('correctly') !== -1 || message.indexOf('API key') !== -1)) {
+                console.warn("Blocked Google Maps alert: ", message);
+                window.gm_authFailure();
+                return;
+            }
+            return originalAlert.apply(window, arguments);
+        };
+
         window.loadGoogleMaps = function() {
             if (window.mapsLoaded) {
                 if (typeof window.initAutocomplete === 'function') window.initAutocomplete();
@@ -481,6 +510,7 @@
             s.async = true; s.defer = true;
             document.head.appendChild(s);
         };
+
         // Load Maps when contact section or checkout is viewed OR when user clicks #contact link
         document.addEventListener('DOMContentLoaded', function() {
             var observer = new IntersectionObserver(function(entries) {
@@ -501,8 +531,6 @@
         });
     })();
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
-    <script src="app.js?v=1.2.0" type="module"></script>
     <!-- After app.js renders real content, hide the static hero to avoid duplication -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
