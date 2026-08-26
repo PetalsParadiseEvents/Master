@@ -92,6 +92,20 @@ $customerEmail = $orderRecord['email'] ?? '';
 $customerName  = $orderRecord['name'] ?? 'Valued Customer';
 $eventDate     = $orderRecord['event_date'] ?? '';
 $fulfillment   = $orderRecord['fulfillment_method'] ?? 'Pickup';
+$totalAmount   = isset($orderRecord['total']) ? number_format((float)$orderRecord['total'], 2) : '0.00';
+
+// Format items list for email
+$rawItems = $orderRecord['items'] ?? [];
+$itemsArr = is_string($rawItems) ? json_decode($rawItems, true) : (is_array($rawItems) ? $rawItems : []);
+$itemsText = "";
+if (is_array($itemsArr) && !empty($itemsArr)) {
+    foreach ($itemsArr as $it) {
+        $title = $it['title'] ?? 'Rental Item';
+        $qty   = $it['quantity'] ?? 1;
+        $price = isset($it['price']) ? number_format((float)$it['price'], 2) : '0.00';
+        $itemsText .= "- {$qty}x {$title} (@ \${$price} each)\n";
+    }
+}
 
 if ($notifyCustomer && !empty($customerEmail)) {
     $statusMessages = [
@@ -115,6 +129,11 @@ if ($notifyCustomer && !empty($customerEmail)) {
              . "Current Status: {$newStatus}\n"
              . "Fulfillment Method: {$fulfillment}\n"
              . (!empty($eventDate) ? "Event Date: {$eventDate}\n" : "")
+             . "Total Estimate: \${$totalAmount}\n"
+             . "----------------------------------------\n\n"
+             . "ITEMS IN YOUR RENTAL REQUEST:\n"
+             . "----------------------------------------\n"
+             . (!empty($itemsText) ? $itemsText : "No item details listed.\n")
              . "----------------------------------------\n\n"
              . "You can track your order status anytime on our website or reply directly to this email if you have questions.\n\n"
              . "Warm regards,\n"
