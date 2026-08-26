@@ -255,7 +255,7 @@
     <!-- Full stylesheet loads non-blocking (print trick) -->
     <link rel="stylesheet" href="styles.css?v=1.2.0" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="styles.css?v=1.2.0"></noscript>
-    <link rel="preload" href="app.js?v=1.6.0" as="script" crossorigin="anonymous">
+    <link rel="preload" href="app.js?v=1.7.0" as="script" crossorigin="anonymous">
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -465,37 +465,38 @@
 
     <!-- canvas-confetti: loaded only when needed -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
-    <script src="app.js?v=1.6.0" type="module"></script>
+    <script src="app.js?v=1.7.0" type="module"></script>
     <!-- Google Maps: loaded LAZILY only when user scrolls to contact section -->
     <script>
     (function(){
-        var mapsLoaded = false;
-        function loadGoogleMaps() {
-            if (mapsLoaded) return;
-            mapsLoaded = true;
+        window.mapsLoaded = false;
+        window.loadGoogleMaps = function() {
+            if (window.mapsLoaded) {
+                if (typeof window.initAutocomplete === 'function') window.initAutocomplete();
+                return;
+            }
+            window.mapsLoaded = true;
             var s = document.createElement('script');
             s.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAMRF6oAHu-iA_50hpuFXPwLKaPRIcos3A&libraries=places&callback=initAutocomplete';
             s.async = true; s.defer = true;
             document.head.appendChild(s);
-        }
-        // Load Maps when contact section enters viewport OR when user clicks #contact link
+        };
+        // Load Maps when contact section or checkout is viewed OR when user clicks #contact link
         document.addEventListener('DOMContentLoaded', function() {
             var observer = new IntersectionObserver(function(entries) {
-                if (entries[0].isIntersecting) { loadGoogleMaps(); observer.disconnect(); }
+                if (entries[0].isIntersecting) { window.loadGoogleMaps(); observer.disconnect(); }
             }, { rootMargin: '200px' });
-            document.querySelectorAll('a[href="#contact"]').forEach(function(a) {
-                a.addEventListener('click', loadGoogleMaps, {once: true});
+            document.querySelectorAll('a[href="#contact"], a[href="#checkout"]').forEach(function(a) {
+                a.addEventListener('click', window.loadGoogleMaps, {once: true});
             });
-            // Also trigger when hash is #contact on load
-            if (window.location.hash === '#contact') loadGoogleMaps();
-            // Observe the contact anchor target
+            // Trigger when hash is #contact or #checkout on load
+            if (window.location.hash === '#contact' || window.location.hash === '#checkout') window.loadGoogleMaps();
             var contactEl = document.getElementById('contact');
             if (contactEl) observer.observe(contactEl);
-            // Fallback: load after 5s idle
             if ('requestIdleCallback' in window) {
-                requestIdleCallback(loadGoogleMaps, {timeout: 5000});
+                requestIdleCallback(window.loadGoogleMaps, {timeout: 3000});
             } else {
-                setTimeout(loadGoogleMaps, 5000);
+                setTimeout(window.loadGoogleMaps, 3000);
             }
         });
     })();

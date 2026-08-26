@@ -1773,21 +1773,28 @@ function renderCheckout() {
     window.initAutocomplete = () => {
         try {
             const input = document.querySelector('input[name="delivery_address"]');
-            if (input && !input.hasAttribute('data-autocomplete-init') && window.google && window.google.maps && window.google.maps.places) {
-                const autocomplete = new google.maps.places.Autocomplete(input);
-                autocomplete.setComponentRestrictions({ country: ['us'] });
-                input.setAttribute('data-autocomplete-init', 'true');
-                
-                // Prevent 'Enter' from submitting the form when selecting an autocomplete option
-                input.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                    }
-                });
+            if (!input) return;
+
+            if (window.google && window.google.maps && window.google.maps.places) {
+                if (!input.hasAttribute('data-autocomplete-init')) {
+                    const autocomplete = new google.maps.places.Autocomplete(input, {
+                        types: ['address'],
+                        componentRestrictions: { country: 'us' }
+                    });
+                    input.setAttribute('data-autocomplete-init', 'true');
+                    
+                    // Prevent 'Enter' from submitting form when selecting an autocomplete option
+                    input.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                        }
+                    });
+                }
+            } else if (typeof window.loadGoogleMaps === 'function') {
+                window.loadGoogleMaps();
             }
         } catch (error) {
             console.error("Google Maps Autocomplete failed to initialize:", error);
-            // Non-blocking: Input remains a standard text field
         }
     };
 
@@ -1796,7 +1803,6 @@ function renderCheckout() {
         console.warn("Google Maps authentication failed. Switching to manual address entry.");
         const input = document.querySelector('input[name="delivery_address"]');
         if (input) {
-            // Remove any Google-injected styles that might block the input
             input.style.backgroundImage = 'none';
             input.placeholder = "Enter full address manually";
             input.disabled = false;
@@ -1817,7 +1823,10 @@ function renderCheckout() {
             const addressInput = deliverySection.querySelector('input');
             if (addressInput) {
                 addressInput.required = type === 'Delivery';
-                if (type === 'Delivery') setTimeout(window.initAutocomplete, 100);
+                if (type === 'Delivery') {
+                    if (typeof window.loadGoogleMaps === 'function') window.loadGoogleMaps();
+                    setTimeout(window.initAutocomplete, 150);
+                }
             }
         }
         
@@ -2226,6 +2235,8 @@ function router(preserveScroll = false) {
         setTimeout(() => initStickyObserver('cart-checkout-btn', 'Proceed to Checkout', "goToCheckout(event)"), 200);
     } else if (hash === '#checkout') {
         setTimeout(() => initStickyObserver('checkout-submit-btn', 'Submit Rental Request', "document.getElementById('checkout-submit-btn').click()"), 200);
+        if (typeof window.loadGoogleMaps === 'function') window.loadGoogleMaps();
+        setTimeout(window.initAutocomplete, 250);
     }
 
 
