@@ -87,6 +87,17 @@ function replaceFeatherIcons(root = document) {
 // Shim: make feather.replace() a no-op to avoid errors if anything still calls it
 window.feather = { replace: replaceFeatherIcons };
 
+// Global HTML Escaper to prevent XSS and ReferenceError crashes
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // State Management
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let appliedPromo = JSON.parse(localStorage.getItem('appliedPromo')) || null;
