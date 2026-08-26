@@ -47,40 +47,38 @@ if (!$isBypassed) {
 $leads = [];
 $orders = [];
 $pdo = getDbConnection();
+$dbConnected = false;
 
 if ($pdo) {
+    $dbConnected = true;
+    
     // Load Leads
     try {
         $stmt = $pdo->query("SELECT * FROM `leads` ORDER BY `date_added` DESC");
-        $dbLeads = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if (!empty($dbLeads)) {
-            $leads = $dbLeads;
-        }
+        $leads = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     } catch (Exception $e) {
-        // Fallback below
+        $dbConnected = false;
     }
 
     // Load Orders
-    try {
-        $stmt = $pdo->query("SELECT * FROM `orders` ORDER BY `date_added` DESC");
-        $dbOrders = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if (!empty($dbOrders)) {
-            $orders = $dbOrders;
+    if ($dbConnected) {
+        try {
+            $stmt = $pdo->query("SELECT * FROM `orders` ORDER BY `date_added` DESC");
+            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (Exception $e) {
+            $dbConnected = false;
         }
-    } catch (Exception $e) {
-        // Fallback below
     }
 }
 
-// Fallback to JSON files
-if (empty($leads)) {
+// Only load from JSON backup files if we are NOT connected to the database
+if (!$dbConnected) {
     $leadsFile = __DIR__ . '/leads.json';
     if (file_exists($leadsFile)) {
         $fileContent = file_get_contents($leadsFile);
         $leads = json_decode($fileContent, true) ?: [];
     }
-}
-if (empty($orders)) {
+    
     $ordersFile = __DIR__ . '/orders.json';
     if (file_exists($ordersFile)) {
         $fileContent = file_get_contents($ordersFile);
@@ -252,6 +250,11 @@ if ($format === 'json') {
         <div class="title-area">
             <h1>🌸 Petals Paradise Portal</h1>
             <p>Leads &amp; Customer Orders — End-to-End Admin Dashboard</p>
+            <p style="font-size: 0.8rem; margin-top: 0.4rem;">
+                <span class="badge" style="background: <?php echo $dbConnected ? 'rgba(46, 204, 113, 0.15)' : 'rgba(230, 126, 34, 0.15)'; ?>; color: <?php echo $dbConnected ? '#2ecc71' : '#e67e22'; ?>; border-color: <?php echo $dbConnected ? 'rgba(46, 204, 113, 0.3)' : 'rgba(230, 126, 34, 0.3)'; ?>;">
+                    ● Connection: <?php echo $dbConnected ? 'MySQL Database (Live &amp; Synced)' : 'JSON Backup Files (Offline Fallback)'; ?>
+                </span>
+            </p>
         </div>
         <div class="action-btns">
             <a href="?format=csv&type=leads<?php echo !empty($providedKey) ? '&key=' . urlencode($providedKey) : ''; ?>" id="downloadLeadsCsvBtn" class="btn btn-primary">
