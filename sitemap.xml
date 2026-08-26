@@ -2,116 +2,134 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://petalsparadiseevents.com/</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://petalsparadiseevents.com/#rentals</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://petalsparadiseevents.com/#graduation</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://petalsparadiseevents.com/#services</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://petalsparadiseevents.com/#videos</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://petalsparadiseevents.com/#gallery</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://petalsparadiseevents.com/#contact</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://petalsparadiseevents.com/locations/</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://petalsparadiseevents.com/locations/ashburn-va.html</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://petalsparadiseevents.com/locations/aldie-va.html</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://petalsparadiseevents.com/locations/south-riding-va.html</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://petalsparadiseevents.com/locations/chantilly-va.html</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://petalsparadiseevents.com/locations/leesburg-va.html</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://petalsparadiseevents.com/locations/sterling-va.html</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://petalsparadiseevents.com/locations/herndon-va.html</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://petalsparadiseevents.com/locations/reston-va.html</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://petalsparadiseevents.com/locations/fairfax-va.html</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://petalsparadiseevents.com/locations/great-falls-va.html</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://petalsparadiseevents.com/locations/loudoun-county-va.html</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://petalsparadiseevents.com/#privacy</loc>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://petalsparadiseevents.com/#terms</loc>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://petalsparadiseevents.com/#cookies</loc>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
   </url>
 </urlset>
