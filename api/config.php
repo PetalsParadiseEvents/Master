@@ -92,6 +92,7 @@ function getDbConnection() {
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
         ]);
         initLeadsTable($pdo);
+        initOrdersTable($pdo);
         return $pdo;
     } catch (Exception $e) {
         return null; // Gracefully fall back to leads.json if DB connection isn't configured yet
@@ -117,6 +118,42 @@ function initLeadsTable($pdo) {
             `location` TEXT,
             `source` VARCHAR(128) DEFAULT '',
             `notes` TEXT
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+        $pdo->exec($sql);
+    } catch (Exception $e) {
+        // Silently continue
+    }
+}
+
+/**
+ * Initializes the clean `orders` table with Primary Keys
+ */
+function initOrdersTable($pdo) {
+    try {
+        $sql = "CREATE TABLE IF NOT EXISTS `orders` (
+            `id` VARCHAR(64) PRIMARY KEY,
+            `date_added` DATETIME DEFAULT CURRENT_TIMESTAMP,
+            `name` VARCHAR(255) NOT NULL,
+            `email` VARCHAR(255) NOT NULL,
+            `phone` VARCHAR(64) NOT NULL,
+            `event_date` VARCHAR(64) NOT NULL,
+            `venue_location` VARCHAR(255) DEFAULT '',
+            `fulfillment_method` VARCHAR(64) NOT NULL,
+            `delivery_address` TEXT,
+            `pickup_date` VARCHAR(64) DEFAULT '',
+            `pickup_time` VARCHAR(64) DEFAULT '',
+            `return_date` VARCHAR(64) DEFAULT '',
+            `return_time` VARCHAR(64) DEFAULT '',
+            `delivery_date` VARCHAR(64) DEFAULT '',
+            `delivery_time` VARCHAR(64) DEFAULT '',
+            `collection_date` VARCHAR(64) DEFAULT '',
+            `collection_time` VARCHAR(64) DEFAULT '',
+            `special_requests` TEXT,
+            `items` TEXT NOT NULL,
+            `subtotal` DECIMAL(10,2) NOT NULL,
+            `discount` DECIMAL(10,2) DEFAULT 0.00,
+            `total` DECIMAL(10,2) NOT NULL,
+            `status` VARCHAR(64) DEFAULT 'Pending'
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
         $pdo->exec($sql);
     } catch (Exception $e) {

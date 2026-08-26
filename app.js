@@ -205,7 +205,7 @@ window.refreshRentalsUI = () => {
                 </div>
             `;
         } else {
-            actionHtml = `<button class="btn btn-primary" style="width: 100%;" onclick="handleAddToCart(${item.id})">Add to Cart</button>`;
+            actionHtml = `<button class="btn btn-primary" style="width: 100%;" onclick="handleAddToCart(${item.id})">Add to cart</button>`;
         }
 
         let priceDisplay = typeof item.price === 'number' ? `$${item.price}` : item.price;
@@ -1699,75 +1699,75 @@ function renderCheckout() {
         const formData = new FormData(e.target);
         const details = Object.fromEntries(formData);
 
-        let body = `Hi Petals Paradise Events team,\n\nI would like to request the following rentals for my upcoming event. Below are the details:\n\n`;
-        
-        body += `CUSTOMER INFORMATION\n`;
-        body += `--------------------\n`;
-        body += `Name: ${details.name}\n`;
-        body += `Email: ${details.email}\n`;
-        body += `Phone: ${details.phone}\n\n`;
-        
-        body += `EVENT LOGISTICS\n`;
-        body += `---------------\n`;
-        body += `Fulfillment: ${details.fulfillment}\n`;
-        if (details.fulfillment === 'Delivery') {
-            body += `Delivery Address: ${details.delivery_address}\n`;
-            body += `Delivery Date: ${details.delivery_date_manual} at ${details.delivery_time_manual}\n`;
-            body += `Collection Date: ${details.collection_date_manual} at ${details.collection_time_manual}\n`;
-        } else {
-            body += `Pick Up Date: ${details.pickup_date_manual} at ${details.pickup_time_manual}\n`;
-            body += `Return Date: ${details.dropoff_date_manual} at ${details.dropoff_time_manual}\n`;
-        }
-        body += `Event Date: ${details.date}\n`;
-        body += `Venue Location: ${details.location || 'N/A'}\n\n`;
-        
-        body += `ORDER SUMMARY\n`;
-        body += `-------------\n`;
-        body += `Rental Duration: ${rentalDays} Day(s)\n`;
-        let total = 0;
-        cart.forEach(item => {
-            body += `- ${item.quantity}x ${item.title} ($${getItemTotal(item)})\n`;
-            total += getItemTotal(item);
-        });
-        
-        if (appliedPromo) {
-            body += `\nPromo Code Applied: ${appliedPromo} (-$${getDiscount()})\n`;
-        }
-        
-        const finalTotal = total - getDiscount();
-        body += `\nEstimated Total: $${finalTotal}${details.fulfillment === 'Delivery' ? ' + Delivery Fee (TBD)' : ''}\n\n`;
+        const orderData = {
+            name: details.name,
+            email: details.email,
+            phone: details.phone,
+            date: details.date,
+            location: details.location || '',
+            fulfillment: details.fulfillment,
+            delivery_address: details.delivery_address || '',
+            special_requests: details.special_requests || '',
+            pickup_date_manual: details.pickup_date_manual || '',
+            pickup_time_manual: details.pickup_time_manual || '',
+            dropoff_date_manual: details.dropoff_date_manual || '',
+            dropoff_time_manual: details.dropoff_time_manual || '',
+            delivery_date_manual: details.delivery_date_manual || '',
+            delivery_time_manual: details.delivery_time_manual || '',
+            collection_date_manual: details.collection_date_manual || '',
+            collection_time_manual: details.collection_time_manual || '',
+            subtotal: getCartTotal(),
+            discount: getDiscount(),
+            total: getCartTotal() - getDiscount(),
+            promo_code: appliedPromo || '',
+            items: cart.map(item => ({
+                id: item.id,
+                title: item.title,
+                quantity: item.quantity,
+                price: getItemPrice(item)
+            }))
+        };
 
-        if (details.special_requests) {
-            body += `SPECIAL REQUESTS / MISSING ITEMS\n`;
-            body += `--------------------------------\n`;
-            body += `${details.special_requests}\n\n`;
+        const submitBtn = document.getElementById('checkout-submit-btn');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Placing Order...';
         }
-        
-        body += `Thank you!`;
 
-        // Log lead confidentially to database API
-        fetch('./api/lead.php', {
+        fetch('./api/place_order.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                name: details.name,
-                email: details.email,
-                phone: details.phone,
-                event_date: details.date,
-                location: details.fulfillment === 'Delivery' ? (details.delivery_address || 'Delivery requested') : 'Self Pickup',
-                notes: body,
-                source: 'Website Rental Inquiry'
-            })
-        }).catch(err => console.error("Rental lead log error:", err));
-
-        const subject = encodeURIComponent(`Rental Request: ${details.name} - ${details.date}`);
-        window.location.href = `mailto:contact@petalsparadiseevents.com?subject=${subject}&body=${encodeURIComponent(body)}`;
-
-        cart = [];
-        appliedPromo = null;
-        saveCart();
-
-        window.location.hash = '#confirmation';
+            body: JSON.stringify(orderData)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Save Order ID to show on confirmation page
+                localStorage.setItem('lastPlacedOrderId', data.order_id);
+                localStorage.setItem('lastPlacedOrderName', details.name);
+                
+                // Clear cart
+                cart = [];
+                appliedPromo = null;
+                saveCart();
+                
+                window.location.hash = '#confirmation';
+            } else {
+                alert(data.error || 'There was an issue submitting your order. Please try again.');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Rental Request';
+                }
+            }
+        })
+        .catch(err => {
+            console.error("Order submission error:", err);
+            alert('Could not submit order. Please check your internet connection and try again.');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Rental Request';
+            }
+        });
     };
 
     window.initAutocomplete = () => {
@@ -2127,13 +2127,21 @@ function renderConfirmation() {
         }
     }, 100);
 
+    const orderId = localStorage.getItem('lastPlacedOrderId') || '';
+    const customerName = localStorage.getItem('lastPlacedOrderName') || '';
+
+    const orderIdDisplay = orderId 
+        ? `<p style="font-family: monospace; font-size: 1.25rem; font-weight: bold; background: rgba(212, 175, 55, 0.1); border: 1px solid var(--primary-color); padding: 0.75rem 1.5rem; border-radius: 8px; display: inline-block; margin-top: 1.5rem; color: var(--primary-color);">Confirmation ID: ${orderId}</p>` 
+        : '';
+
     return `
         <div class="container text-center" style="padding: 4rem 2rem;">
             <div style="color: var(--primary-color); margin-bottom:1rem;">
                 <i data-feather="check-circle" style="width: 64px; height: 64px;"></i>
             </div>
-            <h2 class="section-title">Request Prepared!</h2>
-            <p class="section-subtitle">Your email client has been opened to send the rental request to us. We will contact you shortly to confirm availability and coordinate payment in person.</p>
+            <h2 class="section-title">Order Placed Successfully!</h2>
+            <p class="section-subtitle">Thank you${customerName ? ' ' + customerName : ''}! Your rental request has been received. Our team will review the details and contact you via email or phone within 24 hours to coordinate logistics.</p>
+            ${orderIdDisplay}
             
             <div style="margin-top: 3rem; background: var(--surface-color); padding: 2.5rem; border-radius: 12px; border: 1px dashed var(--primary-color); max-width: 600px; margin-left: auto; margin-right: auto;">
                 <h3 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.5rem;">How was your experience?</h3>
