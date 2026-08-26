@@ -3091,14 +3091,27 @@ window.handleTrackOrder = async function() {
         const endpoint = (isMobileApp ? 'https://www.petalsparadiseevents.com/api/get_order_status.php' : '/api/get_order_status.php') + `?q=${encodeURIComponent(query)}`;
         
         const res = await fetch(endpoint);
-        const data = await res.json();
+        const rawText = await res.text();
+        let data = null;
+        try {
+            data = JSON.parse(rawText);
+        } catch (parseErr) {
+            console.error('Non-JSON response from get_order_status:', rawText);
+            btn.disabled = false;
+            btn.textContent = '🔍 Track Order';
+            const snippet = rawText ? rawText.trim().substring(0, 150) : 'Empty server response';
+            resultArea.innerHTML = `<div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; padding: 1.25rem; border-radius: 12px; text-align: center;">🌸 Server response error: ${escapeHtml(snippet)}</div>`;
+            return;
+        }
+
         btn.disabled = false;
         btn.textContent = '🔍 Track Order';
 
         if (!data.found || !data.orders || data.orders.length === 0) {
+            const msg = data.message || `No order found matching "${escapeHtml(query)}"`;
             resultArea.innerHTML = `
                 <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; padding: 1.25rem; border-radius: 12px; text-align: center;">
-                    🌸 No order found matching "<strong>${escapeHtml(query)}</strong>". Please double check your Confirmation ID or Phone Number.
+                    🌸 ${escapeHtml(msg)}. Please double check your Confirmation ID, Email, or Phone Number.
                 </div>
             `;
             return;
@@ -3152,7 +3165,8 @@ window.handleTrackOrder = async function() {
     } catch (err) {
         btn.disabled = false;
         btn.textContent = '🔍 Track Order';
-        resultArea.innerHTML = '<p style="color: #ef4444; text-align: center;">❌ Unable to connect to order server. Please try again later.</p>';
+        const errDetail = err && err.message ? err.message : '';
+        resultArea.innerHTML = `<p style="color: #ef4444; text-align: center;">❌ Connection error: ${escapeHtml(errDetail || 'Unable to reach order server')}. Please try again.</p>`;
     }
 };
 
