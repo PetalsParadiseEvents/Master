@@ -141,7 +141,7 @@ CORE RULES:
     $lastErrorMsg = '';
 
     foreach ($modelsToTry as $modelName) {
-        $apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/{$modelName}:generateContent";
+        $apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/{$modelName}:generateContent?key=" . urlencode(GEMINI_API_KEY);
         $apiResult = makeGeminiRequest($apiUrl, $payload, GEMINI_API_KEY);
         
         if ($apiResult['status'] === 200) {
