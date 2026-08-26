@@ -4,6 +4,8 @@
  * Petals Paradise Events
  */
 
+require_once __DIR__ . '/config.php';
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -76,11 +78,12 @@ array_unshift($existingLeads, $leadRecord);
 file_put_contents($leadsFile, json_encode($existingLeads, JSON_PRETTY_PRINT));
 
 // 5. Send Notification Email to Owners / Sales Team
-// Add any additional notification email addresses to this array:
-$notificationEmails = [
-    'contact@petalsparadiseevents.com',
-    // 'sales@petalsparadiseevents.com', // Uncomment or add more emails here
-];
+if (empty($notificationEmails) || !is_array($notificationEmails)) {
+    $notificationEmails = [
+        'contact@petalsparadiseevents.com',
+        'biragonimounika@gmail.com'
+    ];
+}
 
 $subject = "🌸 New Lead Received: {$name} ({$eventType})";
 $message = "You received a new customer lead on Petals Paradise Events!\n\n"

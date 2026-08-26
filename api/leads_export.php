@@ -7,12 +7,14 @@
  * Requires Username & Password for authentication.
  */
 
+require_once __DIR__ . '/config.php';
+
 // ═══════════════════════════════════════════════════════════
 // 1. SECURITY & AUTHENTICATION CONFIGURATION
 // ═══════════════════════════════════════════════════════════
-$adminUser   = 'admin';               // Change username if desired
-$adminPass   = 'ppe_password_2026';     // Change password if desired
-$adminSecret = 'ppe_admin_2026';        // Optional API key parameter for automated scripts (?key=ppe_admin_2026)
+$adminUser   = defined('ADMIN_USER') ? ADMIN_USER : 'biragonimounika@gmail.com';
+$adminPass   = defined('ADMIN_PASS') ? ADMIN_PASS : 'Mounika@65';
+$adminSecret = defined('ADMIN_SECRET') ? ADMIN_SECRET : 'ppe_admin_2026';
 
 // Extract credentials from standard PHP Auth or CGI environment header fallback
 $authUser = $_SERVER['PHP_AUTH_USER'] ?? '';
