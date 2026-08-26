@@ -2796,8 +2796,114 @@ function initAIChatbot() {
         return msgDiv;
     };
 
+    // Helper: parse [PLACE_ORDER: {json}] tag and execute automated checkout
+    const parseOrderTag = async (text, messageBubbleContainer) => {
+        const orderTagRegex = /\[PLACE_ORDER:(.*?)\]/s;
+        const match = orderTagRegex.exec(text);
+        
+        if (!match) return;
+        
+        const rawJsonStr = match[1].trim();
+        let orderData = null;
+        try {
+            orderData = JSON.parse(rawJsonStr);
+        } catch (e) {
+            console.error('Failed to parse PLACE_ORDER JSON tag:', e);
+            return;
+        }
+
+        // Clean [PLACE_ORDER:...] from the text response
+        const cleanedText = text.replace(orderTagRegex, '').trim();
+        if (messageBubbleContainer && messageBubbleContainer.querySelector('.message-bubble')) {
+            messageBubbleContainer.querySelector('.message-bubble').innerHTML = formatResponseText(cleanedText);
+        }
+
+        // Prepare order placement loader card
+        const cardContainer = document.createElement('div');
+        cardContainer.className = 'chat-order-card chat-order-loading';
+        cardContainer.innerHTML = `
+            <div class="chat-order-header">
+                <span class="chat-order-badge">⏳ Submitting Your Order...</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">Connecting to Petals Paradise Events reservation engine...</p>
+        `;
+        if (messageBubbleContainer) {
+            messageBubbleContainer.appendChild(cardContainer);
+        }
+
+        const isMobileApp = window.location.origin.includes('localhost') || 
+                            window.location.protocol.startsWith('file:') || 
+                            window.location.hostname === '';
+        const orderEndpoint = isMobileApp ? 'https://www.petalsparadiseevents.com/api/place_order.php' : './api/place_order.php';
+
+        try {
+            const res = await fetch(orderEndpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                const orderId = result.order_id || 'PPE-CONFIRMED';
+                const totalVal = parseFloat(result.total || orderData.total || 0).toFixed(2);
+
+                cardContainer.className = 'chat-order-card chat-order-success';
+                cardContainer.innerHTML = `
+                    <div class="chat-order-header">
+                        <span class="chat-order-badge success">✨ Order Placed Successfully!</span>
+                        <span class="chat-order-id">${orderId}</span>
+                    </div>
+                    <div class="chat-order-body">
+                        <div class="chat-order-row"><span>👤 Customer:</span> <strong>${escapeHtml(orderData.name)}</strong></div>
+                        <div class="chat-order-row"><span>🗓️ Event Date:</span> <strong>${escapeHtml(orderData.event_date)}</strong></div>
+                        <div class="chat-order-row"><span>🚚 Fulfillment:</span> <strong>${escapeHtml(orderData.fulfillment_method)}</strong></div>
+                        ${orderData.delivery_address ? `<div class="chat-order-row"><span>📍 Address:</span> <span>${escapeHtml(orderData.delivery_address)}</span></div>` : ''}
+                        <div class="chat-order-row total"><span>💵 Total Estimate:</span> <strong>$${totalVal}</strong></div>
+                    </div>
+                    <div class="chat-order-status-pill">
+                        ● Status: <strong>Pending Confirmation</strong> (Reviewing Inventory)
+                    </div>
+                    <div class="chat-order-footer">
+                        📧 Confirmation alert sent to <strong>${escapeHtml(orderData.email)}</strong>. We will contact you at <strong>${escapeHtml(orderData.phone)}</strong> shortly!
+                    </div>
+                `;
+
+                if (typeof window.clearCart === 'function') {
+                    window.clearCart();
+                }
+            } else {
+                cardContainer.className = 'chat-order-card chat-order-error';
+                cardContainer.innerHTML = `
+                    <div class="chat-order-header">
+                        <span class="chat-order-badge error">❌ Order Submission Failed</span>
+                    </div>
+                    <p style="font-size: 0.85rem; color: #ef4444; margin-top: 0.5rem;">${escapeHtml(result.error || 'Unable to place order automatically.')}</p>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">Please call us at +1 848-448-6993 or use our inquiry cart.</p>
+                `;
+            }
+        } catch (err) {
+            console.error('Order submission error:', err);
+            cardContainer.className = 'chat-order-card chat-order-error';
+            cardContainer.innerHTML = `
+                <div class="chat-order-header">
+                    <span class="chat-order-badge error">❌ Network Connection Error</span>
+                </div>
+                <p style="font-size: 0.85rem; color: #ef4444; margin-top: 0.5rem;">Could not connect to order server.</p>
+            `;
+        }
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    };
+
     // Helper: parse [ADD_TO_CART:id] brackets and render item recommendation cards
     const parseRecommendations = (text, messageBubbleContainer) => {
+        // First check for order tag
+        if (text.includes('[PLACE_ORDER:')) {
+            parseOrderTag(text, messageBubbleContainer);
+            return;
+        }
+
         const regex = /\[ADD_TO_CART:(\d+)\]/g;
         let match;
         const itemIds = [];
@@ -2808,7 +2914,9 @@ function initAIChatbot() {
 
         // Clean brackets from text message
         const cleanedText = text.replace(regex, '').trim();
-        messageBubbleContainer.querySelector('.message-bubble').innerHTML = formatResponseText(cleanedText);
+        if (messageBubbleContainer && messageBubbleContainer.querySelector('.message-bubble')) {
+            messageBubbleContainer.querySelector('.message-bubble').innerHTML = formatResponseText(cleanedText);
+        }
 
         // Append interactive recommendation cards for matching catalog items
         itemIds.forEach(id => {

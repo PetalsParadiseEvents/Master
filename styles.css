@@ -2586,4 +2586,102 @@ textarea:focus-visible {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   AI CHAT ORDER CONFIRMATION CARD STYLES
+   ═══════════════════════════════════════════════════════════ */
+.chat-order-card {
+  background: var(--surface-color, #1a1d24);
+  border: 1px solid var(--border-color, rgba(255,255,255,0.12));
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.chat-order-card.chat-order-success {
+  border-color: rgba(212, 175, 55, 0.5);
+  background: linear-gradient(135deg, rgba(26, 29, 36, 0.95), rgba(212, 175, 55, 0.08));
+}
+
+.chat-order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.chat-order-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(212, 175, 55, 0.15);
+  color: #f1c40f;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.chat-order-badge.success {
+  background: rgba(46, 204, 113, 0.15);
+  color: #2ecc71;
+  border-color: rgba(46, 204, 113, 0.3);
+}
+
+.chat-order-badge.error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.chat-order-id {
+  font-family: monospace;
+  font-weight: 700;
+  color: var(--primary-color, #d4af37);
+  font-size: 0.85rem;
+}
+
+.chat-order-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary, #f8fafc);
+}
+
+.chat-order-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+}
+
+.chat-order-row.total {
+  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+  padding-top: 0.5rem;
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--primary-color, #d4af37);
+}
+
+.chat-order-status-pill {
+  background: rgba(52, 152, 219, 0.12);
+  color: #3498db;
+  border: 1px solid rgba(52, 152, 219, 0.25);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.chat-order-footer {
+  font-size: 0.78rem;
+  color: var(--text-secondary, #cbd5e1);
+  line-height: 1.4;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 0.5rem;
+}
+
 
