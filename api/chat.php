@@ -134,7 +134,7 @@ CORE RULES:
     ];
 
     // 6. Execute Dual Engine HTTP Request with automatic model fallback
-    $modelsToTry = ['gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-2.5-flash', 'gemini-pro'];
+    $modelsToTry = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-2.5-flash', 'gemini-pro'];
     $apiResult = null;
     
     foreach ($modelsToTry as $modelName) {
