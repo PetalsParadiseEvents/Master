@@ -2996,10 +2996,15 @@ function initAIChatbot() {
 
             if (data.error && !data.response) {
                 const debugMsg = data.debug ? ` (${data.debug})` : '';
-                appendMessage('system', `🌸 Sorry, I am having trouble connecting to my servers right now${debugMsg}. Please try again later.`);
+                appendMessage('system', `🌸 AI Notice: ${escapeHtml(data.error)}${debugMsg ? ' — ' + escapeHtml(debugMsg) : ''}`);
             } else {
-                const reply = data.response;
+                const reply = (data.response || '').trim();
                 
+                if (!reply) {
+                    appendMessage('system', '🌸 I received an empty response from the server. Please try asking again.');
+                    return;
+                }
+
                 // Save conversation history (limit to last 12 messages to optimize performance)
                 chatHistory.push({ role: 'user', text: query });
                 chatHistory.push({ role: 'model', text: reply });
@@ -3008,8 +3013,8 @@ function initAIChatbot() {
                     chatHistory.shift();
                 }
 
-                // Render assistant bubble and parse any item cart integration brackets
-                const botBubble = appendMessage('system', '');
+                // Render assistant bubble first with formatted HTML content
+                const botBubble = appendMessage('system', formatResponseText(reply));
                 parseRecommendations(reply, botBubble);
             }
         } catch (err) {
