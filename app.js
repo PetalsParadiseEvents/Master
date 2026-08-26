@@ -1347,7 +1347,7 @@ function renderContact() {
         const leadNotes = `Event: ${eventType}\nService Level: ${serviceTier}\nDate: ${eventDate}\nGuests: ${guestCount}\nBudget: ${budget}\nPhone: ${phone}\n\nDetails:\n${msg}`;
 
         // Save lead confidentially to backend API
-        fetch('./api/lead.php', {
+        fetch('/api/lead.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1741,7 +1741,7 @@ function renderCheckout() {
             submitBtn.textContent = 'Placing Order...';
         }
 
-        fetch('./api/place_order.php', {
+        fetch('/api/place_order.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(orderData)
@@ -2834,7 +2834,7 @@ function initAIChatbot() {
         const isMobileApp = window.location.origin.includes('localhost') || 
                             window.location.protocol.startsWith('file:') || 
                             window.location.hostname === '';
-        const orderEndpoint = isMobileApp ? 'https://www.petalsparadiseevents.com/api/place_order.php' : './api/place_order.php';
+        const orderEndpoint = isMobileApp ? 'https://www.petalsparadiseevents.com/api/place_order.php' : '/api/place_order.php';
 
         try {
             const res = await fetch(orderEndpoint, {
@@ -2970,7 +2970,7 @@ function initAIChatbot() {
         const isMobileApp = window.location.origin.includes('localhost') || 
                             window.location.protocol.startsWith('file:') || 
                             window.location.hostname === '';
-        const endpoint = isMobileApp ? 'https://www.petalsparadiseevents.com/api/chat.php' : './api/chat.php';
+        const endpoint = isMobileApp ? 'https://www.petalsparadiseevents.com/api/chat.php' : '/api/chat.php';
 
         try {
             const response = await fetch(endpoint, {
@@ -2985,7 +2985,8 @@ function initAIChatbot() {
             chatMessages.removeChild(loadingDiv);
 
             if (data.error && !data.response) {
-                appendMessage('system', '🌸 Sorry, I am having trouble connecting to my servers right now. Please try again later.');
+                const debugMsg = data.debug ? ` (${data.debug})` : '';
+                appendMessage('system', `🌸 Sorry, I am having trouble connecting to my servers right now${debugMsg}. Please try again later.`);
             } else {
                 const reply = data.response;
                 
@@ -3004,7 +3005,8 @@ function initAIChatbot() {
         } catch (err) {
             console.error('Chat API Error:', err);
             chatMessages.removeChild(loadingDiv);
-            appendMessage('system', '🌸 Network connection error. Please make sure you are connected to the internet.');
+            const errDetail = err && err.message ? err.message : '';
+            appendMessage('system', `🌸 Connection issue: ${errDetail || 'Unable to reach chatbot API'}. Please try again or call us at 848-448-6993.`);
         }
     });
 
