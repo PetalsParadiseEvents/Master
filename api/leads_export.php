@@ -6,6 +6,21 @@
 
 require_once __DIR__ . '/config.php';
 
+// Workaround for Apache running PHP in CGI/FastCGI mode where HTTP Basic Auth variables are not populated by default
+if (!isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['HTTP_AUTHORIZATION'])) {
+    if (preg_match('/basic\s+(.*)$/i', $_SERVER['HTTP_AUTHORIZATION'], $matches)) {
+        list($usr, $pwd) = explode(':', base64_decode($matches[1]), 2);
+        $_SERVER['PHP_AUTH_USER'] = $usr;
+        $_SERVER['PHP_AUTH_PW'] = $pwd;
+    }
+} elseif (!isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+    if (preg_match('/basic\s+(.*)$/i', $_SERVER['REDIRECT_HTTP_AUTHORIZATION'], $matches)) {
+        list($usr, $pwd) = explode(':', base64_decode($matches[1]), 2);
+        $_SERVER['PHP_AUTH_USER'] = $usr;
+        $_SERVER['PHP_AUTH_PW'] = $pwd;
+    }
+}
+
 // ═══════════════════════════════════════════════════════════
 // 1. SECURITY & HTTP BASIC AUTHENTICATION
 // ═══════════════════════════════════════════════════════════
