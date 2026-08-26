@@ -205,7 +205,7 @@ window.refreshRentalsUI = () => {
                 </div>
             `;
         } else {
-            actionHtml = `<button class="btn btn-primary" style="width: 100%;" onclick="handleAddToCart(${item.id})">Add to Request</button>`;
+            actionHtml = `<button class="btn btn-primary" style="width: 100%;" onclick="handleAddToCart(${item.id})">Add to Cart</button>`;
         }
 
         let priceDisplay = typeof item.price === 'number' ? `$${item.price}` : item.price;

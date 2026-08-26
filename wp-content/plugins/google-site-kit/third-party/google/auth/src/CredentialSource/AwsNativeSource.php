@@ -155,7 +155,7 @@ class AwsNativeSource implements \Google\Site_Kit_Dependencies\Google\Auth\Exter
         # ************* TASK 4: ADD SIGNING INFORMATION TO THE REQUEST *************
         # The signing information can be either in a query string value or in
         # a header named Authorization. This code shows how to use a header.
-        # Create authorization header and add to request headers
+        # Create authorization header and add to cart headers
         $authorizationHeader = \sprintf('%s Credential=%s/%s, SignedHeaders=%s, Signature=%s', $algorithm, $accessKeyId, $scope, $signedHeaders, $signature);
         # The request can include any headers, but MUST include "host", "x-amz-date",
         # and (for this scenario) "Authorization". "host" and "x-amz-date" must
