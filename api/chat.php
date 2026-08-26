@@ -1,7 +1,7 @@
 <?php
 /**
  * Secure proxy endpoint for Petals Paradise Events AI Assistant.
- * Routes client queries to the Google Gemini 1.5 Flash API.
+ * Routes client queries to the Google Gemini API with dynamic model discovery.
  */
 
 error_reporting(0);
@@ -133,15 +133,24 @@ CORE RULES:
         ]
     ];
 
-    // 6. Execute Dual Engine HTTP Request with automatic model fallback
-    $modelsToTry = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-2.5-flash', 'gemini-pro'];
-    $apiResult = null;
+    // 6. Dynamic Model Discovery via ListModels API
+    $discoveredModels = discoverAvailableGeminiModels(GEMINI_API_KEY);
+    $modelsToTry = array_unique(array_merge($discoveredModels, ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash-exp', 'gemini-2.0-flash', 'gemini-pro']));
     
+    $apiResult = null;
+    $lastErrorMsg = '';
+
     foreach ($modelsToTry as $modelName) {
         $apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/{$modelName}:generateContent";
         $apiResult = makeGeminiRequest($apiUrl, $payload, GEMINI_API_KEY);
+        
         if ($apiResult['status'] === 200) {
             break;
+        } else {
+            $decoded = json_decode($apiResult['body'], true);
+            if (isset($decoded['error']['message'])) {
+                $lastErrorMsg = $decoded['error']['message'];
+            }
         }
     }
 
@@ -159,11 +168,13 @@ CORE RULES:
     $responseDecoded = json_decode($rawResponseBody, true);
 
     if ($httpStatus !== 200) {
-        $errorMessage = isset($responseDecoded['error']['message']) ? $responseDecoded['error']['message'] : 'API Error ' . $httpStatus;
+        $errorMessage = isset($responseDecoded['error']['message']) ? $responseDecoded['error']['message'] : ($lastErrorMsg ?: 'API Error ' . $httpStatus);
+        $keyLen = strlen(GEMINI_API_KEY);
+        $keyPreview = $keyLen > 6 ? substr(GEMINI_API_KEY, 0, 6) . '...' : '(empty)';
         echo json_encode([
             'error' => "Gemini API Status $httpStatus",
             'debug' => $errorMessage,
-            'response' => "⚠️ AI API Notice ($httpStatus): $errorMessage. Please try again or call us at 848-448-6993."
+            'response' => "⚠️ AI Notice ($httpStatus): $errorMessage | Key: {$keyPreview}"
         ]);
         exit(0);
     }
@@ -187,23 +198,49 @@ CORE RULES:
 }
 
 /**
- * Dual Engine HTTP Requester
- * Primary: cURL
- * Fallback: file_get_contents with stream_context
+ * Discover active Gemini models via ListModels API
  */
-function makeGeminiRequest($url, $payload, $apiKey) {
-    $payloadJson = json_encode($payload);
+function discoverAvailableGeminiModels($apiKey) {
+    $url = "https://generativelanguage.googleapis.com/v1beta/models?key=" . urlencode($apiKey);
+    $res = makeGeminiRequest($url, null, $apiKey, 'GET');
     
-    // Engine 1: cURL (if function is available)
+    $discovered = [];
+    if (!empty($res['body'])) {
+        $data = json_decode($res['body'], true);
+        if (isset($data['models']) && is_array($data['models'])) {
+            foreach ($data['models'] as $m) {
+                if (isset($m['supportedGenerationMethods']) && in_array('generateContent', $m['supportedGenerationMethods'])) {
+                    $modelName = str_replace('models/', '', $m['name']);
+                    $discovered[] = $modelName;
+                }
+            }
+        }
+    }
+    return $discovered;
+}
+
+/**
+ * Dual Engine HTTP Requester (cURL + stream_context fallback)
+ */
+function makeGeminiRequest($url, $payload = null, $apiKey = '', $method = 'POST') {
+    $payloadJson = $payload ? json_encode($payload) : null;
+    
+    // Engine 1: cURL
     if (function_exists('curl_init')) {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $payloadJson);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
+        
+        $headers = [
             'x-goog-api-key: ' . $apiKey
-        ]);
+        ];
+        
+        if ($method === 'POST') {
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $payloadJson);
+            $headers[] = 'Content-Type: application/json';
+        }
+        
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_TIMEOUT, 15);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
@@ -219,11 +256,15 @@ function makeGeminiRequest($url, $payload, $apiKey) {
     }
 
     // Engine 2: file_get_contents stream context fallback
+    $httpHeaders = "x-goog-api-key: " . $apiKey . "\r\n";
+    if ($method === 'POST') {
+        $httpHeaders .= "Content-Type: application/json\r\n";
+    }
+
     $opts = [
         'http' => [
-            'method'  => 'POST',
-            'header'  => "Content-Type: application/json\r\n" .
-                         "x-goog-api-key: " . $apiKey . "\r\n",
+            'method'  => $method,
+            'header'  => $httpHeaders,
             'content' => $payloadJson,
             'timeout' => 15,
             'ignore_errors' => true
