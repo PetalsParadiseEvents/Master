@@ -1,4 +1,5 @@
 <?php
+session_start();
 /**
  * Confidential Leads & Orders Export Dashboard Portal
  * Petals Paradise Events
@@ -6,39 +7,96 @@
 
 require_once __DIR__ . '/config.php';
 
-// Workaround for Apache running PHP in CGI/FastCGI mode where HTTP Basic Auth variables are not populated by default
-if (!isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['HTTP_AUTHORIZATION'])) {
-    if (preg_match('/basic\s+(.*)$/i', $_SERVER['HTTP_AUTHORIZATION'], $matches)) {
-        list($usr, $pwd) = explode(':', base64_decode($matches[1]), 2);
-        $_SERVER['PHP_AUTH_USER'] = $usr;
-        $_SERVER['PHP_AUTH_PW'] = $pwd;
-    }
-} elseif (!isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
-    if (preg_match('/basic\s+(.*)$/i', $_SERVER['REDIRECT_HTTP_AUTHORIZATION'], $matches)) {
-        list($usr, $pwd) = explode(':', base64_decode($matches[1]), 2);
-        $_SERVER['PHP_AUTH_USER'] = $usr;
-        $_SERVER['PHP_AUTH_PW'] = $pwd;
-    }
+// Handle Logout
+if (isset($_GET['logout'])) {
+    unset($_SESSION['admin_logged_in']);
+    session_destroy();
+    header('Location: leads_export.php');
+    exit;
 }
 
-// ═══════════════════════════════════════════════════════════
-// 1. SECURITY & HTTP BASIC AUTHENTICATION
-// ═══════════════════════════════════════════════════════════
 $adminUser = ADMIN_USER;
 $adminPass = ADMIN_PASS;
 $adminSecret = ADMIN_SECRET;
 
+// Handle Form Submission Login
+$loginError = '';
+if (isset($_POST['username']) && isset($_POST['password'])) {
+    if ($_POST['username'] === $adminUser && $_POST['password'] === $adminPass) {
+        $_SESSION['admin_logged_in'] = true;
+        header('Location: leads_export.php' . (!empty($_GET['key']) ? '?key=' . urlencode($_GET['key']) : ''));
+        exit;
+    } else {
+        $loginError = '🌸 Invalid username or password.';
+    }
+}
+
 $providedKey = isset($_GET['key']) ? $_GET['key'] : '';
 $isBypassed = (!empty($adminSecret) && $providedKey === $adminSecret);
 
-if (!$isBypassed) {
-    if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']) || 
-        $_SERVER['PHP_AUTH_USER'] !== $adminUser || $_SERVER['PHP_AUTH_PW'] !== $adminPass) {
-        header('WWW-Authenticate: Basic realm="Petals Paradise Events Portal"');
-        header('HTTP/1.0 401 Unauthorized');
-        echo '🌸 Access denied: Invalid username or password.';
-        exit;
-    }
+$isAuthenticated = $isBypassed || (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true);
+
+if (!$isAuthenticated) {
+    // Render a premium, styled login page matching the site's dark/gold theme
+    ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Petals Paradise Portal - Login</title>
+        <style>
+            :root {
+                --bg: #0d0f12;
+                --surface: #1a1d24;
+                --primary: #d4af37;
+                --primary-hover: #f1c40f;
+                --text: #f8fafc;
+                --text-muted: #cbd5e1;
+                --border: rgba(255,255,255,0.12);
+            }
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+            .login-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 400px; padding: 2.5rem; box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
+            .logo-area { text-align: center; margin-bottom: 2rem; }
+            .logo-area h1 { font-family: Georgia, serif; color: var(--primary); font-size: 1.8rem; margin-bottom: 0.5rem; }
+            .logo-area p { color: var(--text-muted); font-size: 0.85rem; }
+            .form-group { margin-bottom: 1.25rem; }
+            .form-label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; }
+            .form-control { width: 100%; padding: 0.8rem 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.95rem; transition: border-color 0.2s; }
+            .form-control:focus { outline: none; border-color: var(--primary); }
+            .btn { width: 100%; padding: 0.9rem; border-radius: 8px; background: var(--primary); color: #0d0f12; border: none; font-weight: 700; font-size: 1rem; cursor: pointer; transition: background 0.2s; margin-top: 1rem; }
+            .btn:hover { background: var(--primary-hover); }
+            .error-message { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1.5rem; text-align: center; }
+        </style>
+    </head>
+    <body>
+        <div class="login-card">
+            <div class="logo-area">
+                <h1>🌸 Petals Paradise</h1>
+                <p>Admin Dashboard Portal Access</p>
+            </div>
+            
+            <?php if (!empty($loginError)): ?>
+                <div class="error-message"><?php echo htmlspecialchars($loginError); ?></div>
+            <?php endif; ?>
+            
+            <form method="POST">
+                <div class="form-group">
+                    <label class="form-label">Username / Email</label>
+                    <input type="email" name="username" class="form-control" placeholder="admin@example.com" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn">Sign In</button>
+            </form>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -265,6 +323,9 @@ if ($format === 'json') {
             </a>
             <a href="?format=json<?php echo !empty($providedKey) ? '&key=' . urlencode($providedKey) : ''; ?>" class="btn btn-outline" target="_blank">
                 JSON API
+            </a>
+            <a href="?logout=1" class="btn btn-outline" style="border-color: #ef4444; color: #ef4444;" onmouseover="this.style.background='rgba(239,68,68,0.1)'" onmouseout="this.style.background='transparent'">
+                🚪 Sign Out
             </a>
         </div>
     </div>
