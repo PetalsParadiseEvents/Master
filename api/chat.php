@@ -179,13 +179,26 @@ CORE RULES:
         exit(0);
     }
 
-    if (isset($responseDecoded['candidates'][0]['content']['parts'][0]['text'])) {
-        $botResponse = $responseDecoded['candidates'][0]['content']['parts'][0]['text'];
+    $botResponse = '';
+    if (isset($responseDecoded['candidates'][0]['content']['parts']) && is_array($responseDecoded['candidates'][0]['content']['parts'])) {
+        foreach ($responseDecoded['candidates'][0]['content']['parts'] as $part) {
+            if (isset($part['text'])) {
+                $botResponse .= $part['text'];
+            }
+        }
+    } elseif (isset($responseDecoded['candidates'][0]['text'])) {
+        $botResponse = $responseDecoded['candidates'][0]['text'];
+    }
+
+    if (!empty($botResponse)) {
         echo json_encode(['response' => $botResponse]);
     } else {
+        $finishReason = isset($responseDecoded['candidates'][0]['finishReason']) ? $responseDecoded['candidates'][0]['finishReason'] : 'No text content returned';
+        $debugOutput = json_encode($responseDecoded);
         echo json_encode([
-            'error' => 'Unexpected JSON structure',
-            'response' => '🌸 I received an empty response. Please ask me again.'
+            'error' => 'No candidate text',
+            'debug' => $finishReason,
+            'response' => "🌸 I apologize, but I could not generate text for that prompt (Reason: {$finishReason}). Please try rephrasing your question!"
         ]);
     }
 
