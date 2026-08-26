@@ -298,6 +298,21 @@ main {
   animation: fadeIn 0.6s ease-out;
 }
 
+/* Ensure page section headers clear the fixed banner (40px) + navbar (72px) = 112px */
+main > .container,
+main > section:not(.hero):not(.hero-skeleton),
+main > div > .container {
+  padding-top: calc(112px + 2.5rem);
+}
+
+@media (max-width: 768px) {
+  main > .container,
+  main > section:not(.hero):not(.hero-skeleton),
+  main > div > .container {
+    padding-top: calc(100px + 1.8rem);
+  }
+}
+
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
