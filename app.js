@@ -122,6 +122,15 @@ window.changeQty = (id, change) => updateQuantity(id, change);
 window.setQty = (id, qty) => setQuantity(id, qty);
 window.removeItem = (id) => removeFromCart(id);
 window.handleClearCart = () => clearCart();
+window.goToCheckout = (e) => {
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+    if (!cart || cart.length === 0) {
+        showToast('Your cart is empty. Add items before checking out!');
+        return;
+    }
+    window.location.hash = '#checkout';
+    if (typeof router === 'function') router();
+};
 window.setRentalDays = (days) => {
     rentalDays = parseInt(days) || 1;
     if (rentalDays < 1) rentalDays = 1;
@@ -1631,9 +1640,9 @@ function renderCart() {
                         <span style="font-size: 1rem; color: var(--text-secondary);">Total Estimate:</span>
                         <span style="font-size: 1.25rem; font-weight: 700; color: var(--primary-color); text-align: right;">$${subtotal - discount}${fulfillmentMethod === 'Delivery' ? ' + Delivery (TBD)' : ''}</span>
                     </div>
-                    <a href="#checkout" id="cart-checkout-btn" class="btn btn-primary" style="width: 100%; text-align: center; margin-top: 1.5rem; display: block; padding: 1.2rem;" onclick="window.location.hash='#checkout';">
+                    <button type="button" id="cart-checkout-btn" class="btn btn-primary" style="width: 100%; text-align: center; margin-top: 1.5rem; display: block; padding: 1.2rem;" onclick="goToCheckout(event)">
                         Proceed to Checkout
-                    </a>
+                    </button>
                     <a href="#rentals" class="btn btn-outline" style="width: 100%; text-align:center; margin-top:1rem;">Continue Shopping</a>
                 </div>
             </div>
@@ -1660,7 +1669,7 @@ function renderCart() {
             
             <!-- Sticky Checkout Button for Mobile -->
             <div id="sticky-checkout" class="sticky-checkout-container">
-                <a href="#checkout" class="btn btn-primary" style="width: 100%; text-align:center;" onclick="window.location.hash='#checkout';">Proceed to Checkout</a>
+                <button type="button" class="btn btn-primary" style="width: 100%; text-align:center;" onclick="goToCheckout(event)">Proceed to Checkout</button>
             </div>
         </div>
     `;
@@ -2201,7 +2210,7 @@ function router(preserveScroll = false) {
 
     // Initialize Sticky Observers based on page
     if (hash === '#cart') {
-        setTimeout(() => initStickyObserver('cart-checkout-btn', 'Proceed to Checkout', "window.location.hash = '#checkout'"), 200);
+        setTimeout(() => initStickyObserver('cart-checkout-btn', 'Proceed to Checkout', "goToCheckout(event)"), 200);
     } else if (hash === '#checkout') {
         setTimeout(() => initStickyObserver('checkout-submit-btn', 'Submit Rental Request', "document.getElementById('checkout-submit-btn').click()"), 200);
     }
