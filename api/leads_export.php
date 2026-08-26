@@ -521,10 +521,20 @@ if ($format === 'json') {
                                             endif;
                                             ?>
                                         </td>
-                                        <td style="white-space: nowrap; font-size: 0.85rem; line-height: 1.4;">
+                                        <td style="white-space: nowrap; font-size: 0.85rem; line-height: 1.4; min-width: 170px;">
                                             Sub: $<?php echo htmlspecialchars(number_format((float)($order['subtotal'] ?? 0), 2)); ?><br>
                                             Disc: -$<?php echo htmlspecialchars(number_format((float)($order['discount'] ?? 0), 2)); ?><br>
-                                            <strong>Total: $<?php echo htmlspecialchars(number_format((float)($order['total'] ?? 0), 2)); ?></strong>
+                                            <div style="margin-top: 0.3rem; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 4px;">
+                                                <span style="font-size: 0.78rem; color: var(--text-muted);">Del Fee: $</span>
+                                                <input type="number" step="0.01" min="0" id="delivery-fee-<?php echo htmlspecialchars($order['id']); ?>" value="<?php echo htmlspecialchars(number_format((float)($order['delivery_fee'] ?? 0), 2)); ?>" style="width: 70px; padding: 2px 4px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: #d4af37; font-weight: bold;">
+                                            </div>
+                                            <strong>Total: <span id="total-display-<?php echo htmlspecialchars($order['id']); ?>" style="color: #d4af37;">$<?php echo htmlspecialchars(number_format((float)($order['total'] ?? 0), 2)); ?></span></strong>
+                                            
+                                            <div style="margin-top: 0.5rem;">
+                                                <textarea id="admin-notes-<?php echo htmlspecialchars($order['id']); ?>" placeholder="Notes / quote message to customer..." style="width: 100%; min-height: 38px; font-size: 0.75rem; padding: 4px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: var(--text-primary); margin-bottom: 4px; resize: vertical;"><?php echo htmlspecialchars($order['admin_notes'] ?? ''); ?></textarea>
+                                                <button onclick="updateOrderQuote('<?php echo htmlspecialchars($order['id']); ?>')" style="width: 100%; font-size: 0.75rem; padding: 4px 8px; background: #d4af37; color: #000; font-weight: bold; border-radius: 4px; border: none; cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">✉️ Update Quote & Email</button>
+                                                <div id="quote-msg-<?php echo htmlspecialchars($order['id']); ?>" style="font-size: 0.72rem; margin-top: 0.25rem; display: none;"></div>
+                                            </div>
                                         </td>
                                         <td style="white-space: nowrap; width: 170px;">
                                             <?php
@@ -569,6 +579,57 @@ if ($format === 'json') {
     </div>
 
     <script>
+        async function updateOrderQuote(orderId) {
+            const feeInput = document.getElementById('delivery-fee-' + orderId);
+            const notesInput = document.getElementById('admin-notes-' + orderId);
+            const msgDiv = document.getElementById('quote-msg-' + orderId);
+
+            if (!feeInput) return;
+            const fee = parseFloat(feeInput.value) || 0.00;
+            const notes = notesInput ? notesInput.value.trim() : '';
+
+            if (msgDiv) {
+                msgDiv.style.display = 'block';
+                msgDiv.style.color = '#cbd5e1';
+                msgDiv.innerText = 'Sending quote...';
+            }
+
+            try {
+                const res = await fetch('update_order_quote.php' + (window.location.search || ''), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        order_id: orderId,
+                        delivery_fee: fee,
+                        admin_notes: notes,
+                        notify: true
+                    })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    if (msgDiv) {
+                        msgDiv.style.color = '#10b981';
+                        msgDiv.innerText = '✅ Quote updated & email sent!';
+                        setTimeout(() => { msgDiv.style.display = 'none'; }, 4000);
+                    }
+                    const totalDisplay = document.getElementById('total-display-' + orderId);
+                    if (totalDisplay && data.new_total !== undefined) {
+                        totalDisplay.innerText = '$' + parseFloat(data.new_total).toFixed(2);
+                    }
+                } else {
+                    if (msgDiv) {
+                        msgDiv.style.color = '#ef4444';
+                        msgDiv.innerText = '❌ ' + (data.error || 'Update failed');
+                    }
+                }
+            } catch (err) {
+                if (msgDiv) {
+                    msgDiv.style.color = '#ef4444';
+                    msgDiv.innerText = '❌ Server connection error';
+                }
+            }
+        }
         function switchTab(tabName) {
             // Switch Active Tab Button
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));

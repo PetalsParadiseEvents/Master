@@ -152,10 +152,16 @@ function initOrdersTable($pdo) {
             `items` TEXT NOT NULL,
             `subtotal` DECIMAL(10,2) NOT NULL,
             `discount` DECIMAL(10,2) DEFAULT 0.00,
+            `delivery_fee` DECIMAL(10,2) DEFAULT 0.00,
             `total` DECIMAL(10,2) NOT NULL,
-            `status` VARCHAR(64) DEFAULT 'Pending'
+            `status` VARCHAR(64) DEFAULT 'Pending',
+            `admin_notes` TEXT
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
         $pdo->exec($sql);
+
+        // Auto-migrate missing columns for existing tables
+        @$pdo->exec("ALTER TABLE `orders` ADD COLUMN `delivery_fee` DECIMAL(10,2) DEFAULT 0.00");
+        @$pdo->exec("ALTER TABLE `orders` ADD COLUMN `admin_notes` TEXT");
     } catch (Exception $e) {
         // Silently continue
     }

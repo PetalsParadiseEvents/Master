@@ -3167,13 +3167,26 @@ window.handleTrackOrder = async function() {
                         ${isDelivery && order.delivery_address ? `<div><strong>Address:</strong> ${escapeHtml(order.delivery_address)}</div>` : ''}
                     </div>
 
+                    ${order.admin_notes ? `
+                        <div style="background: rgba(212,175,55,0.1); border: 1px solid var(--primary-color); border-radius: 10px; padding: 1rem; margin-top: 1rem; color: var(--text-primary); font-size: 0.9rem;">
+                            <strong style="color: var(--primary-color);">💬 Note from Petals Paradise Events:</strong>
+                            <p style="margin: 0.3rem 0 0 0; white-space: pre-wrap;">${escapeHtml(order.admin_notes)}</p>
+                        </div>
+                    ` : ''}
+
                     <div style="background: rgba(212,175,55,0.05); border: 1px solid rgba(212,175,55,0.2); border-radius: 10px; padding: 1rem; margin-top: 1rem;">
-                        <h4 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 0.95rem;">Requested Items:</h4>
-                        <ul style="padding-left: 1.2rem; font-size: 0.88rem; color: var(--text-primary); margin: 0; line-height: 1.5;">
+                        <h4 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 0.95rem;">Requested Items & Quote Summary:</h4>
+                        <ul style="padding-left: 1.2rem; font-size: 0.88rem; color: var(--text-primary); margin: 0 0 0.8rem 0; line-height: 1.5;">
                             ${(Array.isArray(order.items) ? order.items : []).map(it => `
                                 <li>${escapeHtml(it.quantity || 1)}x ${escapeHtml(it.title || 'Item')} (@ $${it.price || 0})</li>
                             `).join('')}
                         </ul>
+                        <div style="border-top: 1px dashed var(--border-color); padding-top: 0.6rem; font-size: 0.88rem; display: flex; flex-direction: column; gap: 0.25rem;">
+                            <div style="display: flex; justify-content: space-between;"><span>Items Subtotal:</span> <span>$${parseFloat(order.subtotal || 0).toFixed(2)}</span></div>
+                            ${parseFloat(order.discount || 0) > 0 ? `<div style="display: flex; justify-content: space-between; color: #10b981;"><span>Discount:</span> <span>-$${parseFloat(order.discount).toFixed(2)}</span></div>` : ''}
+                            <div style="display: flex; justify-content: space-between; color: var(--primary-color); font-weight: 600;"><span>Delivery & Setup Fee:</span> <span>$${parseFloat(order.delivery_fee || 0).toFixed(2)}</span></div>
+                            <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1rem; color: var(--primary-color); border-top: 1px solid var(--border-color); padding-top: 0.4rem; margin-top: 0.2rem;"><span>Total Estimate:</span> <span>$${parseFloat(order.total || 0).toFixed(2)}</span></div>
+                        </div>
                     </div>
                 </div>
             `;
