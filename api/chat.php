@@ -16,37 +16,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
-// 1. Load config
-$configFile = __DIR__ . '/config.php';
-if (!file_exists($configFile)) {
-    echo json_encode(['error' => 'Configuration file not found. please create api/config.php.']);
-    exit(1);
-}
-require_once $configFile;
+try {
+    // 1. Load config
+    $configFile = __DIR__ . '/config.php';
+    if (!file_exists($configFile)) {
+        echo json_encode([
+            'error' => 'Configuration file missing.',
+            'response' => '🌸 Configuration file api/config.php not found.'
+        ]);
+        exit(0);
+    }
+    require_once $configFile;
 
-// 2. Validate API Key
-if (!defined('GEMINI_API_KEY') || GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE' || empty(GEMINI_API_KEY)) {
-    echo json_encode([
-        'error' => 'API Key not configured.',
-        'response' => '🌸 Welcome to Petals Paradise Events! I am ready to assist you. However, my Gemini API Key is not yet configured. Please add your key in `api/config.php` to enable live AI responses.'
-    ]);
-    exit(0);
-}
+    // 2. Validate API Key
+    if (!defined('GEMINI_API_KEY') || GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE' || empty(GEMINI_API_KEY)) {
+        echo json_encode([
+            'error' => 'API Key not configured.',
+            'response' => '🌸 Welcome to Petals Paradise Events! My Gemini API Key is not yet configured. Please add your key in `api/config.php` or `api/secrets.php` to enable live AI responses.'
+        ]);
+        exit(0);
+    }
 
-// 3. Parse JSON request body
-$rawInput = file_get_contents('php://input');
-$data = json_decode($rawInput, true);
+    // 3. Parse JSON request body
+    $rawInput = file_get_contents('php://input');
+    $data = json_decode($rawInput, true);
 
-$userMessage = isset($data['message']) ? trim($data['message']) : '';
-$history = isset($data['history']) ? $data['history'] : [];
+    $userMessage = isset($data['message']) ? trim($data['message']) : '';
+    $history = isset($data['history']) ? $data['history'] : [];
 
-if (empty($userMessage)) {
-    echo json_encode(['error' => 'Empty message.']);
-    exit(0);
-}
+    if (empty($userMessage)) {
+        echo json_encode([
+            'error' => 'Empty message.',
+            'response' => 'Please enter a question or event planning detail!'
+        ]);
+        exit(0);
+    }
 
-// 4. Define the System Instruction
-$systemInstruction = "You are the premium AI Event Decor Assistant & Order Agent for Petals Paradise Events, a luxury party rental and event decor boutique serving the DMV (DC, Maryland, Virginia) area. Your home base is Ashburn, VA.
+    // 4. System Instruction
+    $systemInstruction = "You are the premium AI Event Decor Assistant & Order Agent for Petals Paradise Events, a luxury party rental and event decor boutique serving the DMV (DC, Maryland, Virginia) area. Your home base is Ashburn, VA.
 
 Your tone should be warm, creative, helpful, and highly professional. You assist clients in planning events (weddings, graduations, baby showers, birthdays, South Asian traditional Haldi/Mehandi, housewarmings), recommending inventory, AND placing orders directly on their behalf!
 
@@ -92,93 +99,135 @@ CORE RULES:
         5. Fulfillment Choice ('Delivery' or 'Pickup')
         6. Delivery Address (if Delivery is chosen)
      c) Once ALL required details are gathered, ALWAYS output the single structured payload tag at the VERY END of your response:
-        [PLACE_ORDER:{\"name\":\"Customer Name\",\"email\":\"customer@email.com\",\"phone\":\"848-000-0000\",\"event_date\":\"2026-09-15\",\"fulfillment_method\":\"Delivery\",\"delivery_address\":\"123 Main St, Ashburn VA\",\"special_requests\":\"Notes here\",\"items\":[{\"id\":4,\"title\":\"Adult Folding Chair\",\"price\":1.50,\"quantity\":50},{\"id":1,\"title\":\"Round Fold-In-Half Table\",\"price\":12,\"quantity\":6}]}]
+        [PLACE_ORDER:{\"name\":\"Customer Name\",\"email\":\"customer@email.com\",\"phone\":\"848-000-0000\",\"event_date\":\"2026-09-15\",\"fulfillment_method\":\"Delivery\",\"delivery_address\":\"123 Main St, Ashburn VA\",\"special_requests\":\"Notes here\",\"items\":[{\"id\":4,\"title\":\"Adult Folding Chair\",\"price\":1.50,\"quantity\":50},{\"id\":1,\"title\":\"Round Fold-In-Half Table\",\"price\":12,\"quantity\":6}]}]
 5. Never invent or guess customer name, email, or phone. Politely ask the user to provide them if missing before outputting the [PLACE_ORDER] tag.
 6. Emphasize that deliveries are available throughout Ashburn, Aldie, Sterling, Leesburg, Chantilly, Fairfax, Great Falls, Loudoun County, and the DMV.
 7. Keep your replies warm, helpful, structured, and easy to read using markdown formatting.";
 
-// 5. Structure payload for Gemini API
-$contents = [];
+    // 5. Structure payload for Gemini API
+    $contents = [];
+    foreach ($history as $msg) {
+        $role = (isset($msg['role']) && $msg['role'] === 'user') ? 'user' : 'model';
+        $text = isset($msg['text']) ? $msg['text'] : '';
+        if (!empty($text)) {
+            $contents[] = [
+                'role' => $role,
+                'parts' => [['text' => $text]]
+            ];
+        }
+    }
 
-// Convert input history to Gemini API format (role must be 'user' or 'model')
-foreach ($history as $msg) {
-    $role = ($msg['role'] === 'user') ? 'user' : 'model';
     $contents[] = [
-        'role' => $role,
-        'parts' => [['text' => $msg['text']]]
+        'role' => 'user',
+        'parts' => [['text' => $userMessage]]
     ];
+
+    $payload = [
+        'contents' => $contents,
+        'systemInstruction' => [
+            'parts' => [['text' => $systemInstruction]]
+        ],
+        'generationConfig' => [
+            'temperature' => 0.7,
+            'maxOutputTokens' => 1000
+        ]
+    ];
+
+    // 6. Execute Dual Engine HTTP Request (cURL primary, stream_context fallback)
+    $apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+    $apiResult = makeGeminiRequest($apiUrl, $payload, GEMINI_API_KEY);
+
+    $httpStatus = $apiResult['status'];
+    $rawResponseBody = $apiResult['body'];
+
+    if (empty($rawResponseBody)) {
+        echo json_encode([
+            'error' => 'Empty response from Gemini API',
+            'response' => '🌸 Sorry, I am having trouble contacting my AI brain right now. Please try again in a moment!'
+        ]);
+        exit(0);
+    }
+
+    $responseDecoded = json_decode($rawResponseBody, true);
+
+    if ($httpStatus !== 200) {
+        $errorMessage = isset($responseDecoded['error']['message']) ? $responseDecoded['error']['message'] : 'API Error ' . $httpStatus;
+        echo json_encode([
+            'error' => "Gemini API Status $httpStatus",
+            'debug' => $errorMessage,
+            'response' => "⚠️ AI API Notice ($httpStatus): $errorMessage. Please try again or call us at 848-448-6993."
+        ]);
+        exit(0);
+    }
+
+    if (isset($responseDecoded['candidates'][0]['content']['parts'][0]['text'])) {
+        $botResponse = $responseDecoded['candidates'][0]['content']['parts'][0]['text'];
+        echo json_encode(['response' => $botResponse]);
+    } else {
+        echo json_encode([
+            'error' => 'Unexpected JSON structure',
+            'response' => '🌸 I received an empty response. Please ask me again.'
+        ]);
+    }
+
+} catch (Throwable $e) {
+    echo json_encode([
+        'error' => 'Fatal Server Error',
+        'debug' => $e->getMessage() . ' on line ' . $e->getLine(),
+        'response' => '🌸 Server Notice: ' . $e->getMessage()
+    ]);
 }
 
-// Add the current message
-$contents[] = [
-    'role' => 'user',
-    'parts' => [['text' => $userMessage]]
-];
+/**
+ * Dual Engine HTTP Requester
+ * Primary: cURL
+ * Fallback: file_get_contents with stream_context
+ */
+function makeGeminiRequest($url, $payload, $apiKey) {
+    $payloadJson = json_encode($payload);
+    
+    // Engine 1: cURL (if function is available)
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $payloadJson);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'x-goog-api-key: ' . $apiKey
+        ]);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 
-$payload = [
-    'contents' => $contents,
-    'systemInstruction' => [
-        'parts' => [['text' => $systemInstruction]]
-    ],
-    'generationConfig' => [
-        'temperature' => 0.7,
-        'maxOutputTokens' => 1000
-    ]
-];
+        $body = curl_exec($ch);
+        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err = curl_error($ch);
+        curl_close($ch);
 
-// 6. Execute cURL request to Gemini API
-$url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
-$headers = [
-    'Content-Type: application/json',
-    'x-goog-api-key: ' . GEMINI_API_KEY
-];
+        if (!$err && !empty($body)) {
+            return ['status' => $status, 'body' => $body];
+        }
+    }
 
-$ch = curl_init($url);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-
-$response = curl_exec($ch);
-$httpStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-$curlError = curl_error($ch);
-curl_close($ch);
-
-// 7. Process API response
-if ($curlError) {
-    echo json_encode([
-        'error' => 'Network request failed',
-        'response' => 'Sorry, I am having trouble connecting to my brain right now. Please try again in a moment!'
-    ]);
-    exit(0);
-}
-
-$responseDecoded = json_decode($response, true);
-
-if ($httpStatus !== 200) {
-    $errorMessage = isset($responseDecoded['error']['message']) ? $responseDecoded['error']['message'] : 'Unknown API Error';
-    // Diagnostic: show key prefix (first 6 chars) + length to help debug
-    $keyLen = strlen(GEMINI_API_KEY);
-    $keyPreview = $keyLen > 6 ? substr(GEMINI_API_KEY, 0, 6) . '...' : '(empty)';
-    echo json_encode([
-        'error' => "Gemini API returned status $httpStatus",
-        'debug' => $errorMessage,
-        'response' => "⚠️ API Error ($httpStatus): $errorMessage | Key loaded: {$keyPreview} (length: {$keyLen})"
-    ]);
-    exit(0);
-}
-
-// Extract candidate text
-if (isset($responseDecoded['candidates'][0]['content']['parts'][0]['text'])) {
-    $botResponse = $responseDecoded['candidates'][0]['content']['parts'][0]['text'];
-    echo json_encode(['response' => $botResponse]);
-} else {
-    echo json_encode([
-        'error' => 'Unexpected response structure',
-        'debug' => $response,
-        'response' => 'I received an empty response. Please ask me again.'
-    ]);
+    // Engine 2: file_get_contents stream context fallback
+    $opts = [
+        'http' => [
+            'method'  => 'POST',
+            'header'  => "Content-Type: application/json\r\n" .
+                         "x-goog-api-key: " . $apiKey . "\r\n",
+            'content' => $payloadJson,
+            'timeout' => 15,
+            'ignore_errors' => true
+        ],
+        'ssl' => [
+            'verify_peer' => false,
+            'verify_peer_name' => false
+        ]
+    ];
+    
+    $context = stream_context_create($opts);
+    $body = @file_get_contents($url, false, $context);
+    
+    return ['status' => 200, 'body' => $body];
 }
