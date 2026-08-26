@@ -2979,8 +2979,18 @@ function initAIChatbot() {
                 body: json_encode_mock({ message: query, history: chatHistory })
             });
 
-            const data = await response.json();
-            
+            const rawText = await response.text();
+            let data = null;
+            try {
+                data = JSON.parse(rawText);
+            } catch (pErr) {
+                console.error('API non-JSON response:', rawText);
+                chatMessages.removeChild(loadingDiv);
+                const snippet = rawText ? rawText.trim().substring(0, 150) : 'Empty server response (0 bytes)';
+                appendMessage('system', `🌸 Server diagnostic: ${snippet}`);
+                return;
+            }
+
             // Remove loading bubble
             chatMessages.removeChild(loadingDiv);
 

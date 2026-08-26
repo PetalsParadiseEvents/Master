@@ -4,7 +4,10 @@
  * Routes client queries to the Google Gemini 1.5 Flash API.
  */
 
-header('Content-Type: application/json');
+error_reporting(0);
+ini_set('display_errors', 0);
+
+header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
