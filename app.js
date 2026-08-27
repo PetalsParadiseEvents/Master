@@ -3184,7 +3184,8 @@ window.handleTrackOrder = async function() {
                         <div style="border-top: 1px dashed var(--border-color); padding-top: 0.6rem; font-size: 0.88rem; display: flex; flex-direction: column; gap: 0.25rem;">
                             <div style="display: flex; justify-content: space-between;"><span>Items Subtotal:</span> <span>$${parseFloat(order.subtotal || 0).toFixed(2)}</span></div>
                             ${parseFloat(order.discount || 0) > 0 ? `<div style="display: flex; justify-content: space-between; color: #10b981;"><span>Discount:</span> <span>-$${parseFloat(order.discount).toFixed(2)}</span></div>` : ''}
-                            <div style="display: flex; justify-content: space-between; color: var(--primary-color); font-weight: 600;"><span>Delivery & Setup Fee:</span> <span>$${parseFloat(order.delivery_fee || 0).toFixed(2)}</span></div>
+                            <div style="display: flex; justify-content: space-between; color: var(--primary-color); font-weight: 500;"><span>Delivery Fee:</span> <span>$${parseFloat(order.delivery_fee || 0).toFixed(2)}</span></div>
+                            <div style="display: flex; justify-content: space-between; color: var(--primary-color); font-weight: 500;"><span>Setup & Installation Fee:</span> <span>$${parseFloat(order.setup_fee || 0).toFixed(2)}</span></div>
                             <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1rem; color: var(--primary-color); border-top: 1px solid var(--border-color); padding-top: 0.4rem; margin-top: 0.2rem;"><span>Total Estimate:</span> <span>$${parseFloat(order.total || 0).toFixed(2)}</span></div>
                         </div>
                     </div>

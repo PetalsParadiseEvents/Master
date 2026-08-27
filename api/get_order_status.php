@@ -46,7 +46,7 @@ try {
         $pdo = getDbConnection();
         if ($pdo) {
             try {
-                $sql = "SELECT `id`, `date_added`, `name`, `email`, `phone`, `event_date`, `fulfillment_method`, `delivery_address`, `items`, `subtotal`, `discount`, `total`, `status` 
+                $sql = "SELECT `id`, `date_added`, `name`, `email`, `phone`, `event_date`, `fulfillment_method`, `delivery_address`, `items`, `subtotal`, `discount`, `delivery_fee`, `setup_fee`, `total`, `status`, `admin_notes` 
                         FROM `orders` 
                         WHERE `id` LIKE :q 
                            OR LOWER(`email`) LIKE LOWER(:q) 
@@ -105,8 +105,11 @@ try {
                         'items'              => $ord['items'] ?? [],
                         'subtotal'           => $ord['subtotal'] ?? 0.00,
                         'discount'           => $ord['discount'] ?? 0.00,
+                        'delivery_fee'       => $ord['delivery_fee'] ?? 0.00,
+                        'setup_fee'          => $ord['setup_fee'] ?? 0.00,
                         'total'              => $ord['total'] ?? 0.00,
-                        'status'             => $ord['status'] ?? 'Pending'
+                        'status'             => $ord['status'] ?? 'Pending',
+                        'admin_notes'        => $ord['admin_notes'] ?? ''
                     ];
                 }
             }

@@ -43,6 +43,7 @@ try {
 
     $orderId     = isset($data['order_id']) ? trim($data['order_id']) : '';
     $deliveryFee = isset($data['delivery_fee']) ? floatval($data['delivery_fee']) : 0.00;
+    $setupFee    = isset($data['setup_fee']) ? floatval($data['setup_fee']) : 0.00;
     $adminNotes  = isset($data['admin_notes']) ? trim($data['admin_notes']) : '';
     $notify      = isset($data['notify']) ? (bool)$data['notify'] : true;
 
@@ -65,17 +66,19 @@ try {
             if ($orderRecord) {
                 $subtotal = floatval($orderRecord['subtotal'] ?? 0);
                 $discount = floatval($orderRecord['discount'] ?? 0);
-                $newTotal = max(0, $subtotal - $discount + $deliveryFee);
+                $newTotal = max(0, $subtotal - $discount + $deliveryFee + $setupFee);
 
-                $updateStmt = $pdo->prepare("UPDATE `orders` SET `delivery_fee` = :fee, `admin_notes` = :notes, `total` = :total WHERE `id` = :id");
+                $updateStmt = $pdo->prepare("UPDATE `orders` SET `delivery_fee` = :fee, `setup_fee` = :setup, `admin_notes` = :notes, `total` = :total WHERE `id` = :id");
                 $updateStmt->execute([
                     ':fee'   => $deliveryFee,
+                    ':setup' => $setupFee,
                     ':notes' => $adminNotes,
                     ':total' => $newTotal,
                     ':id'    => $orderId
                 ]);
 
                 $orderRecord['delivery_fee'] = $deliveryFee;
+                $orderRecord['setup_fee']    = $setupFee;
                 $orderRecord['admin_notes']  = $adminNotes;
                 $orderRecord['total']        = $newTotal;
             }
@@ -94,9 +97,10 @@ try {
                 if (isset($ord['id']) && $ord['id'] === $orderId) {
                     $subtotal = floatval($ord['subtotal'] ?? 0);
                     $discount = floatval($ord['discount'] ?? 0);
-                    $newTotal = max(0, $subtotal - $discount + $deliveryFee);
+                    $newTotal = max(0, $subtotal - $discount + $deliveryFee + $setupFee);
 
                     $ord['delivery_fee'] = $deliveryFee;
+                    $ord['setup_fee']    = $setupFee;
                     $ord['admin_notes']  = $adminNotes;
                     $ord['total']        = $newTotal;
 
@@ -126,6 +130,7 @@ try {
     $subtotalFmt   = number_format(floatval($orderRecord['subtotal'] ?? 0), 2);
     $discountFmt   = number_format(floatval($orderRecord['discount'] ?? 0), 2);
     $deliveryFmt   = number_format($deliveryFee, 2);
+    $setupFmt      = number_format($setupFee, 2);
     $totalFmt      = number_format(floatval($orderRecord['total'] ?? 0), 2);
 
     $rawItems = $orderRecord['items'] ?? [];
@@ -142,7 +147,7 @@ try {
 
     if ($notify && !empty($customerEmail)) {
         $trackUrl = "https://petalsparadiseevents.com/#track";
-        $subject  = "🌸 Updated Rental Quote & Delivery Fee for Order {$orderId}";
+        $subject  = "🌸 Updated Rental Quote for Order {$orderId}";
 
         $notesHtml = "";
         if (!empty($adminNotes)) {
@@ -181,7 +186,7 @@ try {
                 </div>
                 
                 <p>Hi <strong>" . htmlspecialchars($customerName) . "</strong>,</p>
-                <p>Thank you for submitting your rental request! We have calculated the delivery and logistics details for your event, and your updated rental quote is ready below.</p>
+                <p>Thank you for submitting your rental request! We have updated the delivery and setup quote for your event as detailed below.</p>
                 
                 {$notesHtml}
 
@@ -198,8 +203,12 @@ try {
                             <td style='text-align: right; font-weight: bold;'>-\${$discountFmt}</td>
                         </tr>" : "") . "
                         <tr>
-                            <td>Delivery & Setup Fee:</td>
+                            <td>Delivery Fee:</td>
                             <td style='text-align: right; font-weight: bold; color: #d4af37;'>\${$deliveryFmt}</td>
+                        </tr>
+                        <tr>
+                            <td>Setup & Installation Fee:</td>
+                            <td style='text-align: right; font-weight: bold; color: #d4af37;'>\${$setupFmt}</td>
                         </tr>
                         <tr class='total-row'>
                             <td style='padding-top: 10px;'>Final Total Estimate:</td>
@@ -218,7 +227,7 @@ try {
                 <div style='background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 8px; margin: 20px 0;'>
                     <h4 style='margin-top: 0; color: #166534; font-size: 15px;'>📩 Questions or Concerns?</h4>
                     <p style='margin: 0; color: #15803d; font-size: 14px;'>
-                        Please review your quote above. If you have any questions or concerns regarding the delivery fee or event logistics, simply reply directly to this email or call us at <strong>+1 848-448-6993</strong>.
+                        Please review your quote above. If you have any questions or concerns regarding the delivery or setup fees, simply reply directly to this email or call us at <strong>+1 848-448-6993</strong>.
                     </p>
                 </div>
 
@@ -248,6 +257,7 @@ try {
         'success'      => true,
         'order_id'     => $orderId,
         'delivery_fee' => $deliveryFee,
+        'setup_fee'    => $setupFee,
         'admin_notes'  => $adminNotes,
         'new_total'    => floatval($orderRecord['total']),
         'email_sent'   => $emailSent

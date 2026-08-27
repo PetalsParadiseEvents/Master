@@ -524,9 +524,13 @@ if ($format === 'json') {
                                         <td style="white-space: nowrap; font-size: 0.85rem; line-height: 1.4; min-width: 170px;">
                                             Sub: $<?php echo htmlspecialchars(number_format((float)($order['subtotal'] ?? 0), 2)); ?><br>
                                             Disc: -$<?php echo htmlspecialchars(number_format((float)($order['discount'] ?? 0), 2)); ?><br>
-                                            <div style="margin-top: 0.3rem; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 4px;">
-                                                <span style="font-size: 0.78rem; color: var(--text-muted);">Del Fee: $</span>
-                                                <input type="number" step="0.01" min="0" id="delivery-fee-<?php echo htmlspecialchars($order['id']); ?>" value="<?php echo htmlspecialchars(number_format((float)($order['delivery_fee'] ?? 0), 2)); ?>" style="width: 70px; padding: 2px 4px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: #d4af37; font-weight: bold;">
+                                            <div style="margin-top: 0.3rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 4px;">
+                                                <span style="font-size: 0.75rem; color: var(--text-muted); width: 62px;">Del Fee: $</span>
+                                                <input type="number" step="0.01" min="0" id="delivery-fee-<?php echo htmlspecialchars($order['id']); ?>" value="<?php echo htmlspecialchars(number_format((float)($order['delivery_fee'] ?? 0), 2)); ?>" style="width: 75px; padding: 2px 4px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: #d4af37; font-weight: bold;">
+                                            </div>
+                                            <div style="margin-bottom: 0.3rem; display: flex; align-items: center; gap: 4px;">
+                                                <span style="font-size: 0.75rem; color: var(--text-muted); width: 62px;">Setup Fee: $</span>
+                                                <input type="number" step="0.01" min="0" id="setup-fee-<?php echo htmlspecialchars($order['id']); ?>" value="<?php echo htmlspecialchars(number_format((float)($order['setup_fee'] ?? 0), 2)); ?>" style="width: 75px; padding: 2px 4px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: #d4af37; font-weight: bold;">
                                             </div>
                                             <strong>Total: <span id="total-display-<?php echo htmlspecialchars($order['id']); ?>" style="color: #d4af37;">$<?php echo htmlspecialchars(number_format((float)($order['total'] ?? 0), 2)); ?></span></strong>
                                             
@@ -580,12 +584,14 @@ if ($format === 'json') {
 
     <script>
         async function updateOrderQuote(orderId) {
-            const feeInput = document.getElementById('delivery-fee-' + orderId);
+            const delInput = document.getElementById('delivery-fee-' + orderId);
+            const setupInput = document.getElementById('setup-fee-' + orderId);
             const notesInput = document.getElementById('admin-notes-' + orderId);
             const msgDiv = document.getElementById('quote-msg-' + orderId);
 
-            if (!feeInput) return;
-            const fee = parseFloat(feeInput.value) || 0.00;
+            if (!delInput) return;
+            const delFee = parseFloat(delInput.value) || 0.00;
+            const setupFee = setupInput ? (parseFloat(setupInput.value) || 0.00) : 0.00;
             const notes = notesInput ? notesInput.value.trim() : '';
 
             if (msgDiv) {
@@ -600,7 +606,8 @@ if ($format === 'json') {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         order_id: orderId,
-                        delivery_fee: fee,
+                        delivery_fee: delFee,
+                        setup_fee: setupFee,
                         admin_notes: notes,
                         notify: true
                     })
