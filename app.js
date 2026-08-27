@@ -3153,7 +3153,7 @@ window.handleTrackOrder = async function() {
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
                         <div>
                             <span style="font-family: monospace; font-size: 1.1rem; font-weight: 700; color: var(--primary-color);">${escapeHtml(order.id)}</span>
-                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;">Placed on ${escapeHtml(order.date_added)}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;">Placed on ${escapeHtml(order.date_added_formatted || order.date_added)}</div>
                         </div>
                         <span class="badge" style="${badgeStyle} font-size: 0.85rem; padding: 0.4rem 0.8rem; border-radius: 20px; font-weight: 600;">
                             ● ${escapeHtml(currentStatus)}

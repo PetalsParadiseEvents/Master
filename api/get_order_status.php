@@ -128,6 +128,18 @@ try {
         if (is_string($o['items'])) {
             $o['items'] = json_decode($o['items'], true) ?: [];
         }
+
+        if (!empty($o['date_added'])) {
+            try {
+                $rawDate = $o['date_added'];
+                // Check if already Eastern Time or UTC
+                $dt = new DateTime($rawDate, new DateTimeZone('UTC'));
+                $dt->setTimezone(new DateTimeZone('America/New_York'));
+                $o['date_added_formatted'] = $dt->format('M d, Y h:i A') . ' EDT';
+            } catch (Exception $e) {
+                $o['date_added_formatted'] = $o['date_added'];
+            }
+        }
     }
 
     echo json_encode([
