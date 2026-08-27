@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('America/New_York');
+
 /**
  * Petals Paradise Events API & Portal Config
  *
@@ -49,6 +51,7 @@ if (!empty($_SERVER['ADMIN_USER']))   $adminUser = $_SERVER['ADMIN_USER'];
 if (!empty($_SERVER['ADMIN_PASS']))   $adminPass = $_SERVER['ADMIN_PASS'];
 if (!empty($_SERVER['DB_USER']))     $dbUser = $_SERVER['DB_USER'];
 if (!empty($_SERVER['DB_PASS']))     $dbPass = $_SERVER['DB_PASS'];
+if (!empty($_SERVER['DB_NAME']))     $dbName = $_SERVER['DB_NAME'];
 
 if (empty($apiKey)) {
     if (!empty($_SERVER['GEMINI_API_KEY'])) {
@@ -60,16 +63,18 @@ if (empty($apiKey)) {
     }
 }
 
-// Define Constants
-if (!defined('GEMINI_API_KEY'))  define('GEMINI_API_KEY', $apiKey);
-if (!defined('ADMIN_USER'))      define('ADMIN_USER', $adminUser);
-if (!defined('ADMIN_PASS'))      define('ADMIN_PASS', $adminPass);
-if (!defined('ADMIN_SECRET'))    define('ADMIN_SECRET', $adminSecret);
-if (!defined('DB_HOST'))        define('DB_HOST', $dbHost);
-if (!defined('DB_NAME'))        define('DB_NAME', $dbName);
-if (!defined('DB_USER'))        define('DB_USER', $dbUser);
-if (!defined('DB_PASS'))        define('DB_PASS', $dbPass);
-if (!defined('DB_TABLE'))       define('DB_TABLE', $dbTable);
+// 4. Global Constants
+if (!defined('ADMIN_USER'))          define('ADMIN_USER', $adminUser);
+if (!defined('ADMIN_PASS'))          define('ADMIN_PASS', $adminPass);
+if (!defined('ADMIN_SECRET'))        define('ADMIN_SECRET', $adminSecret);
+if (!defined('NOTIFICATION_EMAILS')) define('NOTIFICATION_EMAILS', json_encode($notificationEmails));
+if (!defined('GEMINI_API_KEY'))      define('GEMINI_API_KEY', $apiKey);
+
+if (!defined('DB_HOST'))  define('DB_HOST', $dbHost);
+if (!defined('DB_NAME'))  define('DB_NAME', $dbName);
+if (!defined('DB_USER'))  define('DB_USER', $dbUser);
+if (!defined('DB_PASS'))  define('DB_PASS', $dbPass);
+if (!defined('DB_TABLE')) define('DB_TABLE', $dbTable);
 
 /**
  * PDO Database Helper Function
@@ -91,6 +96,10 @@ function getDbConnection() {
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
         ]);
+
+        // Synchronize MySQL session timezone to US Eastern Time
+        @$pdo->exec("SET time_zone = '" . date('P') . "';");
+        
         initLeadsTable($pdo);
         initOrdersTable($pdo);
         return $pdo;
