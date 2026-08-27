@@ -1,78 +1,77 @@
 <?php
 session_start();
 /**
- * Confidential Leads & Orders Export Dashboard Portal
+ * Leads & Orders Admin Dashboard Portal
  * Petals Paradise Events
  */
 
+error_reporting(0);
+ini_set('display_errors', 0);
+
 require_once __DIR__ . '/config.php';
+
+// ═══════════════════════════════════════════════════════════
+// 1. AUTHENTICATION (Session, Cookie, or URL Key Bypass)
+// ═══════════════════════════════════════════════════════════
+$adminUser   = ADMIN_USER;
+$adminPass   = ADMIN_PASS;
+$adminSecret = ADMIN_SECRET;
+$cookieHash  = md5($adminUser . $adminPass . $adminSecret);
 
 // Handle Logout
 if (isset($_GET['logout'])) {
     unset($_SESSION['admin_logged_in']);
-    session_destroy();
     setcookie('ppe_auth', '', time() - 3600, '/');
     header('Location: leads_export.php');
     exit;
 }
 
-$adminUser = ADMIN_USER;
-$adminPass = ADMIN_PASS;
-$adminSecret = ADMIN_SECRET;
-
-$cookieHash = md5($adminUser . $adminPass . $adminSecret);
-
-// Handle Form Submission Login
+// Handle Login Form Submission
 $loginError = '';
-if (isset($_POST['username']) && isset($_POST['password'])) {
-    if (strtolower(trim($_POST['username'])) === strtolower(trim($adminUser)) && $_POST['password'] === $adminPass) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset($_POST['password'])) {
+    if ($_POST['username'] === $adminUser && $_POST['password'] === $adminPass) {
         $_SESSION['admin_logged_in'] = true;
-        setcookie('ppe_auth', $cookieHash, time() + 86400 * 30, '/', '', true, true);
+        setcookie('ppe_auth', $cookieHash, time() + (86400 * 30), '/'); // 30 days
         header('Location: leads_export.php' . (!empty($_GET['key']) ? '?key=' . urlencode($_GET['key']) : ''));
         exit;
     } else {
-        $loginError = '🌸 Invalid username or password.';
+        $loginError = 'Invalid admin username or password.';
     }
 }
 
+// Verify Authentication
 $providedKey = isset($_GET['key']) ? $_GET['key'] : '';
 $isBypassed = (!empty($adminSecret) && $providedKey === $adminSecret);
 $isCookieValid = (isset($_COOKIE['ppe_auth']) && $_COOKIE['ppe_auth'] === $cookieHash);
-
 $isAuthenticated = $isBypassed || (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) || $isCookieValid;
 
 if (!$isAuthenticated) {
-    // Render a premium, styled login page matching the site's dark/gold theme
     ?>
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Petals Paradise Portal - Login</title>
+        <title>Admin Login - Petals Paradise Events</title>
         <style>
             :root {
-                --bg: #0d0f12;
-                --surface: #1a1d24;
+                --bg: #0f172a;
+                --surface: #1e293b;
                 --primary: #d4af37;
-                --primary-hover: #f1c40f;
-                --text: #f8fafc;
-                --text-muted: #cbd5e1;
-                --border: rgba(255,255,255,0.12);
+                --text-primary: #f8fafc;
+                --text-muted: #94a3b8;
+                --border-color: #334155;
             }
-            * { box-sizing: border-box; margin: 0; padding: 0; }
-            body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
-            .login-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 400px; padding: 2.5rem; box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
+            body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text-primary); display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+            .login-card { background: var(--surface); border: 1px solid var(--border-color); border-radius: 16px; width: 100%; max-width: 400px; padding: 2.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
             .logo-area { text-align: center; margin-bottom: 2rem; }
-            .logo-area h1 { font-family: Georgia, serif; color: var(--primary); font-size: 1.8rem; margin-bottom: 0.5rem; }
+            .logo-area h1 { font-family: Georgia, serif; color: var(--primary); font-size: 1.8rem; margin-bottom: 0.25rem; }
             .logo-area p { color: var(--text-muted); font-size: 0.85rem; }
             .form-group { margin-bottom: 1.25rem; }
-            .form-label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; }
-            .form-control { width: 100%; padding: 0.8rem 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.95rem; transition: border-color 0.2s; }
-            .form-control:focus { outline: none; border-color: var(--primary); }
-            .btn { width: 100%; padding: 0.9rem; border-radius: 8px; background: var(--primary); color: #0d0f12; border: none; font-weight: 700; font-size: 1rem; cursor: pointer; transition: background 0.2s; margin-top: 1rem; }
-            .btn:hover { background: var(--primary-hover); }
-            .error-message { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1.5rem; text-align: center; }
+            .form-label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 500; }
+            .form-control { width: 100%; padding: 0.75rem 1rem; background: var(--bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 0.95rem; box-sizing: border-box; }
+            .btn { width: 100%; padding: 0.75rem 1.25rem; background: var(--primary); color: #000; font-weight: 700; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; margin-top: 1rem; }
+            .error-message { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 0.75rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1.25rem; text-align: center; }
         </style>
     </head>
     <body>
@@ -135,7 +134,7 @@ if ($pdo) {
     }
 }
 
-// Only load from JSON backup files if we are NOT connected to the database
+// Fallback to JSON backup files if database connection unavailable
 if (!$dbConnected) {
     $leadsFile = __DIR__ . '/leads.json';
     if (file_exists($leadsFile)) {
@@ -150,21 +149,56 @@ if (!$dbConnected) {
     }
 }
 
-// ═══════════════════════════════════════════════════════════
-// 3. EXPORT / RESPONSE FORMAT HANDLER
-// ═══════════════════════════════════════════════════════════
+// Split orders into Active and Completed arrays
+$activeOrders = [];
+$completedOrders = [];
+
+foreach ($orders as $ord) {
+    $st = $ord['status'] ?? 'Pending';
+    if ($st === 'Completed') {
+        $completedOrders[] = $ord;
+    } else {
+        $activeOrders[] = $ord;
+    }
+}
+
+// Sort Function: Chronologically by Event Date (YYYY-MM-DD), fallback to date_added DESC
+$sortByEventDate = function($a, $b) {
+    $dateA = !empty($a['event_date']) ? strtotime($a['event_date']) : 0;
+    $dateB = !empty($b['event_date']) ? strtotime($b['event_date']) : 0;
+    if ($dateA == $dateB) {
+        return strtotime($b['date_added'] ?? 0) - strtotime($a['date_added'] ?? 0);
+    }
+    return $dateA - $dateB;
+};
+
+usort($activeOrders, $sortByEventDate);
+usort($completedOrders, $sortByEventDate);
+
+// Extract distinct Months for Event Month Filter (e.g., "August 2026", "September 2026")
+$eventMonths = [];
+foreach ($orders as $ord) {
+    if (!empty($ord['event_date'])) {
+        $time = strtotime($ord['event_date']);
+        if ($time) {
+            $monthVal = date('Y-m', $time);
+            $monthLabel = date('F Y', $time);
+            $eventMonths[$monthVal] = $monthLabel;
+        }
+    }
+}
+ksort($eventMonths);
+
+// CSV Export Handler
 $format = isset($_GET['format']) ? strtolower($_GET['format']) : '';
 $type = isset($_GET['type']) ? strtolower($_GET['type']) : 'leads';
 
-// CSV Export Download
 if ($format === 'csv') {
     if ($type === 'orders') {
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename=Petals_Paradise_Orders_' . date('Y-m-d') . '.csv');
-        
         $output = fopen('php://output', 'w');
-        fputcsv($output, ['Order ID', 'Date Added', 'Name', 'Email', 'Phone', 'Event Date', 'Venue Location', 'Fulfillment Method', 'Delivery Address', 'Logistics/Dates', 'Special Requests', 'Items Requested', 'Subtotal', 'Discount', 'Total Estimate', 'Status']);
-        
+        fputcsv($output, ['Order ID', 'Date Added', 'Name', 'Email', 'Phone', 'Event Date', 'Venue Location', 'Fulfillment Method', 'Delivery Address', 'Payment Method', 'Items', 'Subtotal', 'Discount', 'Delivery Fee', 'Setup Fee', 'Total', 'Status', 'Admin Notes']);
         foreach ($orders as $order) {
             $itemList = "";
             $itemsArr = is_string($order['items']) ? json_decode($order['items'], true) : ($order['items'] ?? []);
@@ -173,14 +207,6 @@ if ($format === 'csv') {
                     $itemList .= ($it['quantity'] ?? 1) . "x " . ($it['title'] ?? 'Item') . "; ";
                 }
             }
-            
-            $logistics = "";
-            if (($order['fulfillment_method'] ?? '') === 'Delivery') {
-                $logistics = "Delivery: " . ($order['delivery_date'] ?? $order['delivery_date_manual'] ?? '') . " " . ($order['delivery_time'] ?? $order['delivery_time_manual'] ?? '') . " - Coll: " . ($order['collection_date'] ?? $order['collection_date_manual'] ?? '') . " " . ($order['collection_time'] ?? $order['collection_time_manual'] ?? '');
-            } else {
-                $logistics = "Pickup: " . ($order['pickup_date'] ?? $order['pickup_date_manual'] ?? '') . " " . ($order['pickup_time'] ?? $order['pickup_time_manual'] ?? '') . " - Return: " . ($order['return_date'] ?? $order['dropoff_date_manual'] ?? '') . " " . ($order['return_time'] ?? $order['dropoff_time_manual'] ?? '');
-            }
-            
             fputcsv($output, [
                 $order['id'] ?? '',
                 $order['date_added'] ?? '',
@@ -191,13 +217,15 @@ if ($format === 'csv') {
                 $order['venue_location'] ?? '',
                 $order['fulfillment_method'] ?? '',
                 $order['delivery_address'] ?? '',
-                $logistics,
-                $order['special_requests'] ?? '',
+                $order['payment_method'] ?? 'Unpaid',
                 $itemList,
                 $order['subtotal'] ?? 0.00,
                 $order['discount'] ?? 0.00,
+                $order['delivery_fee'] ?? 0.00,
+                $order['setup_fee'] ?? 0.00,
                 $order['total'] ?? 0.00,
-                $order['status'] ?? 'Pending'
+                $order['status'] ?? 'Pending',
+                $order['admin_notes'] ?? ''
             ]);
         }
         fclose($output);
@@ -205,10 +233,8 @@ if ($format === 'csv') {
     } else {
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename=Petals_Paradise_Leads_' . date('Y-m-d') . '.csv');
-        
         $output = fopen('php://output', 'w');
         fputcsv($output, ['ID', 'Date Added', 'Name', 'Email', 'Phone', 'Event Type', 'Service Tier', 'Guest Count', 'Budget', 'Event Date', 'Location', 'Source', 'Notes']);
-        
         foreach ($leads as $lead) {
             fputcsv($output, [
                 $lead['id'] ?? '',
@@ -231,71 +257,64 @@ if ($format === 'csv') {
     }
 }
 
-// JSON API Output
 if ($format === 'json') {
     header('Content-Type: application/json');
-    echo json_encode([
-        'leads' => $leads,
-        'orders' => $orders
-    ], JSON_PRETTY_PRINT);
+    echo json_encode(['leads' => $leads, 'orders' => $orders], JSON_PRETTY_PRINT);
     exit;
 }
-
-// ═══════════════════════════════════════════════════════════
-// 4. HTML ADMIN PORTAL DASHBOARD (Default Web Access)
-// ═══════════════════════════════════════════════════════════
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Petals Paradise Events - Admin Dashboard</title>
+    <title>Petals Paradise Events - Admin Portal</title>
     <style>
         :root {
-            --bg: #0d0f12;
-            --surface: #1a1d24;
-            --surface-card: #222630;
+            --bg: #0b0f17;
+            --surface: #151c28;
+            --surface-card: #1e2736;
             --primary: #d4af37;
             --primary-hover: #f1c40f;
-            --text: #f8fafc;
-            --text-muted: #cbd5e1;
-            --border: rgba(255,255,255,0.12);
+            --text-primary: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255,255,255,0.12);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 2rem 1.5rem; min-height: 100vh; }
-        .header { max-width: 1400px; margin: 0 auto 2rem auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text-primary); padding: 2rem 1.5rem; min-height: 100vh; }
+        .header { max-width: 1550px; margin: 0 auto 2rem auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; }
         .title-area h1 { font-family: Georgia, serif; color: var(--primary); font-size: 1.8rem; }
         .title-area p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; }
-        .action-btns { display: flex; gap: 0.75rem; }
-        .btn { padding: 0.65rem 1.25rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; border: none; cursor: pointer; }
+        .action-btns { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .btn { padding: 0.65rem 1.25rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.88rem; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; border: none; cursor: pointer; }
         .btn-primary { background: var(--primary); color: #0d0f12; }
         .btn-primary:hover { background: var(--primary-hover); }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); }
         .btn-outline:hover { background: rgba(255,255,255,0.08); }
         
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 1550px; margin: 0 auto; }
         
-        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
         .tab-btn { background: none; border: none; color: var(--text-muted); font-size: 1.05rem; font-weight: 600; padding: 0.75rem 1.5rem; cursor: pointer; transition: all 0.2s; border-bottom: 3px solid transparent; }
         .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
         
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
-        .stat-value { font-size: 2rem; font-weight: 700; color: var(--primary); }
-        .stat-label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-card { background: var(--surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; }
+        .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
+        .stat-label { font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .search-bar { margin-bottom: 1rem; }
-        .search-input { width: 100%; padding: 0.75rem 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.95rem; }
+        .toolbar { display: flex; gap: 1rem; margin-bottom: 1.2rem; flex-wrap: wrap; align-items: center; }
+        .search-input { flex: 1; min-width: 280px; padding: 0.75rem 1rem; background: var(--surface); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 0.92rem; }
+        .filter-select { padding: 0.75rem 1rem; background: var(--surface); border: 1px solid var(--border-color); border-radius: 8px; color: var(--primary); font-weight: 600; font-size: 0.9rem; cursor: pointer; }
 
-        .table-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .table-card { background: var(--surface); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
         .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
-        th { background: rgba(212,175,55,0.1); color: var(--primary); padding: 1rem; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
-        td { padding: 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
+        th { background: rgba(212,175,55,0.1); color: var(--primary); padding: 0.9rem 1rem; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); }
+        td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border-color); vertical-align: top; }
         tr:last-child td { border-bottom: none; }
         tr:hover { background: rgba(255,255,255,0.02); }
         
@@ -313,7 +332,7 @@ if ($format === 'json') {
     <div class="header">
         <div class="title-area">
             <h1>🌸 Petals Paradise Portal</h1>
-            <p>Leads &amp; Customer Orders — End-to-End Admin Dashboard</p>
+            <p>Leads, Active Orders &amp; Completed Events Admin Control Center</p>
             <p style="font-size: 0.8rem; margin-top: 0.4rem;">
                 <span class="badge" style="background: <?php echo $dbConnected ? 'rgba(46, 204, 113, 0.15)' : 'rgba(230, 126, 34, 0.15)'; ?>; color: <?php echo $dbConnected ? '#2ecc71' : '#e67e22'; ?>; border-color: <?php echo $dbConnected ? 'rgba(46, 204, 113, 0.3)' : 'rgba(230, 126, 34, 0.3)'; ?>;">
                     ● Connection: <?php echo $dbConnected ? 'MySQL Database (Live &amp; Synced)' : 'JSON Backup Files (Offline Fallback)'; ?>
@@ -337,18 +356,19 @@ if ($format === 'json') {
     </div>
 
     <div class="container">
-        <!-- Tab Bar -->
+        <!-- Tab Navigation Bar -->
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('leads')">Leads (Contact Form)</button>
-            <button class="tab-btn" onclick="switchTab('orders')">Orders (Cart Requests)</button>
+            <button class="tab-btn active" onclick="switchTab('leads')">📋 Leads / Inquiries (<?php echo count($leads); ?>)</button>
+            <button class="tab-btn" onclick="switchTab('orders')">📦 Active Orders (<?php echo count($activeOrders); ?>)</button>
+            <button class="tab-btn" onclick="switchTab('completed')">✅ Completed Orders (<?php echo count($completedOrders); ?>)</button>
         </div>
 
-        <!-- ──────────────── LEADS TAB ──────────────── -->
+        <!-- ──────────────── 1. LEADS TAB ──────────────── -->
         <div id="leads-tab" class="tab-content active">
             <div class="stats-bar">
                 <div class="stat-card">
                     <div class="stat-value"><?php echo count($leads); ?></div>
-                    <div class="stat-label">Total Leads</div>
+                    <div class="stat-label">Total Leads Received</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value">
@@ -357,12 +377,12 @@ if ($format === 'json') {
                         echo $latestLead;
                         ?>
                     </div>
-                    <div class="stat-label">Latest Lead Received</div>
+                    <div class="stat-label">Latest Inquiry</div>
                 </div>
             </div>
 
-            <div class="search-bar">
-                <input type="text" id="leadSearch" class="search-input" placeholder="Search leads by name, email, phone, location..." onkeyup="filterLeads()">
+            <div class="toolbar">
+                <input type="text" id="leadSearch" class="search-input" placeholder="🔍 Search leads by name, email, phone, location..." onkeyup="filterLeads()">
             </div>
 
             <div class="table-card">
@@ -370,7 +390,7 @@ if ($format === 'json') {
                     <table id="leadsTable">
                         <thead>
                             <tr>
-                                <th>Date</th>
+                                <th>Date Received</th>
                                 <th>Name</th>
                                 <th>Contact Info</th>
                                 <th>Event Details</th>
@@ -382,12 +402,12 @@ if ($format === 'json') {
                         <tbody>
                             <?php if (empty($leads)): ?>
                                 <tr>
-                                    <td colspan="7" class="empty-state">No customer leads captured yet.</td>
+                                    <td colspan="7" class="empty-state">No customer inquiries submitted yet.</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($leads as $lead): ?>
                                     <tr>
-                                        <td style="white-space: nowrap; color: var(--text-muted); font-size: 0.85rem;">
+                                        <td style="white-space: nowrap; color: var(--text-muted); font-size: 0.82rem;">
                                             <?php echo htmlspecialchars($lead['date_added'] ?? ''); ?>
                                         </td>
                                         <td>
@@ -419,169 +439,236 @@ if ($format === 'json') {
             </div>
         </div>
 
-        <!-- ──────────────── ORDERS TAB ──────────────── -->
+        <!-- ──────────────── 2. ACTIVE ORDERS TAB ──────────────── -->
         <div id="orders-tab" class="tab-content">
             <div class="stats-bar">
                 <div class="stat-card">
-                    <div class="stat-value"><?php echo count($orders); ?></div>
-                    <div class="stat-label">Total Orders Placed</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">
-                        <?php 
-                        $latestOrder = !empty($orders) ? date('M d, Y', strtotime($orders[0]['date_added'] ?? 'now')) : 'N/A';
-                        echo $latestOrder;
-                        ?>
-                    </div>
-                    <div class="stat-label">Latest Order Received</div>
+                    <div class="stat-value"><?php echo count($activeOrders); ?></div>
+                    <div class="stat-label">Active Event Orders</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value">
                         $<?php 
                         $sum = 0;
-                        foreach ($orders as $o) { $sum += (float)($o['total'] ?? 0); }
+                        foreach ($activeOrders as $o) { $sum += (float)($o['total'] ?? 0); }
                         echo number_format($sum, 2);
                         ?>
                     </div>
-                    <div class="stat-label">Total Est. Value</div>
+                    <div class="stat-label">Active Orders Est. Value</div>
                 </div>
             </div>
 
-            <div class="search-bar">
-                <input type="text" id="orderSearch" class="search-input" placeholder="Search orders by confirmation ID, name, email, phone, items..." onkeyup="filterOrders()">
+            <div class="toolbar">
+                <input type="text" id="orderSearch" class="search-input" placeholder="🔍 Search active orders by Order ID, name, email, phone, items..." onkeyup="filterOrders()">
+                
+                <select id="monthFilter" class="filter-select" onchange="filterOrders()">
+                    <option value="all">📅 All Event Months</option>
+                    <?php foreach ($eventMonths as $val => $label): ?>
+                        <option value="<?php echo htmlspecialchars($val); ?>"><?php echo htmlspecialchars($label); ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
 
-            <div class="table-card">
-                <div class="table-wrapper">
-                    <table id="ordersTable">
-                        <thead>
+            <?php renderOrdersTable($activeOrders, 'ordersTable'); ?>
+        </div>
+
+        <!-- ──────────────── 3. COMPLETED ORDERS TAB ──────────────── -->
+        <div id="completed-tab" class="tab-content">
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-value" style="color: #10b981;"><?php echo count($completedOrders); ?></div>
+                    <div class="stat-label">Completed Orders</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: #10b981;">
+                        $<?php 
+                        $sumComp = 0;
+                        foreach ($completedOrders as $o) { $sumComp += (float)($o['total'] ?? 0); }
+                        echo number_format($sumComp, 2);
+                        ?>
+                    </div>
+                    <div class="stat-label">Completed Total Revenue</div>
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <input type="text" id="completedSearch" class="search-input" placeholder="🔍 Search completed orders by Order ID, name, email, phone, items..." onkeyup="filterOrders()">
+                
+                <select id="completedMonthFilter" class="filter-select" onchange="filterOrders()">
+                    <option value="all">📅 All Event Months</option>
+                    <?php foreach ($eventMonths as $val => $label): ?>
+                        <option value="<?php echo htmlspecialchars($val); ?>"><?php echo htmlspecialchars($label); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <?php renderOrdersTable($completedOrders, 'completedTable'); ?>
+        </div>
+
+    </div>
+
+    <?php
+    function renderOrdersTable($ordersList, $tableId) {
+        ?>
+        <div class="table-card">
+            <div class="table-wrapper">
+                <table id="<?php echo $tableId; ?>">
+                    <thead>
+                        <tr>
+                            <th>Order ID / Date</th>
+                            <th>Customer Details</th>
+                            <th>Event Date &amp; Location</th>
+                            <th>Fulfillment &amp; Logistics</th>
+                            <th>Items Requested</th>
+                            <th>Financial Breakdown</th>
+                            <th>Payment Method (Admin)</th>
+                            <th>Status &amp; Actions</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($ordersList)): ?>
                             <tr>
-                                <th>Order ID / Date</th>
-                                <th>Customer Details</th>
-                                <th>Event Date &amp; Location</th>
-                                <th>Fulfillment &amp; Logistics</th>
-                                <th>Items Requested</th>
-                                <th>Financials</th>
-                                <th>Status &amp; Actions</th>
-                                <th>Special Notes</th>
+                                <td colspan="9" class="empty-state">No orders in this category.</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($orders)): ?>
-                                <tr>
-                                    <td colspan="8" class="empty-state">No rental orders placed yet.</td>
-                                </tr>
-                            <?php else: ?>
-                                <?php foreach ($orders as $order): ?>
-                                    <tr>
-                                        <td style="white-space: nowrap; font-size: 0.85rem;">
-                                            <span style="color: var(--primary); font-weight:700; font-family:monospace;"><?php echo htmlspecialchars($order['id'] ?? 'PPE-N/A'); ?></span>
-                                            <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.25rem;">
-                                                <?php echo htmlspecialchars($order['date_added'] ?? ''); ?>
-                                            </div>
-                                        </td>
-                                        <td class="contact-info">
-                                            <strong><?php echo htmlspecialchars($order['name'] ?? 'N/A'); ?></strong>
-                                            <div>📧 <a href="mailto:<?php echo htmlspecialchars($order['email']); ?>"><?php echo htmlspecialchars($order['email']); ?></a></div>
-                                            <div>📞 <a href="tel:<?php echo htmlspecialchars($order['phone']); ?>"><?php echo htmlspecialchars($order['phone']); ?></a></div>
-                                        </td>
-                                        <td>
-                                            🗓️ <strong><?php echo htmlspecialchars($order['event_date'] ?? 'N/A'); ?></strong>
-                                            <div style="font-size: 0.8rem; margin-top:0.30rem; color:var(--text-muted);">
-                                                📍 <?php echo htmlspecialchars($order['venue_location'] ?? 'Not Specified'); ?>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <?php 
-                                            $isDelivery = ($order['fulfillment_method'] ?? '') === 'Delivery'; 
-                                            ?>
-                                            <span class="badge <?php echo $isDelivery ? 'badge-delivery' : 'badge-pickup'; ?>">
-                                                <?php echo htmlspecialchars($order['fulfillment_method'] ?? 'Pickup'); ?>
-                                            </span>
-                                            
-                                            <div style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--text-muted); line-height: 1.4;">
-                                                <?php if ($isDelivery): ?>
-                                                    <strong>Address:</strong> <?php echo htmlspecialchars($order['delivery_address'] ?? 'N/A'); ?><br>
-                                                    <strong>Del:</strong> <?php echo htmlspecialchars($order['delivery_date'] ?? $order['delivery_date_manual'] ?? ''); ?> <?php echo htmlspecialchars($order['delivery_time'] ?? $order['delivery_time_manual'] ?? ''); ?><br>
-                                                    <strong>Coll:</strong> <?php echo htmlspecialchars($order['collection_date'] ?? $order['collection_date_manual'] ?? ''); ?> <?php echo htmlspecialchars($order['collection_time'] ?? $order['collection_time_manual'] ?? ''); ?>
-                                                <?php else: ?>
-                                                    <strong>Pick:</strong> <?php echo htmlspecialchars($order['pickup_date'] ?? $order['pickup_date_manual'] ?? ''); ?> <?php echo htmlspecialchars($order['pickup_time'] ?? $order['pickup_time_manual'] ?? ''); ?><br>
-                                                    <strong>Ret:</strong> <?php echo htmlspecialchars($order['return_date'] ?? $order['dropoff_date_manual'] ?? ''); ?> <?php echo htmlspecialchars($order['return_time'] ?? $order['dropoff_time_manual'] ?? ''); ?>
-                                                <?php endif; ?>
-                                            </div>
-                                        </td>
-                                        <td style="font-size: 0.85rem; line-height: 1.4;">
-                                            <?php 
-                                            $itemsArr = is_string($order['items']) ? json_decode($order['items'], true) : ($order['items'] ?? []);
-                                            if (is_array($itemsArr)): 
-                                                foreach ($itemsArr as $it): 
-                                                    echo "• " . htmlspecialchars($it['quantity'] ?? 1) . "x " . htmlspecialchars($it['title'] ?? 'Item') . "<br>";
-                                                endforeach;
-                                            else:
-                                                echo "-";
-                                            endif;
-                                            ?>
-                                        </td>
-                                        <td style="white-space: nowrap; font-size: 0.85rem; line-height: 1.4; min-width: 170px;">
-                                            Sub: $<?php echo htmlspecialchars(number_format((float)($order['subtotal'] ?? 0), 2)); ?><br>
-                                            Disc: -$<?php echo htmlspecialchars(number_format((float)($order['discount'] ?? 0), 2)); ?><br>
-                                            <div style="margin-top: 0.3rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 4px;">
-                                                <span style="font-size: 0.75rem; color: var(--text-muted); width: 62px;">Del Fee: $</span>
-                                                <input type="number" step="0.01" min="0" id="delivery-fee-<?php echo htmlspecialchars($order['id']); ?>" value="<?php echo htmlspecialchars(number_format((float)($order['delivery_fee'] ?? 0), 2)); ?>" oninput="recalcOrderTotal('<?php echo htmlspecialchars($order['id']); ?>', <?php echo (float)($order['subtotal'] ?? 0); ?>, <?php echo (float)($order['discount'] ?? 0); ?>)" style="width: 75px; padding: 2px 4px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: #d4af37; font-weight: bold;">
-                                            </div>
-                                            <div style="margin-bottom: 0.3rem; display: flex; align-items: center; gap: 4px;">
-                                                <span style="font-size: 0.75rem; color: var(--text-muted); width: 62px;">Setup Fee: $</span>
-                                                <input type="number" step="0.01" min="0" id="setup-fee-<?php echo htmlspecialchars($order['id']); ?>" value="<?php echo htmlspecialchars(number_format((float)($order['setup_fee'] ?? 0), 2)); ?>" oninput="recalcOrderTotal('<?php echo htmlspecialchars($order['id']); ?>', <?php echo (float)($order['subtotal'] ?? 0); ?>, <?php echo (float)($order['discount'] ?? 0); ?>)" style="width: 75px; padding: 2px 4px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: #d4af37; font-weight: bold;">
-                                            </div>
-                                            <strong>Total: <span id="total-display-<?php echo htmlspecialchars($order['id']); ?>" style="color: #d4af37;">$<?php echo htmlspecialchars(number_format((float)($order['total'] ?? 0), 2)); ?></span></strong>
-                                            
-                                            <div style="margin-top: 0.5rem;">
-                                                <textarea id="admin-notes-<?php echo htmlspecialchars($order['id']); ?>" placeholder="Notes / quote message to customer..." style="width: 100%; min-height: 38px; font-size: 0.75rem; padding: 4px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: var(--text-primary); margin-bottom: 4px; resize: vertical;"><?php echo htmlspecialchars($order['admin_notes'] ?? ''); ?></textarea>
-                                                <button onclick="updateOrderQuote('<?php echo htmlspecialchars($order['id']); ?>')" style="width: 100%; font-size: 0.75rem; padding: 4px 8px; background: #d4af37; color: #000; font-weight: bold; border-radius: 4px; border: none; cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">✉️ Update Quote & Email</button>
-                                                <div id="quote-msg-<?php echo htmlspecialchars($order['id']); ?>" style="font-size: 0.72rem; margin-top: 0.25rem; display: none;"></div>
-                                            </div>
-                                        </td>
-                                        <td style="white-space: nowrap; width: 170px;">
+                        <?php else: ?>
+                            <?php foreach ($ordersList as $order): 
+                                $eventDateRaw = $order['event_date'] ?? '';
+                                $eventMonthVal = !empty($eventDateRaw) ? date('Y-m', strtotime($eventDateRaw)) : '';
+                                ?>
+                                <tr data-event-date="<?php echo htmlspecialchars($eventMonthVal); ?>">
+                                    <td style="white-space: nowrap; font-size: 0.85rem;">
+                                        <span style="color: var(--primary); font-weight:700; font-family:monospace;"><?php echo htmlspecialchars($order['id'] ?? 'PPE-N/A'); ?></span>
+                                        <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.25rem;">
+                                            Added: <?php echo htmlspecialchars($order['date_added'] ?? ''); ?>
+                                        </div>
+                                    </td>
+                                    <td class="contact-info">
+                                        <strong><?php echo htmlspecialchars($order['name'] ?? 'N/A'); ?></strong>
+                                        <div>📧 <a href="mailto:<?php echo htmlspecialchars($order['email']); ?>"><?php echo htmlspecialchars($order['email']); ?></a></div>
+                                        <div>📞 <a href="tel:<?php echo htmlspecialchars($order['phone']); ?>"><?php echo htmlspecialchars($order['phone']); ?></a></div>
+                                    </td>
+                                    <td>
+                                        🗓️ <strong style="color: var(--primary);"><?php echo htmlspecialchars($order['event_date'] ?? 'N/A'); ?></strong>
+                                        <div style="font-size: 0.8rem; margin-top:0.30rem; color:var(--text-muted);">
+                                            📍 <?php echo htmlspecialchars($order['venue_location'] ?? 'Not Specified'); ?>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <?php 
+                                        $isDelivery = ($order['fulfillment_method'] ?? '') === 'Delivery'; 
+                                        ?>
+                                        <span class="badge <?php echo $isDelivery ? 'badge-delivery' : 'badge-pickup'; ?>">
+                                            <?php echo htmlspecialchars($order['fulfillment_method'] ?? 'Pickup'); ?>
+                                        </span>
+                                        
+                                        <div style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--text-muted); line-height: 1.4;">
+                                            <?php if ($isDelivery): ?>
+                                                <strong>Address:</strong> <?php echo htmlspecialchars($order['delivery_address'] ?? 'N/A'); ?><br>
+                                                <strong>Del:</strong> <?php echo htmlspecialchars($order['delivery_date'] ?? $order['delivery_date_manual'] ?? ''); ?> <?php echo htmlspecialchars($order['delivery_time'] ?? $order['delivery_time_manual'] ?? ''); ?><br>
+                                                <strong>Coll:</strong> <?php echo htmlspecialchars($order['collection_date'] ?? $order['collection_date_manual'] ?? ''); ?> <?php echo htmlspecialchars($order['collection_time'] ?? $order['collection_time_manual'] ?? ''); ?>
+                                            <?php else: ?>
+                                                <strong>Pick:</strong> <?php echo htmlspecialchars($order['pickup_date'] ?? $order['pickup_date_manual'] ?? ''); ?> <?php echo htmlspecialchars($order['pickup_time'] ?? $order['pickup_time_manual'] ?? ''); ?><br>
+                                                <strong>Ret:</strong> <?php echo htmlspecialchars($order['return_date'] ?? $order['dropoff_date_manual'] ?? ''); ?> <?php echo htmlspecialchars($order['return_time'] ?? $order['dropoff_time_manual'] ?? ''); ?>
+                                            <?php endif; ?>
+                                        </div>
+                                    </td>
+                                    <td style="font-size: 0.85rem; line-height: 1.4; min-width: 160px;">
+                                        <?php 
+                                        $itemsArr = is_string($order['items']) ? json_decode($order['items'], true) : ($order['items'] ?? []);
+                                        if (is_array($itemsArr)): 
+                                            foreach ($itemsArr as $it): 
+                                                echo "• " . htmlspecialchars($it['quantity'] ?? 1) . "x " . htmlspecialchars($it['title'] ?? 'Item') . "<br>";
+                                            endforeach;
+                                        else:
+                                            echo "-";
+                                        endif;
+                                        ?>
+                                    </td>
+                                    <td style="white-space: nowrap; font-size: 0.85rem; line-height: 1.4; min-width: 170px;">
+                                        Sub: $<?php echo htmlspecialchars(number_format((float)($order['subtotal'] ?? 0), 2)); ?><br>
+                                        Disc: -$<?php echo htmlspecialchars(number_format((float)($order['discount'] ?? 0), 2)); ?><br>
+                                        <div style="margin-top: 0.3rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 4px;">
+                                            <span style="font-size: 0.75rem; color: var(--text-muted); width: 62px;">Del Fee: $</span>
+                                            <input type="number" step="0.01" min="0" id="delivery-fee-<?php echo htmlspecialchars($order['id']); ?>" value="<?php echo htmlspecialchars(number_format((float)($order['delivery_fee'] ?? 0), 2)); ?>" oninput="recalcOrderTotal('<?php echo htmlspecialchars($order['id']); ?>', <?php echo (float)($order['subtotal'] ?? 0); ?>, <?php echo (float)($order['discount'] ?? 0); ?>)" style="width: 75px; padding: 2px 4px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: #d4af37; font-weight: bold;">
+                                        </div>
+                                        <div style="margin-bottom: 0.3rem; display: flex; align-items: center; gap: 4px;">
+                                            <span style="font-size: 0.75rem; color: var(--text-muted); width: 62px;">Setup Fee: $</span>
+                                            <input type="number" step="0.01" min="0" id="setup-fee-<?php echo htmlspecialchars($order['id']); ?>" value="<?php echo htmlspecialchars(number_format((float)($order['setup_fee'] ?? 0), 2)); ?>" oninput="recalcOrderTotal('<?php echo htmlspecialchars($order['id']); ?>', <?php echo (float)($order['subtotal'] ?? 0); ?>, <?php echo (float)($order['discount'] ?? 0); ?>)" style="width: 75px; padding: 2px 4px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: #d4af37; font-weight: bold;">
+                                        </div>
+                                        <strong>Total: <span id="total-display-<?php echo htmlspecialchars($order['id']); ?>" style="color: #d4af37;">$<?php echo htmlspecialchars(number_format((float)($order['total'] ?? 0), 2)); ?></span></strong>
+                                        
+                                        <div style="margin-top: 0.5rem;">
+                                            <textarea id="admin-notes-<?php echo htmlspecialchars($order['id']); ?>" placeholder="Notes / quote message to customer..." style="width: 100%; min-height: 38px; font-size: 0.75rem; padding: 4px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: var(--text-primary); margin-bottom: 4px; resize: vertical;"><?php echo htmlspecialchars($order['admin_notes'] ?? ''); ?></textarea>
+                                            <button onclick="updateOrderQuote('<?php echo htmlspecialchars($order['id']); ?>')" style="width: 100%; font-size: 0.75rem; padding: 4px 8px; background: #d4af37; color: #000; font-weight: bold; border-radius: 4px; border: none; cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">✉️ Update Quote & Email</button>
+                                            <div id="quote-msg-<?php echo htmlspecialchars($order['id']); ?>" style="font-size: 0.72rem; margin-top: 0.25rem; display: none;"></div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Admin Only Payment Method Dropdown -->
+                                    <td style="white-space: nowrap; font-size: 0.8rem; width: 140px;">
+                                        <?php $currentPayment = $order['payment_method'] ?? 'Unpaid'; ?>
+                                        <select class="form-control" style="font-size: 0.78rem; padding: 0.4rem; width: 100%; border-radius: 6px; cursor: pointer; background: var(--bg); color: #38bdf8; font-weight: 600; border: 1px solid var(--border-color);" onchange="updatePaymentMethod('<?php echo htmlspecialchars($order['id']); ?>', this.value)">
                                             <?php
-                                            $currentStatus = $order['status'] ?? 'Pending';
-                                            $statusColors = [
-                                                'Pending' => 'background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-color: rgba(245, 158, 11, 0.4);',
-                                                'Confirmed' => 'background: rgba(59, 130, 246, 0.15); color: #3b82f6; border-color: rgba(59, 130, 246, 0.4);',
-                                                'Order Picked Up' => 'background: rgba(139, 92, 246, 0.15); color: #8b5cf6; border-color: rgba(139, 92, 246, 0.4);',
-                                                'Out for Delivery' => 'background: rgba(99, 102, 241, 0.15); color: #6366f1; border-color: rgba(99, 102, 241, 0.4);',
-                                                'Delivered' => 'background: rgba(16, 185, 129, 0.15); color: #10b981; border-color: rgba(16, 185, 129, 0.4);',
-                                                'Returned' => 'background: rgba(100, 116, 139, 0.15); color: #94a3b8; border-color: rgba(100, 116, 139, 0.4);',
-                                                'Cancelled' => 'background: rgba(239, 68, 68, 0.15); color: #ef4444; border-color: rgba(239, 68, 68, 0.4);'
+                                            $payMethods = [
+                                                'Unpaid'                           => '💳 Unpaid',
+                                                'Cash'                             => '💵 Cash',
+                                                'Online (Zelle / Venmo / CashApp)' => '📲 Online (Zelle/Venmo)',
+                                                'Credit / Debit Card'             => '💳 Credit/Debit Card',
+                                                'Partial Deposit Paid'             => '💰 Partial Deposit Paid'
                                             ];
-                                            $badgeStyle = $statusColors[$currentStatus] ?? $statusColors['Pending'];
+                                            foreach ($payMethods as $val => $lbl):
+                                                $sel = ($val === $currentPayment) ? 'selected' : '';
+                                                echo "<option value=\"{$val}\" {$sel}>{$lbl}</option>";
+                                            endforeach;
                                             ?>
-                                            <div style="margin-bottom: 0.4rem;">
-                                                <span class="badge" id="badge-<?php echo htmlspecialchars($order['id']); ?>" style="<?php echo $badgeStyle; ?>">
-                                                    ● <?php echo htmlspecialchars($currentStatus); ?>
-                                                </span>
-                                            </div>
-                                            
-                                            <select class="form-control" style="font-size: 0.8rem; padding: 0.4rem 0.5rem; min-height: auto; width: 100%; border-radius: 6px; cursor: pointer; background: var(--bg);" onchange="changeOrderStatus('<?php echo htmlspecialchars($order['id']); ?>', this.value)">
-                                                <?php 
-                                                $statuses = ['Pending', 'Confirmed', 'Order Picked Up', 'Out for Delivery', 'Delivered', 'Returned', 'Cancelled'];
-                                                foreach ($statuses as $st): 
-                                                    $selected = ($st === $currentStatus) ? 'selected' : '';
-                                                    echo "<option value=\"{$st}\" {$selected}>{$st}</option>";
-                                                endforeach;
-                                                ?>
-                                            </select>
-                                            <div id="status-msg-<?php echo htmlspecialchars($order['id']); ?>" style="font-size: 0.72rem; margin-top: 0.3rem; color: #10b981; display: none;"></div>
-                                        </td>
-                                        <td style="max-width: 200px; font-size: 0.8rem; color: var(--text-muted); white-space: pre-wrap;"><?php echo htmlspecialchars($order['special_requests'] ?? '-'); ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
+                                        </select>
+                                        <div id="pay-msg-<?php echo htmlspecialchars($order['id']); ?>" style="font-size: 0.72rem; margin-top: 0.25rem; color: #38bdf8; display: none;"></div>
+                                    </td>
+
+                                    <td style="white-space: nowrap; width: 160px;">
+                                        <?php
+                                        $currentStatus = $order['status'] ?? 'Pending';
+                                        $statusColors = [
+                                            'Pending'          => 'background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-color: rgba(245, 158, 11, 0.4);',
+                                            'Confirmed'        => 'background: rgba(59, 130, 246, 0.15); color: #3b82f6; border-color: rgba(59, 130, 246, 0.4);',
+                                            'Order Picked Up'  => 'background: rgba(139, 92, 246, 0.15); color: #8b5cf6; border-color: rgba(139, 92, 246, 0.4);',
+                                            'Out for Delivery' => 'background: rgba(99, 102, 241, 0.15); color: #6366f1; border-color: rgba(99, 102, 241, 0.4);',
+                                            'Delivered'        => 'background: rgba(16, 185, 129, 0.15); color: #10b981; border-color: rgba(16, 185, 129, 0.4);',
+                                            'Returned'         => 'background: rgba(100, 116, 139, 0.15); color: #94a3b8; border-color: rgba(100, 116, 139, 0.4);',
+                                            'Completed'        => 'background: rgba(16, 185, 129, 0.25); color: #34d399; border-color: #10b981;',
+                                            'Cancelled'        => 'background: rgba(239, 68, 68, 0.15); color: #ef4444; border-color: rgba(239, 68, 68, 0.4);'
+                                        ];
+                                        $badgeStyle = $statusColors[$currentStatus] ?? $statusColors['Pending'];
+                                        ?>
+                                        <div style="margin-bottom: 0.4rem;">
+                                            <span class="badge" id="badge-<?php echo htmlspecialchars($order['id']); ?>" style="<?php echo $badgeStyle; ?>">
+                                                ● <?php echo htmlspecialchars($currentStatus); ?>
+                                            </span>
+                                        </div>
+                                        
+                                        <select class="form-control" style="font-size: 0.8rem; padding: 0.4rem 0.5rem; min-height: auto; width: 100%; border-radius: 6px; cursor: pointer; background: var(--bg); color: var(--text-primary); border: 1px solid var(--border-color);" onchange="changeOrderStatus('<?php echo htmlspecialchars($order['id']); ?>', this.value)">
+                                            <?php 
+                                            $statuses = ['Pending', 'Confirmed', 'Order Picked Up', 'Out for Delivery', 'Delivered', 'Returned', 'Completed', 'Cancelled'];
+                                            foreach ($statuses as $st): 
+                                                $selected = ($st === $currentStatus) ? 'selected' : '';
+                                                echo "<option value=\"{$st}\" {$selected}>{$st}</option>";
+                                            endforeach;
+                                            ?>
+                                        </select>
+                                        <div id="status-msg-<?php echo htmlspecialchars($order['id']); ?>" style="font-size: 0.72rem; margin-top: 0.3rem; color: #10b981; display: none;"></div>
+                                    </td>
+                                    <td style="max-width: 180px; font-size: 0.8rem; color: var(--text-muted); white-space: pre-wrap;"><?php echo htmlspecialchars($order['special_requests'] ?? '-'); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
                         </tbody>
-                    </table>
-                </div>
+                    <?php endif; ?>
+                </table>
             </div>
         </div>
-    </div>
+        <?php
+    }
+    ?>
 
     <script>
         function recalcOrderTotal(orderId, subtotal, discount) {
@@ -596,6 +683,7 @@ if ($format === 'json') {
 
             totalDisplay.innerText = '$' + calcTotal.toFixed(2);
         }
+
         async function updateOrderQuote(orderId) {
             const delInput = document.getElementById('delivery-fee-' + orderId);
             const setupInput = document.getElementById('setup-fee-' + orderId);
@@ -650,17 +738,47 @@ if ($format === 'json') {
                 }
             }
         }
+
+        async function updatePaymentMethod(orderId, paymentMethod) {
+            const msgDiv = document.getElementById('pay-msg-' + orderId);
+            if (msgDiv) {
+                msgDiv.style.display = 'block';
+                msgDiv.style.color = '#cbd5e1';
+                msgDiv.innerText = 'Saving payment...';
+            }
+
+            try {
+                const res = await fetch('update_order_payment.php' + (window.location.search || ''), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ order_id: orderId, payment_method: paymentMethod })
+                });
+                const data = await res.json();
+                if (data.success && msgDiv) {
+                    msgDiv.style.color = '#38bdf8';
+                    msgDiv.innerText = '💳 Payment status saved!';
+                    setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
+                } else if (msgDiv) {
+                    msgDiv.style.color = '#ef4444';
+                    msgDiv.innerText = '❌ Failed to save payment';
+                }
+            } catch (err) {
+                if (msgDiv) {
+                    msgDiv.style.color = '#ef4444';
+                    msgDiv.innerText = '❌ Server connection error';
+                }
+            }
+        }
+
         function switchTab(tabName) {
-            // Switch Active Tab Button
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => btn.innerText.toLowerCase().includes(tabName));
             if (activeBtn) activeBtn.classList.add('active');
 
-            // Switch Active Tab Content
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            document.getElementById(tabName + '-tab').classList.add('active');
+            const target = document.getElementById(tabName + '-tab');
+            if (target) target.classList.add('active');
 
-            // Switch CSV Download Action Buttons
             if (tabName === 'leads') {
                 document.getElementById('downloadLeadsCsvBtn').style.display = 'inline-flex';
                 document.getElementById('downloadOrdersCsvBtn').style.display = 'none';
@@ -681,12 +799,30 @@ if ($format === 'json') {
         }
 
         function filterOrders() {
-            const query = document.getElementById('orderSearch').value.toLowerCase();
-            const rows = document.querySelectorAll('#ordersTable tbody tr');
-            rows.forEach(row => {
+            const orderQ = (document.getElementById('orderSearch') ? document.getElementById('orderSearch').value : '').toLowerCase();
+            const orderMonth = document.getElementById('monthFilter') ? document.getElementById('monthFilter').value : 'all';
+
+            const compQ = (document.getElementById('completedSearch') ? document.getElementById('completedSearch').value : '').toLowerCase();
+            const compMonth = document.getElementById('completedMonthFilter') ? document.getElementById('completedMonthFilter').value : 'all';
+
+            // Active Orders Table
+            document.querySelectorAll('#ordersTable tbody tr').forEach(row => {
                 if (row.querySelector('.empty-state')) return;
                 const text = row.innerText.toLowerCase();
-                row.style.display = text.includes(query) ? '' : 'none';
+                const eventMonth = row.getAttribute('data-event-date') || '';
+                const matchQ = !orderQ || text.includes(orderQ);
+                const matchM = orderMonth === 'all' || eventMonth === orderMonth;
+                row.style.display = (matchQ && matchM) ? '' : 'none';
+            });
+
+            // Completed Orders Table
+            document.querySelectorAll('#completedTable tbody tr').forEach(row => {
+                if (row.querySelector('.empty-state')) return;
+                const text = row.innerText.toLowerCase();
+                const eventMonth = row.getAttribute('data-event-date') || '';
+                const matchQ = !compQ || text.includes(compQ);
+                const matchM = compMonth === 'all' || eventMonth === compMonth;
+                row.style.display = (matchQ && matchM) ? '' : 'none';
             });
         }
 
@@ -697,7 +833,7 @@ if ($format === 'json') {
             if (msgDiv) {
                 msgDiv.style.display = 'block';
                 msgDiv.style.color = '#cbd5e1';
-                msgDiv.innerText = 'Updating...';
+                msgDiv.innerText = 'Updating status...';
             }
 
             try {
@@ -713,24 +849,31 @@ if ($format === 'json') {
                     if (msgDiv) {
                         msgDiv.style.color = '#10b981';
                         msgDiv.innerText = data.email_sent ? '✅ Status Updated & Email Sent!' : '✅ Status Updated!';
-                        setTimeout(() => { msgDiv.style.display = 'none'; }, 3500);
                     }
                     
                     if (badge) {
                         badge.innerText = '● ' + newStatus;
                         const colors = {
-                            'Pending': { bg: 'rgba(245, 158, 11, 0.15)', col: '#f59e0b', bd: 'rgba(245, 158, 11, 0.4)' },
-                            'Confirmed': { bg: 'rgba(59, 130, 246, 0.15)', col: '#3b82f6', bd: 'rgba(59, 130, 246, 0.4)' },
-                            'Order Picked Up': { bg: 'rgba(139, 92, 246, 0.15)', col: '#8b5cf6', bd: 'rgba(139, 92, 246, 0.4)' },
+                            'Pending':          { bg: 'rgba(245, 158, 11, 0.15)', col: '#f59e0b', bd: 'rgba(245, 158, 11, 0.4)' },
+                            'Confirmed':        { bg: 'rgba(59, 130, 246, 0.15)', col: '#3b82f6', bd: 'rgba(59, 130, 246, 0.4)' },
+                            'Order Picked Up':  { bg: 'rgba(139, 92, 246, 0.15)', col: '#8b5cf6', bd: 'rgba(139, 92, 246, 0.4)' },
                             'Out for Delivery': { bg: 'rgba(99, 102, 241, 0.15)', col: '#6366f1', bd: 'rgba(99, 102, 241, 0.4)' },
-                            'Delivered': { bg: 'rgba(16, 185, 129, 0.15)', col: '#10b981', bd: 'rgba(16, 185, 129, 0.4)' },
-                            'Returned': { bg: 'rgba(100, 116, 139, 0.15)', col: '#94a3b8', bd: 'rgba(100, 116, 139, 0.4)' },
-                            'Cancelled': { bg: 'rgba(239, 68, 68, 0.15)', col: '#ef4444', bd: 'rgba(239, 68, 68, 0.4)' }
+                            'Delivered':        { bg: 'rgba(16, 185, 129, 0.15)', col: '#10b981', bd: 'rgba(16, 185, 129, 0.4)' },
+                            'Returned':         { bg: 'rgba(100, 116, 139, 0.15)', col: '#94a3b8', bd: 'rgba(100, 116, 139, 0.4)' },
+                            'Completed':        { bg: 'rgba(16, 185, 129, 0.25)', col: '#34d399', bd: '#10b981' },
+                            'Cancelled':        { bg: 'rgba(239, 68, 68, 0.15)', col: '#ef4444', bd: 'rgba(239, 68, 68, 0.4)' }
                         };
                         const styleObj = colors[newStatus] || colors['Pending'];
                         badge.style.background = styleObj.bg;
                         badge.style.color = styleObj.col;
                         badge.style.borderColor = styleObj.bd;
+                    }
+
+                    // Reload page after short delay if status changed to or from Completed so tab arrays refresh!
+                    if (newStatus === 'Completed') {
+                        setTimeout(() => { window.location.reload(); }, 1200);
+                    } else {
+                        setTimeout(() => { if (msgDiv) msgDiv.style.display = 'none'; }, 3500);
                     }
                 } else {
                     if (msgDiv) {
@@ -738,10 +881,10 @@ if ($format === 'json') {
                         msgDiv.innerText = '❌ ' + (data.error || 'Update failed');
                     }
                 }
-            } catch (e) {
+            } catch (err) {
                 if (msgDiv) {
                     msgDiv.style.color = '#ef4444';
-                    msgDiv.innerText = '❌ Network error';
+                    msgDiv.innerText = '❌ Server connection error';
                 }
             }
         }

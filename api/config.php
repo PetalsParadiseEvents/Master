@@ -156,6 +156,7 @@ function initOrdersTable($pdo) {
             `setup_fee` DECIMAL(10,2) DEFAULT 0.00,
             `total` DECIMAL(10,2) NOT NULL,
             `status` VARCHAR(64) DEFAULT 'Pending',
+            `payment_method` VARCHAR(128) DEFAULT 'Unpaid',
             `admin_notes` TEXT
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
         $pdo->exec($sql);
@@ -182,6 +183,9 @@ function ensureOrderColumnsExist($pdo) {
         }
         if (!in_array('setup_fee', $columns)) {
             $pdo->exec("ALTER TABLE `orders` ADD COLUMN `setup_fee` DECIMAL(10,2) DEFAULT 0.00");
+        }
+        if (!in_array('payment_method', $columns)) {
+            $pdo->exec("ALTER TABLE `orders` ADD COLUMN `payment_method` VARCHAR(128) DEFAULT 'Unpaid'");
         }
         if (!in_array('admin_notes', $columns)) {
             $pdo->exec("ALTER TABLE `orders` ADD COLUMN `admin_notes` TEXT");

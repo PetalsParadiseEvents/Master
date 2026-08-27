@@ -41,7 +41,7 @@ $orderId = isset($data['order_id']) ? trim($data['order_id']) : '';
 $newStatus = isset($data['status']) ? trim($data['status']) : '';
 $notifyCustomer = isset($data['notify']) ? (bool)$data['notify'] : true;
 
-$validStatuses = ['Pending', 'Confirmed', 'Order Picked Up', 'Out for Delivery', 'Delivered', 'Returned', 'Cancelled'];
+$validStatuses = ['Pending', 'Confirmed', 'Order Picked Up', 'Out for Delivery', 'Delivered', 'Returned', 'Completed', 'Cancelled'];
 
 if (empty($orderId) || !in_array($newStatus, $validStatuses)) {
     http_response_code(400);
@@ -114,6 +114,7 @@ if ($notifyCustomer && !empty($customerEmail)) {
         'Out for Delivery' => "Your rental decor for Order {$orderId} is OUT FOR DELIVERY! Our logistics team is en route to your specified address.",
         'Delivered' => "Your rental decor for Order {$orderId} has been DELIVERED to your event address! Enjoy your celebration.",
         'Returned' => "We have received your RETURNED rental items for Order {$orderId}. Thank you for renting with Petals Paradise Events!",
+        'Completed' => "Thank you for choosing Petals Paradise Events! Your rental order {$orderId} is now officially COMPLETED. We hope we helped make your celebration truly unforgettable! Please remember Petals Paradise Events for all your future milestone celebrations, birthdays, weddings, and party decor needs.",
         'Cancelled' => "Your rental request for Order {$orderId} has been CANCELLED as requested.",
         'Pending' => "Your rental request for Order {$orderId} is currently PENDING review."
     ];
