@@ -408,7 +408,7 @@ if ($format === 'json') {
                                 <?php foreach ($leads as $lead): ?>
                                     <tr>
                                         <td style="white-space: nowrap; color: var(--text-muted); font-size: 0.82rem;">
-                                            <?php echo htmlspecialchars($lead['date_added'] ?? ''); ?>
+                                            <?php echo htmlspecialchars(formatDateToEST($lead['date_added'] ?? '')); ?>
                                         </td>
                                         <td>
                                             <strong><?php echo htmlspecialchars($lead['name'] ?? 'N/A'); ?></strong>
@@ -540,7 +540,7 @@ if ($format === 'json') {
                                     <td style="white-space: nowrap; font-size: 0.85rem;">
                                         <span style="color: var(--primary); font-weight:700; font-family:monospace;"><?php echo htmlspecialchars($order['id'] ?? 'PPE-N/A'); ?></span>
                                         <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.25rem;">
-                                            Added: <?php echo htmlspecialchars($order['date_added'] ?? ''); ?>
+                                            <?php echo htmlspecialchars(formatDateToEST($order['date_added'] ?? '')); ?>
                                         </div>
                                     </td>
                                     <td class="contact-info">

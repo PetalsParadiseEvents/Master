@@ -203,3 +203,20 @@ function ensureOrderColumnsExist($pdo) {
         // Ignored
     }
 }
+
+/**
+ * Formats any raw datetime string into US Eastern Time (America/New_York)
+ */
+function formatDateToEST($dateStr, $format = 'M d, Y g:i A') {
+    if (empty($dateStr)) return '';
+    try {
+        if (strpos($dateStr, 'EDT') !== false || strpos($dateStr, 'EST') !== false) {
+            return $dateStr;
+        }
+        $dt = new DateTime($dateStr, new DateTimeZone('UTC'));
+        $dt->setTimezone(new DateTimeZone('America/New_York'));
+        return $dt->format($format) . ($format === 'M d, Y' ? '' : ' EDT');
+    } catch (Exception $e) {
+        return $dateStr;
+    }
+}
