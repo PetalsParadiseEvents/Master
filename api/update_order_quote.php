@@ -58,6 +58,7 @@ try {
 
     // 3. Update Database
     if ($pdo) {
+        ensureOrderColumnsExist($pdo);
         try {
             $stmt = $pdo->prepare("SELECT * FROM `orders` WHERE `id` = :id LIMIT 1");
             $stmt->execute([':id' => $orderId]);

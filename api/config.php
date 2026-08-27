@@ -160,11 +160,33 @@ function initOrdersTable($pdo) {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
         $pdo->exec($sql);
 
-        // Auto-migrate missing columns for existing tables
-        @$pdo->exec("ALTER TABLE `orders` ADD COLUMN `delivery_fee` DECIMAL(10,2) DEFAULT 0.00");
-        @$pdo->exec("ALTER TABLE `orders` ADD COLUMN `setup_fee` DECIMAL(10,2) DEFAULT 0.00");
-        @$pdo->exec("ALTER TABLE `orders` ADD COLUMN `admin_notes` TEXT");
+        ensureOrderColumnsExist($pdo);
     } catch (Exception $e) {
         // Silently continue
+    }
+}
+
+function ensureOrderColumnsExist($pdo) {
+    if (!$pdo) return;
+    try {
+        $columns = [];
+        $stmt = $pdo->query("SHOW COLUMNS FROM `orders`");
+        if ($stmt) {
+            $cols = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($cols as $c) {
+                $columns[] = strtolower($c['Field']);
+            }
+        }
+        if (!in_array('delivery_fee', $columns)) {
+            $pdo->exec("ALTER TABLE `orders` ADD COLUMN `delivery_fee` DECIMAL(10,2) DEFAULT 0.00");
+        }
+        if (!in_array('setup_fee', $columns)) {
+            $pdo->exec("ALTER TABLE `orders` ADD COLUMN `setup_fee` DECIMAL(10,2) DEFAULT 0.00");
+        }
+        if (!in_array('admin_notes', $columns)) {
+            $pdo->exec("ALTER TABLE `orders` ADD COLUMN `admin_notes` TEXT");
+        }
+    } catch (Exception $e) {
+        // Ignored
     }
 }
