@@ -573,17 +573,22 @@ if ($format === 'json') {
                                             <?php endif; ?>
                                         </div>
                                     </td>
-                                    <td style="font-size: 0.85rem; line-height: 1.4; min-width: 160px;">
+                                    <td style="font-size: 0.85rem; line-height: 1.4; min-width: 175px;">
+                                        <div id="items-list-<?php echo htmlspecialchars($order['id']); ?>">
                                         <?php 
                                         $itemsArr = is_string($order['items']) ? json_decode($order['items'], true) : ($order['items'] ?? []);
                                         if (is_array($itemsArr)): 
                                             foreach ($itemsArr as $it): 
-                                                echo "• " . htmlspecialchars($it['quantity'] ?? 1) . "x " . htmlspecialchars($it['title'] ?? 'Item') . "<br>";
+                                                echo "• " . htmlspecialchars($it['quantity'] ?? 1) . "x " . htmlspecialchars($it['title'] ?? 'Item') . " (@ $" . number_format((float)($it['price'] ?? 0), 2) . ")<br>";
                                             endforeach;
                                         else:
                                             echo "-";
                                         endif;
                                         ?>
+                                        </div>
+                                        <button onclick="openSubstitutionModal('<?php echo htmlspecialchars($order['id']); ?>')" style="margin-top: 6px; font-size: 0.72rem; padding: 3px 8px; background: rgba(212,175,55,0.15); color: var(--primary); border: 1px solid rgba(212,175,55,0.4); border-radius: 4px; cursor: pointer; font-weight: bold; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                                            🔄 Substitute / Edit Items
+                                        </button>
                                     </td>
                                     <td style="white-space: nowrap; font-size: 0.85rem; line-height: 1.4; min-width: 170px;">
                                         Sub: $<?php echo htmlspecialchars(number_format((float)($order['subtotal'] ?? 0), 2)); ?><br>
@@ -888,6 +893,241 @@ if ($format === 'json') {
                 }
             }
         }
+
+        // ═══════════════════════════════════════════════════════════
+        // ITEM SUBSTITUTION MODAL LOGIC
+        // ═══════════════════════════════════════════════════════════
+        let currentModalOrderId = null;
+        let allOrdersData = <?php echo json_encode(array_values($orders)); ?>;
+
+        function escapeHtml(str) {
+            if (typeof str !== 'string') return str;
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function openSubstitutionModal(orderId) {
+            currentModalOrderId = orderId;
+            document.getElementById('modalOrderId').innerText = orderId;
+            document.getElementById('modalSubNote').value = '';
+            document.getElementById('modalMsg').style.display = 'none';
+
+            const ord = allOrdersData.find(o => o.id === orderId);
+            const tbody = document.getElementById('modalItemsBody');
+            tbody.innerHTML = '';
+
+            if (ord && ord.items) {
+                let items = (typeof ord.items === 'string') ? JSON.parse(ord.items) : ord.items;
+                if (Array.isArray(items)) {
+                    items.forEach(it => {
+                        appendModalRow(it.title || 'Item', it.quantity || 1, it.price || 0);
+                    });
+                }
+            }
+
+            if (tbody.children.length === 0) {
+                appendModalRow('Sample Item', 1, 10.00);
+            }
+
+            recalcModalSubtotal();
+            document.getElementById('substitutionModal').style.display = 'flex';
+        }
+
+        function closeSubstitutionModal() {
+            document.getElementById('substitutionModal').style.display = 'none';
+        }
+
+        function appendModalRow(title, qty, price) {
+            const tbody = document.getElementById('modalItemsBody');
+            const tr = document.createElement('tr');
+            tr.style.borderBottom = '1px solid var(--border-color)';
+            tr.innerHTML = `
+                <td style="padding: 0.4rem;"><input type="text" value="${escapeHtml(title)}" class="modal-title-input" style="width: 100%; padding: 5px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: var(--text-primary);"></td>
+                <td style="padding: 0.4rem;"><input type="number" min="1" value="${qty}" class="modal-qty-input" oninput="recalcModalSubtotal()" style="width: 100%; padding: 5px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: var(--text-primary);"></td>
+                <td style="padding: 0.4rem;"><input type="number" step="0.01" min="0" value="${parseFloat(price).toFixed(2)}" class="modal-price-input" oninput="recalcModalSubtotal()" style="width: 100%; padding: 5px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: #d4af37; font-weight: bold;"></td>
+                <td style="padding: 0.4rem; font-weight: bold; color: var(--primary);" class="modal-row-total">$0.00</td>
+                <td style="padding: 0.4rem; text-align: center;"><button onclick="this.closest('tr').remove(); recalcModalSubtotal();" style="background: none; border: none; color: #ef4444; font-size: 1rem; cursor: pointer;">🗑️</button></td>
+            `;
+            tbody.appendChild(tr);
+            recalcModalSubtotal();
+        }
+
+        function addCatalogItemToModal() {
+            const picker = document.getElementById('catalogPicker');
+            if (!picker.value) return;
+            const parts = picker.value.split('|');
+            appendModalRow(parts[0], 1, parseFloat(parts[1]) || 0);
+            picker.value = '';
+        }
+
+        function addCustomRowToModal() {
+            appendModalRow('Custom Item / Prop', 1, 0.00);
+        }
+
+        function recalcModalSubtotal() {
+            let subtotal = 0;
+            document.querySelectorAll('#modalItemsBody tr').forEach(tr => {
+                const qtyInput = tr.querySelector('.modal-qty-input');
+                const priceInput = tr.querySelector('.modal-price-input');
+                if (qtyInput && priceInput) {
+                    const qty = parseFloat(qtyInput.value) || 0;
+                    const price = parseFloat(priceInput.value) || 0;
+                    const total = qty * price;
+                    subtotal += total;
+                    const totalTd = tr.querySelector('.modal-row-total');
+                    if (totalTd) totalTd.innerText = '$' + total.toFixed(2);
+                }
+            });
+            document.getElementById('modalSubtotalDisplay').innerText = '$' + subtotal.toFixed(2);
+        }
+
+        async function saveSubstitutedItems(sendEmail) {
+            if (!currentModalOrderId) return;
+            const msgDiv = document.getElementById('modalMsg');
+            const items = [];
+
+            document.querySelectorAll('#modalItemsBody tr').forEach(tr => {
+                const titleInput = tr.querySelector('.modal-title-input');
+                const qtyInput = tr.querySelector('.modal-qty-input');
+                const priceInput = tr.querySelector('.modal-price-input');
+
+                if (titleInput && qtyInput && priceInput) {
+                    const title = titleInput.value.trim();
+                    const qty = parseInt(qtyInput.value) || 1;
+                    const price = parseFloat(priceInput.value) || 0;
+                    if (title) {
+                        items.push({ title: title, quantity: qty, price: price });
+                    }
+                }
+            });
+
+            if (items.length === 0) {
+                alert('Please add at least one item.');
+                return;
+            }
+
+            const note = document.getElementById('modalSubNote').value.trim();
+
+            if (msgDiv) {
+                msgDiv.style.display = 'block';
+                msgDiv.style.color = '#cbd5e1';
+                msgDiv.innerText = sendEmail ? 'Saving and sending quote email...' : 'Saving item changes...';
+            }
+
+            try {
+                const res = await fetch('update_order_items.php' + (window.location.search || ''), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        order_id: currentModalOrderId,
+                        items: items,
+                        substitution_note: note,
+                        notify: sendEmail
+                    })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    if (msgDiv) {
+                        msgDiv.style.color = '#10b981';
+                        msgDiv.innerText = sendEmail ? '✅ Item substitution saved & customer emailed!' : '✅ Item changes saved successfully!';
+                    }
+                    setTimeout(() => {
+                        closeSubstitutionModal();
+                        window.location.reload();
+                    }, 1200);
+                } else {
+                    if (msgDiv) {
+                        msgDiv.style.color = '#ef4444';
+                        msgDiv.innerText = '❌ ' + (data.error || 'Update failed');
+                    }
+                }
+            } catch (err) {
+                if (msgDiv) {
+                    msgDiv.style.color = '#ef4444';
+                    msgDiv.innerText = '❌ Server connection error';
+                }
+            }
+        }
     </script>
+
+    <!-- Item Substitution Modal Container -->
+    <div id="substitutionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); z-index: 9999; align-items: center; justify-content: center; padding: 1rem;">
+        <div style="background: var(--surface); border: 1px solid var(--primary); border-radius: 16px; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; padding: 1.8rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+                <h3 style="color: var(--primary); font-family: Georgia, serif; font-size: 1.3rem; margin: 0;">🔄 Substitute &amp; Edit Order Items</h3>
+                <button onclick="closeSubstitutionModal()" style="background: none; border: none; color: var(--text-muted); font-size: 1.6rem; cursor: pointer;">&times;</button>
+            </div>
+
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+                Order ID: <strong id="modalOrderId" style="color: var(--primary); font-family: monospace;"></strong>
+            </div>
+
+            <!-- Catalog Picker Quick Add -->
+            <div style="background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.8rem; margin-bottom: 1.2rem; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+                <span style="font-size: 0.8rem; font-weight: bold; color: var(--primary);">➕ Add Store Catalog Item:</span>
+                <select id="catalogPicker" class="filter-select" style="flex: 1; min-width: 200px; font-size: 0.82rem; padding: 0.4rem; background: var(--bg); color: var(--text-primary); border: 1px solid var(--border-color);">
+                    <option value="">-- Select Store Item --</option>
+                    <option value="Round Fold-In-Half Table|12.00">Round Fold-In-Half Table ($12.00)</option>
+                    <option value="Cocktail Table (With Cloths)|11.00">Cocktail Table ($11.00)</option>
+                    <option value="Adult Rectangular Folding Table Rental|8.00">Adult Rectangular Table ($8.00)</option>
+                    <option value="Adult Folding Chair|1.50">Adult Folding Chair ($1.50)</option>
+                    <option value="Wedding Tent (16x26)|150.00">Wedding Tent (16x26) ($150.00)</option>
+                    <option value="Tent (10x20)|100.00">Tent (10x20) ($100.00)</option>
+                    <option value="Round Cylinder Pedestal Display|30.00">Round Cylinder Pedestal ($30.00)</option>
+                    <option value="Buffet Food Warmers|10.00">Buffet Food Warmer ($10.00)</option>
+                    <option value="Loveseat for rental|100.00">Loveseat ($100.00)</option>
+                    <option value="Haldi Urli`s|125.00">Haldi Urli`s ($125.00)</option>
+                    <option value="Pipe and Drape Backdrop Stand|50.00">Pipe and Drape Backdrop Stand ($50.00)</option>
+                    <option value="GRAD Marquee Letters|40.00">GRAD Marquee Letters ($40.00)</option>
+                    <option value="4FT Marquee Numbers|20.00">4FT Marquee Numbers ($20.00)</option>
+                    <option value="Photo/Any Event Backdrop|150.00">Photo / Event Backdrop ($150.00)</option>
+                    <option value="New Born Baby Photo Prop|20.00">New Born Baby Photo Prop ($20.00)</option>
+                    <option value="Seemantham/Baby Shower Backdrop|150.00">Seemantham / Baby Shower Backdrop ($150.00)</option>
+                    <option value="VEVOR Metal Wedding Centerpiece (2PCS)|25.00">Metal Wedding Centerpiece ($25.00)</option>
+                    <option value="Happy Birthday Neon Sign|10.00">Happy Birthday Neon Sign ($10.00)</option>
+                    <option value="Good Vibes Only Neon Sign|10.00">Good Vibes Only Neon Sign ($10.00)</option>
+                </select>
+                <button onclick="addCatalogItemToModal()" style="font-size: 0.8rem; padding: 0.4rem 0.8rem; background: var(--primary); color: #000; font-weight: bold; border-radius: 6px; border: none; cursor: pointer;">Add Item</button>
+            </div>
+
+            <!-- Dynamic Items Table -->
+            <div style="margin-bottom: 1.2rem;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                    <thead>
+                        <tr style="background: rgba(255,255,255,0.05); text-align: left;">
+                            <th style="padding: 0.5rem;">Item Description</th>
+                            <th style="padding: 0.5rem; width: 70px;">Qty</th>
+                            <th style="padding: 0.5rem; width: 90px;">Price ($)</th>
+                            <th style="padding: 0.5rem; width: 80px;">Total</th>
+                            <th style="padding: 0.5rem; width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="modalItemsBody">
+                        <!-- Dynamic Rows -->
+                    </tbody>
+                </table>
+                <button onclick="addCustomRowToModal()" style="margin-top: 0.6rem; font-size: 0.78rem; padding: 0.35rem 0.75rem; background: transparent; color: var(--primary); border: 1px dashed var(--primary); border-radius: 6px; cursor: pointer; font-weight: bold;">➕ Add Custom Item Row</button>
+            </div>
+
+            <!-- Live Subtotal Display -->
+            <div style="background: var(--bg); border: 1px solid var(--border-color); padding: 0.8rem; border-radius: 8px; margin-bottom: 1.2rem; display: flex; justify-content: space-between; font-weight: bold;">
+                <span>New Items Subtotal:</span>
+                <span id="modalSubtotalDisplay" style="color: var(--primary); font-size: 1rem;">$0.00</span>
+            </div>
+
+            <!-- Optional Explanation Note for Email -->
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem; font-weight: bold;">💬 Explanation / Substitution Note for Customer Email:</label>
+                <textarea id="modalSubNote" placeholder="e.g. 'Haldi Urli`s is out of stock for your event date. We have substituted it with the Pipe &amp; Drape Backdrop Stand set...'" style="width: 100%; min-height: 55px; font-size: 0.8rem; padding: 6px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg); color: var(--text-primary); resize: vertical;"></textarea>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end; flex-wrap: wrap;">
+                <button onclick="saveSubstitutedItems(false)" style="font-size: 0.85rem; padding: 0.6rem 1.2rem; background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); font-weight: bold; border-radius: 8px; cursor: pointer;">💾 Save Changes quietly</button>
+                <button onclick="saveSubstitutedItems(true)" style="font-size: 0.85rem; padding: 0.6rem 1.2rem; background: var(--primary); color: #000; font-weight: bold; border-radius: 8px; border: none; cursor: pointer;">✉️ Save &amp; Send Replacement Quote Email</button>
+            </div>
+            <div id="modalMsg" style="margin-top: 0.8rem; font-size: 0.8rem; text-align: center; display: none;"></div>
+        </div>
+    </div>
 </body>
 </html>
