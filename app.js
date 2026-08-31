@@ -3067,11 +3067,11 @@ function renderTrackOrderView() {
     return `
         <div class="container text-center" style="max-width: 800px; margin: 0 auto; padding-top: calc(112px + 2rem); padding-bottom: 4rem;">
             <h2 class="section-title">Track Your Rental Order</h2>
-            <p class="section-subtitle">Enter your Order Confirmation ID (e.g., PPE-20260826-123), Email, or Phone Number to check live order status and logistics updates.</p>
+            <p class="section-subtitle">Enter your Order Confirmation ID (e.g. PPE-20260826-123) or Phone Number (at least 3 characters) to check live order status and logistics updates.</p>
 
             <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; box-shadow: var(--shadow-md); margin-top: 2rem;">
                 <form onsubmit="event.preventDefault(); window.handleTrackOrder();" style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                    <input type="text" id="track-query-input" class="form-control" placeholder="Enter Order ID (e.g. PPE-20260826-123) or Phone..." style="flex: 1; min-width: 240px; height: 52px; font-size: 1rem; border-radius: 30px; padding-left: 1.5rem;" required>
+                    <input type="text" id="track-query-input" class="form-control" placeholder="Enter Order ID or Phone Number (at least 3 characters)..." style="flex: 1; min-width: 240px; height: 52px; font-size: 1rem; border-radius: 30px; padding-left: 1.5rem;" required>
                     <button type="submit" id="track-submit-btn" class="btn btn-primary" style="height: 52px; padding: 0 2rem; border-radius: 30px;">
                         🔍 Track Order
                     </button>
@@ -3089,7 +3089,10 @@ window.handleTrackOrder = async function() {
 
     if (!input || !resultArea) return;
     const query = input.value.trim();
-    if (!query) return;
+    if (!query || query.length < 3) {
+        resultArea.innerHTML = '<p style="text-align: center; color: #ef4444; padding: 1.5rem; font-weight: 500;">⚠️ Please enter at least 3 characters of your Order Number or Phone Number.</p>';
+        return;
+    }
 
     btn.disabled = true;
     btn.textContent = 'Searching...';

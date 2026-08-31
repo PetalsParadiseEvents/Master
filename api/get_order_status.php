@@ -30,10 +30,10 @@ try {
         $query = isset($data['q']) ? trim($data['q']) : '';
     }
 
-    if (empty($query)) {
+    if (empty($query) || strlen($query) < 3) {
         echo json_encode([
             'found' => false,
-            'message' => 'Please enter an Order ID, Name, Email, or Phone Number.'
+            'message' => 'Please enter at least 3 characters of your Order Number or Phone Number.'
         ]);
         exit(0);
     }
@@ -49,13 +49,11 @@ try {
                 $sql = "SELECT `id`, `date_added`, `name`, `email`, `phone`, `event_date`, `fulfillment_method`, `delivery_address`, `items`, `subtotal`, `discount`, `delivery_fee`, `setup_fee`, `total`, `status`, `admin_notes` 
                         FROM `orders` 
                         WHERE `id` LIKE :q 
-                           OR LOWER(`email`) LIKE LOWER(:q) 
-                           OR LOWER(`name`) LIKE LOWER(:q) 
                            OR `phone` LIKE :q";
                 
                 $params = [':q' => '%' . $query . '%'];
 
-                if (!empty($cleanDigits) && strlen($cleanDigits) >= 4) {
+                if (!empty($cleanDigits) && strlen($cleanDigits) >= 3) {
                     $sql .= " OR REPLACE(REPLACE(REPLACE(REPLACE(`phone`, '-', ''), ' ', ''), '(', ''), ')', '') LIKE :digits";
                     $params[':digits'] = '%' . $cleanDigits . '%';
                 }
@@ -81,14 +79,12 @@ try {
 
             foreach ($allOrders as $ord) {
                 $ordId = strtolower($ord['id'] ?? '');
-                $ordEmail = strtolower($ord['email'] ?? '');
-                $ordName = strtolower($ord['name'] ?? '');
                 $ordPhone = preg_replace('/[^0-9]/', '', $ord['phone'] ?? '');
 
                 $match = false;
-                if (!empty($qLower) && (strpos($ordId, $qLower) !== false || strpos($ordEmail, $qLower) !== false || strpos($ordName, $qLower) !== false)) {
+                if (!empty($qLower) && strpos($ordId, $qLower) !== false) {
                     $match = true;
-                } elseif (!empty($cleanDigits) && strlen($cleanDigits) >= 4 && !empty($ordPhone) && strpos($ordPhone, $cleanDigits) !== false) {
+                } elseif (!empty($cleanDigits) && strlen($cleanDigits) >= 3 && !empty($ordPhone) && strpos($ordPhone, $cleanDigits) !== false) {
                     $match = true;
                 }
 
