@@ -148,19 +148,27 @@
       animation: bannerShimmer 3s linear infinite;
       color: #0d0f12;
       text-align: center;
-      padding: 10px 16px;
+      padding: 8px 16px;
       font-family: 'Outfit', sans-serif;
-      font-size: 0.875rem;
+      font-size: 0.85rem;
       font-weight: 600;
+      line-height: 1.4;
       letter-spacing: 0.02em;
       position: relative;
       z-index: 1000;
+      height: auto !important;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 4px 10px;
     }
     @keyframes bannerShimmer {
       0% { background-position: 0% center; }
       100% { background-position: 200% center; }
     }
-    .promo-banner a { color: #0d0f12; text-decoration: underline; font-weight: 700; }
+    .promo-banner a { color: #0d0f12; text-decoration: underline; font-weight: 700; white-space: nowrap; }
 
     /* ── Navbar ── */
     .navbar {
@@ -707,7 +715,8 @@
 
 <!-- Promo Banner -->
 <div class="promo-banner" role="banner" aria-label="Promotional announcement">
-  🌟 Premium event rentals serving Aldie, VA &amp; Loudoun County! &nbsp;|&nbsp; <a href="tel:+18484486993">Call +1-848-448-6993</a> to reserve today
+  <span>🌟 Premium event rentals serving Aldie, VA &amp; Loudoun County!</span>
+  <span><a href="tel:+18484486993">Call +1-848-448-6993</a> to reserve today</span>
 </div>
 
 <!-- Navbar -->

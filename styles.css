@@ -74,21 +74,23 @@ a {
 }
 
 .promo-banner {
-  height: var(--banner-height);
+  min-height: var(--banner-height, 40px);
+  height: auto;
   background: linear-gradient(90deg, #b8860b, #d4af37, #f1c40f, #d4af37, #b8860b);
   background-size: 200% auto;
   color: #0d0f12;
   display: flex;
   align-items: center;
-  position: fixed;
-  top: 0;
-  left: 0;
+  justify-content: center;
+  position: relative;
   width: 100%;
   z-index: 1100;
   box-shadow: 0 2px 15px rgba(0,0,0,0.4);
   text-decoration: none;
   overflow: hidden;
   animation: shine 3s linear infinite;
+  padding: 6px 12px;
+  line-height: 1.35;
 }
 
 .ticker-wrap {
@@ -846,7 +848,8 @@ footer {
 
 @media (max-width: 768px) {
   .promo-banner {
-    height: 40px; 
+    min-height: 40px;
+    height: auto;
   }
   
   :root {

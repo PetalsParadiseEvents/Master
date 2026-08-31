@@ -154,19 +154,27 @@
       animation: bannerShimmer 3s linear infinite;
       color: #0d0f12;
       text-align: center;
-      padding: 10px 16px;
+      padding: 8px 16px;
       font-family: 'Outfit', sans-serif;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 600;
+      line-height: 1.4;
       letter-spacing: 0.02em;
       position: relative;
       z-index: 1100;
+      height: auto !important;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 4px 10px;
     }
     @keyframes bannerShimmer {
       0% { background-position: 0% center; }
       100% { background-position: 200% center; }
     }
-    .promo-banner a { color: #0d0f12; text-decoration: underline; }
+    .promo-banner a { color: #0d0f12; text-decoration: underline; font-weight: 700; white-space: nowrap; }
 
     /* ── Navbar ── */
     .navbar {
@@ -777,7 +785,8 @@
 
   <!-- Promo Banner -->
   <div class="promo-banner" role="banner">
-    🌸 Free delivery within 15 miles of Aldie, VA &nbsp;|&nbsp; Call us: <a href="tel:+18484486993">+1-848-448-6993</a> &nbsp;|&nbsp; Mon–Sun, 9 AM – 9 PM
+    <span>🌸 Free delivery within 15 miles of Aldie, VA</span>
+    <span>Call us: <a href="tel:+18484486993">+1-848-448-6993</a> | Mon–Sun, 9 AM – 9 PM</span>
   </div>
 
   <!-- Navbar -->

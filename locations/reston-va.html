@@ -156,18 +156,27 @@
       animation: bannerShimmer 3s linear infinite;
       color: #0d0f12;
       text-align: center;
-      padding: 10px 20px;
+      padding: 8px 16px;
       font-family: 'Outfit', sans-serif;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 600;
+      line-height: 1.4;
       letter-spacing: 0.02em;
       z-index: 1100;
       position: relative;
+      height: auto !important;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 4px 10px;
     }
     .promo-banner a {
       color: #0d0f12;
       text-decoration: underline;
       font-weight: 700;
+      white-space: nowrap;
     }
     @keyframes bannerShimmer {
       0% { background-position: 0% center; }
@@ -774,8 +783,8 @@
 
   <!-- Promo Banner -->
   <div class="promo-banner" role="banner">
-    🎉 Free delivery within 30 miles for orders over $200! &nbsp;
-    <a href="tel:+18484486993">Call +1-848-448-6993</a> to book your Reston event today.
+    <span>🎉 Free delivery within 30 miles for orders over $200!</span>
+    <span>Call <a href="tel:+18484486993">+1-848-448-6993</a> to book your Reston event today.</span>
   </div>
 
   <!-- Navbar -->

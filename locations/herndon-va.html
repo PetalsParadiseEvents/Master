@@ -153,15 +153,23 @@
       animation: shimmer 3s linear infinite;
       color: #0d0f12;
       text-align: center;
-      padding: 10px 16px;
+      padding: 8px 16px;
       font-family: 'Outfit', sans-serif;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 600;
+      line-height: 1.4;
       letter-spacing: 0.02em;
       position: relative;
       z-index: 1000;
+      height: auto !important;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 4px 10px;
     }
-    .promo-banner a { color: #0d0f12; text-decoration: underline; }
+    .promo-banner a { color: #0d0f12; text-decoration: underline; font-weight: 700; white-space: nowrap; }
     @keyframes shimmer { to { background-position: 200% center; } }
 
     /* ── Navbar ── */
@@ -695,7 +703,8 @@
 
   <!-- Promo Banner -->
   <div class="promo-banner" role="banner">
-    🌸 Free delivery available for large orders! Call <a href="tel:+18484486993">+1-848-448-6993</a> or <a href="https://wa.me/qr/UGD3LZ3UNUCQP1" target="_blank" rel="noopener">WhatsApp us</a> to book your Herndon event today.
+    <span>🌸 Free delivery available for large orders!</span>
+    <span>Call <a href="tel:+18484486993">+1-848-448-6993</a> or <a href="https://wa.me/qr/UGD3LZ3UNUCQP1" target="_blank" rel="noopener">WhatsApp us</a> to book your Herndon event today.</span>
   </div>
 
   <!-- Navbar -->
