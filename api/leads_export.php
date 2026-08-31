@@ -556,13 +556,18 @@ if ($format === 'json') {
                                     </td>
                                     <td>
                                         <?php 
-                                        $isDelivery = ($order['fulfillment_method'] ?? '') === 'Delivery'; 
+                                        $currentFulfillment = $order['fulfillment_method'] ?? 'Pickup';
+                                        $isDelivery = ($currentFulfillment === 'Delivery'); 
                                         ?>
-                                        <span class="badge <?php echo $isDelivery ? 'badge-delivery' : 'badge-pickup'; ?>">
-                                            <?php echo htmlspecialchars($order['fulfillment_method'] ?? 'Pickup'); ?>
-                                        </span>
+                                        <div style="margin-bottom: 0.35rem;">
+                                            <select class="form-control" style="font-size: 0.78rem; padding: 0.35rem 0.5rem; width: 100%; border-radius: 6px; cursor: pointer; background: var(--bg); color: <?php echo $isDelivery ? '#2ecc71' : '#3498db'; ?>; font-weight: bold; border: 1px solid var(--border-color);" onchange="changeFulfillmentMethod('<?php echo htmlspecialchars($order['id']); ?>', this.value)">
+                                                <option value="Delivery" <?php echo $isDelivery ? 'selected' : ''; ?>>🚚 Delivery</option>
+                                                <option value="Pickup" <?php echo !$isDelivery ? 'selected' : ''; ?>>📦 Pickup</option>
+                                            </select>
+                                        </div>
+                                        <div id="fulfill-msg-<?php echo htmlspecialchars($order['id']); ?>" style="font-size: 0.72rem; margin-bottom: 0.3rem; display: none;"></div>
                                         
-                                        <div style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--text-muted); line-height: 1.4;">
+                                        <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
                                             <?php if ($isDelivery): ?>
                                                 <strong>Address:</strong> <?php echo htmlspecialchars($order['delivery_address'] ?? 'N/A'); ?><br>
                                                 <strong>Del:</strong> <?php echo htmlspecialchars($order['delivery_date'] ?? $order['delivery_date_manual'] ?? ''); ?> <?php echo htmlspecialchars($order['delivery_time'] ?? $order['delivery_time_manual'] ?? ''); ?><br>
@@ -766,6 +771,37 @@ if ($format === 'json') {
                 } else if (msgDiv) {
                     msgDiv.style.color = '#ef4444';
                     msgDiv.innerText = '❌ Failed to save payment';
+                }
+            } catch (err) {
+                if (msgDiv) {
+                    msgDiv.style.color = '#ef4444';
+                    msgDiv.innerText = '❌ Server connection error';
+                }
+            }
+        }
+
+        async function changeFulfillmentMethod(orderId, method) {
+            const msgDiv = document.getElementById('fulfill-msg-' + orderId);
+            if (msgDiv) {
+                msgDiv.style.display = 'block';
+                msgDiv.style.color = '#cbd5e1';
+                msgDiv.innerText = 'Saving...';
+            }
+
+            try {
+                const res = await fetch('update_fulfillment_method.php' + (window.location.search || ''), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ order_id: orderId, fulfillment_method: method })
+                });
+                const data = await res.json();
+                if (data.success && msgDiv) {
+                    msgDiv.style.color = '#2ecc71';
+                    msgDiv.innerText = (method === 'Delivery') ? '🚚 Saved as Delivery!' : '📦 Saved as Pickup!';
+                    setTimeout(() => { window.location.reload(); }, 1000);
+                } else if (msgDiv) {
+                    msgDiv.style.color = '#ef4444';
+                    msgDiv.innerText = '❌ Save error';
                 }
             } catch (err) {
                 if (msgDiv) {
