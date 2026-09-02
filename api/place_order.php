@@ -193,7 +193,7 @@ $adminMessage .= "\nITEMS REQUESTED\n"
               . "----------------------------------------\n"
               . $itemsText . "\n"
               . "Subtotal: \${$subtotal}\n"
-              . "Discount: -\${$discount}" . (!empty($promoCode) ? " ({$promoCode})" : "") . "\n"
+              . ((float)$discount > 0 ? "Discount: -\${$discount}" . (!empty($promoCode) ? " ({$promoCode})" : "") . "\n" : "")
               . "Total Estimate: \${$total}" . ($fulfillment === 'Delivery' ? " + Delivery Fee (TBD)" : "") . "\n\n"
               . "----------------------------------------\n"
               . "This order has been saved directly to your phpMyAdmin database and leads dashboard.\n"

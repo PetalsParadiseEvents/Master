@@ -159,7 +159,8 @@ if ($notifyCustomer && !empty($customerEmail)) {
                 <p style='margin: 5px 0;'><strong>Order Confirmation ID:</strong> <span style='font-family: monospace; font-weight: bold; color: #d4af37;'>" . htmlspecialchars($orderId) . "</span></p>
                 <p style='margin: 5px 0;'><strong>Current Status:</strong> " . htmlspecialchars($newStatus) . "</p>
                 <p style='margin: 5px 0;'><strong>Fulfillment Method:</strong> " . htmlspecialchars($fulfillment) . "</p>" .
-                (!empty($eventDate) ? "<p style='margin: 5px 0;'><strong>Event Date:</strong> " . htmlspecialchars($eventDate) . "</p>" : "") . "
+                (!empty($eventDate) ? "<p style='margin: 5px 0;'><strong>Event Date:</strong> " . htmlspecialchars($eventDate) . "</p>" : "") .
+                (floatval($orderRecord['discount'] ?? 0) > 0 ? "<p style='margin: 5px 0; color: #38a169;'><strong>Discount Applied:</strong> -\$" . number_format((float)$orderRecord['discount'], 2) . "</p>" : "") . "
                 <p style='margin: 5px 0;'><strong>Total Estimate:</strong> \$" . htmlspecialchars($totalAmount) . "</p>
             </div>
 

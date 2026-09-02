@@ -597,7 +597,9 @@ if ($format === 'json') {
                                     </td>
                                     <td style="white-space: nowrap; font-size: 0.85rem; line-height: 1.4; min-width: 170px;">
                                         Sub: $<?php echo htmlspecialchars(number_format((float)($order['subtotal'] ?? 0), 2)); ?><br>
-                                        Disc: -$<?php echo htmlspecialchars(number_format((float)($order['discount'] ?? 0), 2)); ?><br>
+                                        <?php if ((float)($order['discount'] ?? 0) > 0): ?>
+                                            <span style="color: #38a169;">Disc: -$<?php echo htmlspecialchars(number_format((float)($order['discount'] ?? 0), 2)); ?></span><br>
+                                        <?php endif; ?>
                                         <div style="margin-top: 0.3rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 4px;">
                                             <span style="font-size: 0.75rem; color: var(--text-muted); width: 62px;">Del Fee: $</span>
                                             <input type="number" step="0.01" min="0" id="delivery-fee-<?php echo htmlspecialchars($order['id']); ?>" value="<?php echo htmlspecialchars(number_format((float)($order['delivery_fee'] ?? 0), 2)); ?>" oninput="recalcOrderTotal('<?php echo htmlspecialchars($order['id']); ?>', <?php echo (float)($order['subtotal'] ?? 0); ?>, <?php echo (float)($order['discount'] ?? 0); ?>)" style="width: 75px; padding: 2px 4px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: #d4af37; font-weight: bold;">
