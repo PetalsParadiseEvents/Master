@@ -175,19 +175,70 @@ $sortByEventDate = function($a, $b) {
 usort($activeOrders, $sortByEventDate);
 usort($completedOrders, $sortByEventDate);
 
-// Extract distinct Months for Event Month Filter (e.g., "August 2026", "September 2026")
-$eventMonths = [];
+// Helper Function: Get Week Range Details (Monday to Sunday)
+function getWeekRangeDetails($dateStr) {
+    if (empty($dateStr)) {
+        return [
+            'label'  => 'Date Unspecified',
+            'monday' => '',
+            'sunday' => '',
+            'key'    => 'unspecified'
+        ];
+    }
+    $time = strtotime($dateStr);
+    if (!$time) {
+        return [
+            'label'  => 'Date Unspecified',
+            'monday' => '',
+            'sunday' => '',
+            'key'    => 'unspecified'
+        ];
+    }
+    $dayOfWeek  = (int)date('N', $time); // 1 (Mon) to 7 (Sun)
+    $mondayTime = strtotime('-' . ($dayOfWeek - 1) . ' days', $time);
+    $sundayTime = strtotime('+' . (7 - $dayOfWeek) . ' days', $time);
+
+    $monStr = date('M jS(l)', $mondayTime); // e.g. Aug 31st(Monday)
+    $sunStr = date('M jS(l)', $sundayTime); // e.g. Sep 6th(Sunday)
+
+    $monYmd = date('Y-m-d', $mondayTime);
+    $sunYmd = date('Y-m-d', $sundayTime);
+
+    return [
+        'label'  => "{$monStr} - {$sunStr}",
+        'monday' => $monYmd,
+        'sunday' => $sunYmd,
+        'key'    => "{$monYmd}_to_{$sunYmd}"
+    ];
+}
+
+// Extract distinct Months and Weeks for Event Filters
+$eventMonths   = [];
+$monthWeeksMap = []; // [ '2026-09' => [ 'key' => label, ... ] ]
+$allWeeksMap   = [];
+
 foreach ($orders as $ord) {
     if (!empty($ord['event_date'])) {
         $time = strtotime($ord['event_date']);
         if ($time) {
-            $monthVal = date('Y-m', $time);
+            $monthVal   = date('Y-m', $time);
             $monthLabel = date('F Y', $time);
             $eventMonths[$monthVal] = $monthLabel;
+
+            $wInfo  = getWeekRangeDetails($ord['event_date']);
+            $wKey   = $wInfo['key'];
+            $wLabel = $wInfo['label'];
+
+            $allWeeksMap[$wKey] = $wLabel;
+            if (!isset($monthWeeksMap[$monthVal])) {
+                $monthWeeksMap[$monthVal] = [];
+            }
+            $monthWeeksMap[$monthVal][$wKey] = $wLabel;
         }
     }
 }
 ksort($eventMonths);
+ksort($allWeeksMap);
 
 // CSV Export Handler
 $format = isset($_GET['format']) ? strtolower($_GET['format']) : '';
@@ -461,10 +512,17 @@ if ($format === 'json') {
             <div class="toolbar">
                 <input type="text" id="orderSearch" class="search-input" placeholder="🔍 Search active orders by Order ID, name, email, phone, items..." onkeyup="filterOrders()">
                 
-                <select id="monthFilter" class="filter-select" onchange="filterOrders()">
+                <select id="monthFilter" class="filter-select" onchange="onMonthFilterChange('active')">
                     <option value="all">📅 All Event Months</option>
                     <?php foreach ($eventMonths as $val => $label): ?>
                         <option value="<?php echo htmlspecialchars($val); ?>"><?php echo htmlspecialchars($label); ?></option>
+                    <?php endforeach; ?>
+                </select>
+
+                <select id="weekFilter" class="filter-select" onchange="filterOrders()">
+                    <option value="all">🗓️ All Weeks</option>
+                    <?php foreach ($allWeeksMap as $wKey => $wLabel): ?>
+                        <option value="<?php echo htmlspecialchars($wKey); ?>"><?php echo htmlspecialchars($wLabel); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -494,10 +552,17 @@ if ($format === 'json') {
             <div class="toolbar">
                 <input type="text" id="completedSearch" class="search-input" placeholder="🔍 Search completed orders by Order ID, name, email, phone, items..." onkeyup="filterOrders()">
                 
-                <select id="completedMonthFilter" class="filter-select" onchange="filterOrders()">
+                <select id="completedMonthFilter" class="filter-select" onchange="onMonthFilterChange('completed')">
                     <option value="all">📅 All Event Months</option>
                     <?php foreach ($eventMonths as $val => $label): ?>
                         <option value="<?php echo htmlspecialchars($val); ?>"><?php echo htmlspecialchars($label); ?></option>
+                    <?php endforeach; ?>
+                </select>
+
+                <select id="completedWeekFilter" class="filter-select" onchange="filterOrders()">
+                    <option value="all">🗓️ All Weeks</option>
+                    <?php foreach ($allWeeksMap as $wKey => $wLabel): ?>
+                        <option value="<?php echo htmlspecialchars($wKey); ?>"><?php echo htmlspecialchars($wLabel); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -528,15 +593,30 @@ if ($format === 'json') {
                     </thead>
                     <tbody>
                         <?php if (empty($ordersList)): ?>
-                            <tr>
+                            <tr class="empty-state-row">
                                 <td colspan="9" class="empty-state">No orders in this category.</td>
                             </tr>
                         <?php else: ?>
-                            <?php foreach ($ordersList as $order): 
-                                $eventDateRaw = $order['event_date'] ?? '';
+                            <?php 
+                            $currentWeekKey = null;
+                            foreach ($ordersList as $order): 
+                                $eventDateRaw  = $order['event_date'] ?? '';
                                 $eventMonthVal = !empty($eventDateRaw) ? date('Y-m', strtotime($eventDateRaw)) : '';
-                                ?>
-                                <tr data-event-date="<?php echo htmlspecialchars($eventMonthVal); ?>">
+                                $wInfo         = getWeekRangeDetails($eventDateRaw);
+                                $weekKey       = $wInfo['key'];
+                                $weekLabel     = $wInfo['label'];
+
+                                if ($weekKey !== $currentWeekKey):
+                                    $currentWeekKey = $weekKey;
+                                    ?>
+                                    <tr class="week-header-row" data-event-date="<?php echo htmlspecialchars($eventMonthVal); ?>" data-week-key="<?php echo htmlspecialchars($weekKey); ?>">
+                                        <td colspan="9" style="background: linear-gradient(90deg, rgba(212,175,55,0.25), rgba(212,175,55,0.06)); padding: 10px 16px; font-weight: bold; color: #d4af37; font-size: 0.9rem; border-top: 2px solid rgba(212,175,55,0.4); border-bottom: 1px solid rgba(212,175,55,0.25); letter-spacing: 0.3px;">
+                                            📅 <strong>Week:</strong> <?php echo htmlspecialchars($weekLabel); ?>
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
+
+                                <tr data-event-date="<?php echo htmlspecialchars($eventMonthVal); ?>" data-week-key="<?php echo htmlspecialchars($weekKey); ?>">
                                     <td style="white-space: nowrap; font-size: 0.85rem;">
                                         <span style="color: var(--primary); font-weight:700; font-family:monospace;"><?php echo htmlspecialchars($order['id'] ?? 'PPE-N/A'); ?></span>
                                         <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.25rem;">
@@ -841,32 +921,111 @@ if ($format === 'json') {
             });
         }
 
+        const monthWeeksMap = <?php echo json_encode($monthWeeksMap); ?>;
+        const allWeeksMap   = <?php echo json_encode($allWeeksMap); ?>;
+
+        function onMonthFilterChange(tabType) {
+            const isCompleted = (tabType === 'completed');
+            const monthSelect = document.getElementById(isCompleted ? 'completedMonthFilter' : 'monthFilter');
+            const weekSelect = document.getElementById(isCompleted ? 'completedWeekFilter' : 'weekFilter');
+
+            if (!monthSelect || !weekSelect) {
+                filterOrders();
+                return;
+            }
+
+            const selectedMonth = monthSelect.value;
+            const currentWeekVal = weekSelect.value;
+
+            weekSelect.innerHTML = '';
+            
+            if (selectedMonth === 'all') {
+                const optAll = document.createElement('option');
+                optAll.value = 'all';
+                optAll.textContent = '🗓️ All Weeks';
+                weekSelect.appendChild(optAll);
+
+                for (const [wKey, wLabel] of Object.entries(allWeeksMap)) {
+                    const opt = document.createElement('option');
+                    opt.value = wKey;
+                    opt.textContent = wLabel;
+                    if (wKey === currentWeekVal) opt.selected = true;
+                    weekSelect.appendChild(opt);
+                }
+            } else {
+                const monthLabel = monthSelect.options[monthSelect.selectedIndex] ? monthSelect.options[monthSelect.selectedIndex].text : 'Month';
+                const optAll = document.createElement('option');
+                optAll.value = 'all';
+                optAll.textContent = '🗓️ All Weeks in ' + monthLabel.replace('📅 ', '');
+                weekSelect.appendChild(optAll);
+
+                const monthWeeks = monthWeeksMap[selectedMonth] || {};
+                for (const [wKey, wLabel] of Object.entries(monthWeeks)) {
+                    const opt = document.createElement('option');
+                    opt.value = wKey;
+                    opt.textContent = wLabel;
+                    if (wKey === currentWeekVal) opt.selected = true;
+                    weekSelect.appendChild(opt);
+                }
+            }
+
+            filterOrders();
+        }
+
         function filterOrders() {
             const orderQ = (document.getElementById('orderSearch') ? document.getElementById('orderSearch').value : '').toLowerCase();
             const orderMonth = document.getElementById('monthFilter') ? document.getElementById('monthFilter').value : 'all';
+            const orderWeek = document.getElementById('weekFilter') ? document.getElementById('weekFilter').value : 'all';
 
             const compQ = (document.getElementById('completedSearch') ? document.getElementById('completedSearch').value : '').toLowerCase();
             const compMonth = document.getElementById('completedMonthFilter') ? document.getElementById('completedMonthFilter').value : 'all';
+            const compWeek = document.getElementById('completedWeekFilter') ? document.getElementById('completedWeekFilter').value : 'all';
 
-            // Active Orders Table
-            document.querySelectorAll('#ordersTable tbody tr').forEach(row => {
-                if (row.querySelector('.empty-state')) return;
-                const text = row.innerText.toLowerCase();
-                const eventMonth = row.getAttribute('data-event-date') || '';
-                const matchQ = !orderQ || text.includes(orderQ);
-                const matchM = orderMonth === 'all' || eventMonth === orderMonth;
-                row.style.display = (matchQ && matchM) ? '' : 'none';
-            });
+            function processTable(tableId, query, selectedMonth, selectedWeek) {
+                const table = document.getElementById(tableId);
+                if (!table) return;
 
-            // Completed Orders Table
-            document.querySelectorAll('#completedTable tbody tr').forEach(row => {
-                if (row.querySelector('.empty-state')) return;
-                const text = row.innerText.toLowerCase();
-                const eventMonth = row.getAttribute('data-event-date') || '';
-                const matchQ = !compQ || text.includes(compQ);
-                const matchM = compMonth === 'all' || eventMonth === compMonth;
-                row.style.display = (matchQ && matchM) ? '' : 'none';
-            });
+                const rows = Array.from(table.querySelectorAll('tbody tr'));
+                
+                rows.forEach(row => {
+                    if (row.classList.contains('empty-state-row') || row.querySelector('.empty-state')) return;
+                    if (row.classList.contains('week-header-row')) return;
+
+                    const text = row.innerText.toLowerCase();
+                    const eventMonth = row.getAttribute('data-event-date') || '';
+                    const weekKey = row.getAttribute('data-week-key') || '';
+
+                    const matchQ = !query || text.includes(query);
+                    const matchM = (selectedMonth === 'all') || (eventMonth === selectedMonth);
+                    const matchW = (selectedWeek === 'all') || (weekKey === selectedWeek);
+
+                    row.style.display = (matchQ && matchM && matchW) ? '' : 'none';
+                });
+
+                // Hide/show week header rows based on whether any order in that week is visible
+                let currentHeader = null;
+                let hasVisibleOrders = false;
+
+                rows.forEach(row => {
+                    if (row.classList.contains('week-header-row')) {
+                        if (currentHeader) {
+                            currentHeader.style.display = hasVisibleOrders ? '' : 'none';
+                        }
+                        currentHeader = row;
+                        hasVisibleOrders = false;
+                    } else if (!row.classList.contains('empty-state-row') && !row.querySelector('.empty-state')) {
+                        if (row.style.display !== 'none') {
+                            hasVisibleOrders = true;
+                        }
+                    }
+                });
+                if (currentHeader) {
+                    currentHeader.style.display = hasVisibleOrders ? '' : 'none';
+                }
+            }
+
+            processTable('ordersTable', orderQ, orderMonth, orderWeek);
+            processTable('completedTable', compQ, compMonth, compWeek);
         }
 
         async function changeOrderStatus(orderId, newStatus) {
