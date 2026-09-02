@@ -8,6 +8,14 @@ session_start();
 error_reporting(0);
 ini_set('display_errors', 0);
 
+// Set strict anti-caching and security headers
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
+header('X-Frame-Options: DENY');
+header('X-Content-Type-Options: nosniff');
+header('X-Robots-Tag: noindex, nofollow, noarchive');
+
 require_once __DIR__ . '/config.php';
 
 // ═══════════════════════════════════════════════════════════
@@ -32,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset(
     if ($_POST['username'] === $adminUser && $_POST['password'] === $adminPass) {
         $_SESSION['admin_logged_in'] = true;
         setcookie('ppe_auth', $cookieHash, time() + (86400 * 30), '/'); // 30 days
-        header('Location: leads_export.php' . (!empty($_GET['key']) ? '?key=' . urlencode($_GET['key']) : ''));
+        header('Location: leads_export.php');
         exit;
     } else {
         $loginError = 'Invalid admin username or password.';
@@ -46,6 +54,19 @@ $isCookieValid = (isset($_COOKIE['ppe_auth']) && $_COOKIE['ppe_auth'] === $cooki
 $isAuthenticated = $isBypassed || (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) || $isCookieValid;
 
 if (!$isAuthenticated) {
+    $requestedFormat = isset($_GET['format']) ? strtolower($_GET['format']) : '';
+    if ($requestedFormat === 'json') {
+        http_response_code(401);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['error' => 'Unauthorized admin access. Please sign in to view JSON data.'], JSON_PRETTY_PRINT);
+        exit;
+    }
+    if ($requestedFormat === 'csv') {
+        http_response_code(401);
+        header('Content-Type: text/plain; charset=utf-8');
+        echo "Unauthorized admin access. Please sign in to download CSV data.";
+        exit;
+    }
     ?>
     <!DOCTYPE html>
     <html lang="en">
