@@ -46,7 +46,7 @@ try {
         $pdo = getDbConnection();
         if ($pdo) {
             try {
-                $sql = "SELECT `id`, `date_added`, `name`, `email`, `phone`, `event_date`, `fulfillment_method`, `delivery_address`, `items`, `subtotal`, `discount`, `delivery_fee`, `setup_fee`, `total`, `status`, `admin_notes` 
+                $sql = "SELECT `id`, `date_added`, `name`, `email`, `phone`, `event_date`, `fulfillment_method`, `delivery_address`, `items`, `subtotal`, `discount`, `promo_code`, `delivery_fee`, `setup_fee`, `total`, `status`, `admin_notes` 
                         FROM `orders` 
                         WHERE `id` LIKE :q 
                            OR `phone` LIKE :q";

@@ -675,19 +675,29 @@ if ($format === 'json') {
                                             🔄 Substitute / Edit Items
                                         </button>
                                     </td>
-                                    <td style="white-space: nowrap; font-size: 0.85rem; line-height: 1.4; min-width: 170px;">
+                                    <td style="white-space: nowrap; font-size: 0.85rem; line-height: 1.4; min-width: 175px;">
                                         Sub: $<?php echo htmlspecialchars(number_format((float)($order['subtotal'] ?? 0), 2)); ?><br>
-                                        <?php if ((float)($order['discount'] ?? 0) > 0): ?>
-                                            <span style="color: #38a169;">Disc: -$<?php echo htmlspecialchars(number_format((float)($order['discount'] ?? 0), 2)); ?></span><br>
-                                        <?php endif; ?>
+
                                         <div style="margin-top: 0.3rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 4px;">
-                                            <span style="font-size: 0.75rem; color: var(--text-muted); width: 62px;">Del Fee: $</span>
-                                            <input type="number" step="0.01" min="0" id="delivery-fee-<?php echo htmlspecialchars($order['id']); ?>" value="<?php echo htmlspecialchars(number_format((float)($order['delivery_fee'] ?? 0), 2)); ?>" oninput="recalcOrderTotal('<?php echo htmlspecialchars($order['id']); ?>', <?php echo (float)($order['subtotal'] ?? 0); ?>, <?php echo (float)($order['discount'] ?? 0); ?>)" style="width: 75px; padding: 2px 4px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: #d4af37; font-weight: bold;">
+                                            <span style="font-size: 0.75rem; color: var(--text-muted); width: 62px;">Coupon:</span>
+                                            <input type="text" id="promo-code-<?php echo htmlspecialchars($order['id']); ?>" value="<?php echo htmlspecialchars($order['promo_code'] ?? ''); ?>" placeholder="e.g. PETALS10" style="width: 80px; padding: 2px 4px; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: #38a169; font-weight: bold;">
                                         </div>
+                                        
+                                        <div style="margin-bottom: 0.2rem; display: flex; align-items: center; gap: 4px;">
+                                            <span style="font-size: 0.75rem; color: var(--text-muted); width: 62px;">Disc $:</span>
+                                            <input type="number" step="0.01" min="0" id="discount-fee-<?php echo htmlspecialchars($order['id']); ?>" value="<?php echo htmlspecialchars(number_format((float)($order['discount'] ?? 0), 2)); ?>" oninput="recalcOrderTotal('<?php echo htmlspecialchars($order['id']); ?>', <?php echo (float)($order['subtotal'] ?? 0); ?>)" style="width: 80px; padding: 2px 4px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: #38a169; font-weight: bold;">
+                                        </div>
+
+                                        <div style="margin-bottom: 0.2rem; display: flex; align-items: center; gap: 4px;">
+                                            <span style="font-size: 0.75rem; color: var(--text-muted); width: 62px;">Del Fee: $</span>
+                                            <input type="number" step="0.01" min="0" id="delivery-fee-<?php echo htmlspecialchars($order['id']); ?>" value="<?php echo htmlspecialchars(number_format((float)($order['delivery_fee'] ?? 0), 2)); ?>" oninput="recalcOrderTotal('<?php echo htmlspecialchars($order['id']); ?>', <?php echo (float)($order['subtotal'] ?? 0); ?>)" style="width: 80px; padding: 2px 4px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: #d4af37; font-weight: bold;">
+                                        </div>
+                                        
                                         <div style="margin-bottom: 0.3rem; display: flex; align-items: center; gap: 4px;">
                                             <span style="font-size: 0.75rem; color: var(--text-muted); width: 62px;">Setup Fee: $</span>
-                                            <input type="number" step="0.01" min="0" id="setup-fee-<?php echo htmlspecialchars($order['id']); ?>" value="<?php echo htmlspecialchars(number_format((float)($order['setup_fee'] ?? 0), 2)); ?>" oninput="recalcOrderTotal('<?php echo htmlspecialchars($order['id']); ?>', <?php echo (float)($order['subtotal'] ?? 0); ?>, <?php echo (float)($order['discount'] ?? 0); ?>)" style="width: 75px; padding: 2px 4px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: #d4af37; font-weight: bold;">
+                                            <input type="number" step="0.01" min="0" id="setup-fee-<?php echo htmlspecialchars($order['id']); ?>" value="<?php echo htmlspecialchars(number_format((float)($order['setup_fee'] ?? 0), 2)); ?>" oninput="recalcOrderTotal('<?php echo htmlspecialchars($order['id']); ?>', <?php echo (float)($order['subtotal'] ?? 0); ?>)" style="width: 80px; padding: 2px 4px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: #d4af37; font-weight: bold;">
                                         </div>
+                                        
                                         <strong>Total: <span id="total-display-<?php echo htmlspecialchars($order['id']); ?>" style="color: #d4af37;">$<?php echo htmlspecialchars(number_format((float)($order['total'] ?? 0), 2)); ?></span></strong>
                                         
                                         <div style="margin-top: 0.5rem;">
@@ -763,12 +773,14 @@ if ($format === 'json') {
     ?>
 
     <script>
-        function recalcOrderTotal(orderId, subtotal, discount) {
+        function recalcOrderTotal(orderId, subtotal) {
+            const discInput = document.getElementById('discount-fee-' + orderId);
             const delInput = document.getElementById('delivery-fee-' + orderId);
             const setupInput = document.getElementById('setup-fee-' + orderId);
             const totalDisplay = document.getElementById('total-display-' + orderId);
             if (!totalDisplay) return;
 
+            const discount = discInput ? (parseFloat(discInput.value) || 0) : 0;
             const delFee = delInput ? (parseFloat(delInput.value) || 0) : 0;
             const setupFee = setupInput ? (parseFloat(setupInput.value) || 0) : 0;
             const calcTotal = Math.max(0, subtotal - discount + delFee + setupFee);
@@ -777,12 +789,16 @@ if ($format === 'json') {
         }
 
         async function updateOrderQuote(orderId) {
+            const discInput = document.getElementById('discount-fee-' + orderId);
+            const promoInput = document.getElementById('promo-code-' + orderId);
             const delInput = document.getElementById('delivery-fee-' + orderId);
             const setupInput = document.getElementById('setup-fee-' + orderId);
             const notesInput = document.getElementById('admin-notes-' + orderId);
             const msgDiv = document.getElementById('quote-msg-' + orderId);
 
             if (!delInput) return;
+            const discount = discInput ? (parseFloat(discInput.value) || 0.00) : 0.00;
+            const promoCode = promoInput ? promoInput.value.trim() : '';
             const delFee = parseFloat(delInput.value) || 0.00;
             const setupFee = setupInput ? (parseFloat(setupInput.value) || 0.00) : 0.00;
             const notes = notesInput ? notesInput.value.trim() : '';
@@ -799,6 +815,8 @@ if ($format === 'json') {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         order_id: orderId,
+                        discount: discount,
+                        promo_code: promoCode,
                         delivery_fee: delFee,
                         setup_fee: setupFee,
                         admin_notes: notes,

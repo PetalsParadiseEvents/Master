@@ -232,9 +232,9 @@ try {
                             <td>Items Subtotal:</td>
                             <td style='text-align: right; font-weight: bold;'>\${$subtotalFmt}</td>
                         </tr>" .
-                        (floatval($orderRecord['discount'] ?? 0) > 0 ? "
+                        (floatval($orderRecord['discount'] ?? 0) > 0 || !empty($orderRecord['promo_code']) ? "
                         <tr style='color: #38a169;'>
-                            <td>Discount Applied:</td>
+                            <td>Coupon / Discount Applied" . (!empty($orderRecord['promo_code']) ? " (" . htmlspecialchars($orderRecord['promo_code']) . ")" : "") . ":</td>
                             <td style='text-align: right; font-weight: bold;'>-\${$discountFmt}</td>
                         </tr>" : "") . "
                         <tr>

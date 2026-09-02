@@ -47,6 +47,9 @@ try {
     $adminNotes  = isset($data['admin_notes']) ? trim($data['admin_notes']) : '';
     $notify      = isset($data['notify']) ? (bool)$data['notify'] : true;
 
+    $hasDiscountInput = isset($data['discount']);
+    $hasPromoInput    = isset($data['promo_code']);
+
     if (empty($orderId)) {
         http_response_code(400);
         echo json_encode(['error' => 'Order ID is required.']);
@@ -65,19 +68,24 @@ try {
             $orderRecord = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($orderRecord) {
-                $subtotal = floatval($orderRecord['subtotal'] ?? 0);
-                $discount = floatval($orderRecord['discount'] ?? 0);
-                $newTotal = max(0, $subtotal - $discount + $deliveryFee + $setupFee);
+                $subtotal  = floatval($orderRecord['subtotal'] ?? 0);
+                $discount  = $hasDiscountInput ? max(0, floatval($data['discount'])) : floatval($orderRecord['discount'] ?? 0);
+                $promoCode = $hasPromoInput ? trim(filter_var($data['promo_code'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : ($orderRecord['promo_code'] ?? '');
+                $newTotal  = max(0, $subtotal - $discount + $deliveryFee + $setupFee);
 
-                $updateStmt = $pdo->prepare("UPDATE `orders` SET `delivery_fee` = :fee, `setup_fee` = :setup, `admin_notes` = :notes, `total` = :total WHERE `id` = :id");
+                $updateStmt = $pdo->prepare("UPDATE `orders` SET `discount` = :discount, `promo_code` = :promo, `delivery_fee` = :fee, `setup_fee` = :setup, `admin_notes` = :notes, `total` = :total WHERE `id` = :id");
                 $updateStmt->execute([
-                    ':fee'   => $deliveryFee,
-                    ':setup' => $setupFee,
-                    ':notes' => $adminNotes,
-                    ':total' => $newTotal,
-                    ':id'    => $orderId
+                    ':discount' => $discount,
+                    ':promo'    => $promoCode,
+                    ':fee'      => $deliveryFee,
+                    ':setup'    => $setupFee,
+                    ':notes'    => $adminNotes,
+                    ':total'    => $newTotal,
+                    ':id'       => $orderId
                 ]);
 
+                $orderRecord['discount']     = $discount;
+                $orderRecord['promo_code']   = $promoCode;
                 $orderRecord['delivery_fee'] = $deliveryFee;
                 $orderRecord['setup_fee']    = $setupFee;
                 $orderRecord['admin_notes']  = $adminNotes;
@@ -96,10 +104,13 @@ try {
             $ordersList = json_decode($fileContent, true) ?: [];
             foreach ($ordersList as &$ord) {
                 if (isset($ord['id']) && $ord['id'] === $orderId) {
-                    $subtotal = floatval($ord['subtotal'] ?? 0);
-                    $discount = floatval($ord['discount'] ?? 0);
-                    $newTotal = max(0, $subtotal - $discount + $deliveryFee + $setupFee);
+                    $subtotal  = floatval($ord['subtotal'] ?? 0);
+                    $discount  = $hasDiscountInput ? max(0, floatval($data['discount'])) : floatval($ord['discount'] ?? 0);
+                    $promoCode = $hasPromoInput ? trim(filter_var($data['promo_code'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : ($ord['promo_code'] ?? '');
+                    $newTotal  = max(0, $subtotal - $discount + $deliveryFee + $setupFee);
 
+                    $ord['discount']     = $discount;
+                    $ord['promo_code']   = $promoCode;
                     $ord['delivery_fee'] = $deliveryFee;
                     $ord['setup_fee']    = $setupFee;
                     $ord['admin_notes']  = $adminNotes;
@@ -198,9 +209,9 @@ try {
                             <td>Items Subtotal:</td>
                             <td style='text-align: right; font-weight: bold;'>\${$subtotalFmt}</td>
                         </tr>" .
-                        (floatval($orderRecord['discount'] ?? 0) > 0 ? "
+                        (floatval($orderRecord['discount'] ?? 0) > 0 || !empty($orderRecord['promo_code']) ? "
                         <tr style='color: #38a169;'>
-                            <td>Discount Applied:</td>
+                            <td>Coupon / Discount Applied" . (!empty($orderRecord['promo_code']) ? " (" . htmlspecialchars($orderRecord['promo_code']) . ")" : "") . ":</td>
                             <td style='text-align: right; font-weight: bold;'>-\${$discountFmt}</td>
                         </tr>" : "") . "
                         <tr>

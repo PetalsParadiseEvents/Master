@@ -199,6 +199,9 @@ function ensureOrderColumnsExist($pdo) {
         if (!in_array('admin_notes', $columns)) {
             $pdo->exec("ALTER TABLE `orders` ADD COLUMN `admin_notes` TEXT");
         }
+        if (!in_array('promo_code', $columns)) {
+            $pdo->exec("ALTER TABLE `orders` ADD COLUMN `promo_code` VARCHAR(128) DEFAULT ''");
+        }
     } catch (Exception $e) {
         // Ignored
     }
