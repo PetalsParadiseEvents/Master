@@ -361,22 +361,27 @@ function getDiscount() {
 }
 
 const PROMOS = {
-    'PETALS5': { min: 100, discount: 5 },
-    'PETALS10': { min: 150, discount: 10 },
-    'PETALS15': { min: 200, discount: 15 },
-    'PETALS20': { min: 300, discount: 20 }
+    'PETALS5':  { min: 0,   discount: 5 },
+    'PETALS10': { min: 50,  discount: 10 },
+    'PETALS15': { min: 100, discount: 15 },
+    'PETALS20': { min: 150, discount: 20 }
 };
 
 function applyPromoCode(code) {
+    if (!code) return;
+    const cleanCode = code.trim().toUpperCase();
     const subtotal = getCartTotal();
-    const promo = PROMOS[code.toUpperCase()];
+    const promo = PROMOS[cleanCode];
     if (promo) {
         if (subtotal >= promo.min) {
-            appliedPromo = code.toUpperCase();
+            appliedPromo = cleanCode;
             saveCart();
             showToast(`Promo ${appliedPromo} applied! $${promo.discount} off.`);
+            if (typeof renderCartModal === 'function') {
+                renderCartModal();
+            }
         } else {
-            showToast(`Min. order for ${code} is $${promo.min}. (Excl. delivery)`);
+            showToast(`Min. order for ${cleanCode} is $${promo.min}. (Excl. delivery)`);
         }
     } else {
         showToast('Invalid promo code.');

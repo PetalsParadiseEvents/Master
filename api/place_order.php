@@ -86,19 +86,20 @@ foreach ($items as $item) {
 $dbSaved = false;
 $pdo = getDbConnection();
 if ($pdo) {
+    ensureOrderColumnsExist($pdo);
     try {
         $stmt = $pdo->prepare("INSERT INTO `orders` (
             `id`, `date_added`, `name`, `email`, `phone`, `event_date`, `venue_location`, 
             `fulfillment_method`, `delivery_address`, 
             `pickup_date`, `pickup_time`, `return_date`, `return_time`, 
             `delivery_date`, `delivery_time`, `collection_date`, `collection_time`, 
-            `special_requests`, `items`, `subtotal`, `discount`, `total`, `status`
+            `special_requests`, `items`, `subtotal`, `discount`, `promo_code`, `total`, `status`
         ) VALUES (
             :id, NOW(), :name, :email, :phone, :event_date, :venue_location, 
             :fulfillment_method, :delivery_address, 
             :pickup_date, :pickup_time, :return_date, :return_time, 
             :delivery_date, :delivery_time, :collection_date, :collection_time, 
-            :special_requests, :items, :subtotal, :discount, :total, 'Pending'
+            :special_requests, :items, :subtotal, :discount, :promo_code, :total, 'Pending'
         )");
         
         $stmt->execute([
@@ -122,6 +123,7 @@ if ($pdo) {
             ':items'              => $itemsJson,
             ':subtotal'           => $subtotal,
             ':discount'           => $discount,
+            ':promo_code'         => $promoCode,
             ':total'              => $total
         ]);
         $dbSaved = true;
@@ -155,6 +157,7 @@ $orderRecord = [
     'items'              => $items,
     'subtotal'           => $subtotal,
     'discount'           => $discount,
+    'promo_code'         => $promoCode,
     'total'              => $total,
     'status'             => 'Pending'
 ];
