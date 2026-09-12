@@ -90,10 +90,24 @@ try {
     $customerName  = $orderRecord['name'] ?? 'Valued Customer';
     $eventDate     = $orderRecord['event_date'] ?? '';
     $fulfillment   = $orderRecord['fulfillment_method'] ?? 'Pickup';
-    $totalFmt      = number_format(floatval($orderRecord['total'] ?? 0), 2);
-    $subtotalFmt   = number_format(floatval($orderRecord['subtotal'] ?? 0), 2);
-    $discountVal   = floatval($orderRecord['discount'] ?? 0);
+    $subtotalVal  = floatval($orderRecord['subtotal'] ?? 0);
+    $discountVal  = floatval($orderRecord['discount'] ?? 0);
+    $deliveryVal  = floatval($orderRecord['delivery_fee'] ?? 0);
+    $setupVal     = floatval($orderRecord['setup_fee'] ?? 0);
+
+    $baseTotal    = max(0, $subtotalVal - $discountVal + $deliveryVal + $setupVal);
+    if ($baseTotal <= 0 && floatval($orderRecord['total'] ?? 0) > 0) {
+        $baseTotal = floatval($orderRecord['total']);
+    }
+
+    $onlineTaxVal  = round($baseTotal * 0.06, 2);
+    $finalTotalVal = round($baseTotal + $onlineTaxVal, 2);
+
+    $subtotalFmt   = number_format($subtotalVal, 2);
     $discountFmt   = number_format($discountVal, 2);
+    $baseTotalFmt  = number_format($baseTotal, 2);
+    $onlineTaxFmt  = number_format($onlineTaxVal, 2);
+    $finalTotalFmt = number_format($finalTotalVal, 2);
     $promoCode     = $orderRecord['promo_code'] ?? '';
 
     if (empty($customerEmail)) {
@@ -117,7 +131,7 @@ try {
 
     // Square link & QR code URLs
     $squarePayUrl = SQUARE_PAYMENT_LINK;
-    $squareQrUrl  = SQUARE_QR_CODE_URL;
+    $squareQrUrl  = defined('SQUARE_QR_CODE_DATA_URI') ? SQUARE_QR_CODE_DATA_URI : SQUARE_QR_CODE_URL;
     $trackUrl     = "https://petalsparadiseevents.com/#track";
 
     // Notes block if provided
@@ -130,7 +144,7 @@ try {
         </div>";
     }
 
-    $subject = "💳 Secure Online Payment Option - Order {$orderId} - Petals Paradise Events";
+    $subject = "💳 Online Payment Request (\${$finalTotalFmt}) - Order {$orderId} - Petals Paradise Events";
 
     $message = "
     <!DOCTYPE html>
@@ -148,6 +162,9 @@ try {
             .pay-btn { display: inline-block; font-size: 18px; line-height: 48px; height: 48px; color: #ffffff !important; min-width: 212px; background-color: #006aff; text-align: center; box-shadow: 0 0 0 1px rgba(0,0,0,.1) inset; border-radius: 6px; text-decoration: none; font-weight: bold; padding: 0 24px; }
             .track-btn { display: inline-block; background-color: #d4af37; color: #ffffff !important; padding: 12px 28px; text-decoration: none; border-radius: 30px; font-weight: bold; font-size: 14px; margin: 15px 0; text-align: center; }
             .qr-card { background: #ffffff; border: 2px solid #006aff; border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+            .price-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+            .price-table td { padding: 5px 0; font-size: 14px; }
+            .price-table tr.total-row { border-top: 2px solid #006aff; font-weight: bold; font-size: 16px; }
             .footer { font-size: 13px; color: #718096; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 15px; text-align: center; }
         </style>
     </head>
@@ -159,13 +176,13 @@ try {
             </div>
             
             <p>Hi <strong>" . htmlspecialchars($customerName) . "</strong>,</p>
-            <p>Here is your secure online payment link for Order <strong>" . htmlspecialchars($orderId) . "</strong>. You can easily complete your payment using Credit Card, Debit Card, or Apple Pay via Square.</p>
+            <p>Here is your secure online payment link for Order <strong>" . htmlspecialchars($orderId) . "</strong>. You can complete your payment using Credit Card, Debit Card, or Apple Pay via Square.</p>
             
             {$notesHtml}
 
             <!-- SQUARE PAYMENT BUTTON -->
             <div style='text-align: center; margin: 25px 0;'>
-                <a href='{$squarePayUrl}' target='_blank' class='pay-btn'>Pay now</a>
+                <a href='{$squarePayUrl}' target='_blank' class='pay-btn'>Pay now (\${$finalTotalFmt})</a>
             </div>
 
             <!-- QR CODE CARD -->
@@ -176,12 +193,26 @@ try {
             </div>
 
             <div class='box'>
-                <h3 style='margin-top:0; color:#2d3748; font-size:16px;'>📋 Summary of Order Details</h3>
-                <p style='margin: 5px 0;'><strong>Confirmation ID:</strong> <span style='font-family: monospace; font-weight: bold; color: #d4af37;'>" . htmlspecialchars($orderId) . "</span></p>
-                " . (!empty($eventDate) ? "<p style='margin: 5px 0;'><strong>Event Date:</strong> " . htmlspecialchars($eventDate) . "</p>" : "") . "
-                <p style='margin: 5px 0;'><strong>Fulfillment Method:</strong> " . htmlspecialchars($fulfillment) . "</p>
-                " . ($discountVal > 0 || !empty($promoCode) ? "<p style='margin: 5px 0; color: #38a169;'><strong>Discount Applied:</strong> -\${$discountFmt}" . (!empty($promoCode) ? " ({$promoCode})" : "") . "</p>" : "") . "
-                <p style='margin: 5px 0; font-size: 16px;'><strong>Total Due:</strong> <span style='color: #d4af37; font-weight: bold;'>\${$totalFmt}</span></p>
+                <h3 style='margin-top:0; color:#2d3748; font-size:16px;'>📋 Financial Breakdown & Final Total</h3>
+                <table class='price-table'>
+                    <tr>
+                        <td>Order Subtotal / Base Total:</td>
+                        <td style='text-align: right; font-weight: bold;'>\${$baseTotalFmt}</td>
+                    </tr>" .
+                    ($discountVal > 0 || !empty($promoCode) ? "
+                    <tr style='color: #38a169;'>
+                        <td>Discount Applied" . (!empty($promoCode) ? " ({$promoCode})" : "") . ":</td>
+                        <td style='text-align: right; font-weight: bold;'>-\${$discountFmt}</td>
+                    </tr>" : "") . "
+                    <tr style='color: #006aff;'>
+                        <td>Online Payment Tax / Fee (6%):</td>
+                        <td style='text-align: right; font-weight: bold;'>+\${$onlineTaxFmt}</td>
+                    </tr>
+                    <tr class='total-row'>
+                        <td style='padding-top: 10px; color: #1a202c;'>Final Amount Due (Online):</td>
+                        <td style='text-align: right; padding-top: 10px; color: #006aff;'>\${$finalTotalFmt}</td>
+                    </tr>
+                </table>
             </div>
 
             <div class='box'>

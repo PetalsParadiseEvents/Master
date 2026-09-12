@@ -954,16 +954,25 @@ if ($format === 'json') {
 
         function showQrModal(orderId, total) {
             currentQrOrderId = orderId;
-            const orderIdEl = document.getElementById('qrModalOrderId');
-            const totalEl   = document.getElementById('qrModalTotal');
-            const msgEl     = document.getElementById('qrModalMsg');
-            const imgEl     = document.getElementById('qrModalImg');
-            const modalEl   = document.getElementById('qrModal');
+            const orderIdEl  = document.getElementById('qrModalOrderId');
+            const baseTotalEl = document.getElementById('qrModalBaseTotal');
+            const taxEl      = document.getElementById('qrModalTax');
+            const totalEl    = document.getElementById('qrModalTotal');
+            const payBtn     = document.getElementById('qrModalPayBtn');
+            const msgEl      = document.getElementById('qrModalMsg');
+            const imgEl      = document.getElementById('qrModalImg');
+            const modalEl    = document.getElementById('qrModal');
 
-            if (orderIdEl) orderIdEl.innerText = orderId;
-            if (totalEl)   totalEl.innerText = '$' + total;
-            if (msgEl)     msgEl.style.display = 'none';
-            if (imgEl)     imgEl.src = '/square-qr-code.png?v=' + Date.now();
+            const numTotal   = parseFloat(total) || 0;
+            const taxAmount  = Math.round(numTotal * 0.06 * 100) / 100;
+            const finalTotal = (numTotal + taxAmount).toFixed(2);
+
+            if (orderIdEl)   orderIdEl.innerText = orderId;
+            if (baseTotalEl) baseTotalEl.innerText = '$' + numTotal.toFixed(2);
+            if (taxEl)       taxEl.innerText = '+$' + taxAmount.toFixed(2);
+            if (totalEl)     totalEl.innerText = '$' + finalTotal;
+            if (payBtn)      payBtn.innerText = 'Pay now ($' + finalTotal + ')';
+            if (msgEl)       msgEl.style.display = 'none';
 
             if (modalEl) {
                 modalEl.style.zIndex = '999999';
@@ -1461,16 +1470,35 @@ if ($format === 'json') {
     </div>
 
     <!-- Square Pay & QR Code Modal -->
-    <div id="qrModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-        <div style="background: var(--card-bg, #1a1a1a); border: 2px solid #006aff; width: 92%; max-width: 440px; border-radius: 16px; padding: 1.5rem; color: var(--text-primary, #fff); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); text-align: center; position: relative;">
+    <div id="qrModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 999999; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+        <div style="background: var(--card-bg, #1e2736); border: 2px solid #006aff; width: 92%; max-width: 440px; border-radius: 16px; padding: 1.5rem; color: var(--text-primary, #fff); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); text-align: center; position: relative;">
             <button onclick="closeQrModal()" style="position: absolute; top: 12px; right: 14px; background: transparent; border: none; color: #888; font-size: 1.4rem; cursor: pointer; line-height: 1;">&times;</button>
-            <h3 style="margin-top: 0; color: #006aff; font-size: 1.25rem;">💳 Square Online Payment</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted, #94a3b8); margin: 0.3rem 0 1rem 0;">Order <strong id="qrModalOrderId" style="color: var(--primary, #d4af37);"></strong> | Total: <strong id="qrModalTotal" style="color: #38a169;"></strong></p>
+            <h3 style="margin-top: 0; color: #006aff; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                💳 Square Online Payment
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted, #94a3b8); margin: 0.3rem 0 0.8rem 0;">
+                Order <strong id="qrModalOrderId" style="color: var(--primary, #d4af37);"></strong>
+            </p>
             
-            <div style="background: #ffffff; padding: 16px; border-radius: 12px; border: 1px solid #cbd5e1; display: inline-block; margin-bottom: 1rem;">
-                <img id="qrModalImg" src="/square-qr-code.png" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https%3A%2F%2Fsquare.link%2Fu%2FxV2eBBtG%3Fsrc%3Dembed';" alt="Official Square Pay QR Code" style="width: 180px; height: 180px; display: block; border-radius: 8px;" />
+            <div style="background: rgba(0,106,255,0.08); border: 1px solid rgba(0,106,255,0.3); border-radius: 10px; padding: 10px 14px; margin-bottom: 1rem; text-align: left; font-size: 0.88rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 3px; color: var(--text-muted, #94a3b8);">
+                    <span>Base Order Amount:</span>
+                    <span id="qrModalBaseTotal" style="font-weight: 600; color: #fff;">$0.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px; color: #38bdf8;">
+                    <span>Online Payment Tax (6%):</span>
+                    <span id="qrModalTax" style="font-weight: 600;">+$0.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-top: 1px dashed var(--border-color, #444); padding-top: 6px; font-weight: bold; font-size: 0.98rem; color: #006aff;">
+                    <span>Final Total Due (Online):</span>
+                    <span id="qrModalTotal">$0.00</span>
+                </div>
             </div>
-            <p style="font-size: 0.78rem; color: var(--text-muted, #94a3b8); margin-bottom: 1rem;">Scan QR code with smartphone camera or click below to open payment link.</p>
+
+            <div style="background: #ffffff; padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; display: inline-block; margin-bottom: 0.8rem;">
+                <img id="qrModalImg" src="<?php echo defined('SQUARE_QR_CODE_DATA_URI') ? SQUARE_QR_CODE_DATA_URI : '/square-qr-code.png'; ?>" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https%3A%2F%2Fsquare.link%2Fu%2FxV2eBBtG%3Fsrc%3Dembed';" alt="Official Square Pay QR Code" style="width: 180px; height: 180px; display: block; border-radius: 8px;" />
+            </div>
+            <p style="font-size: 0.76rem; color: var(--text-muted, #94a3b8); margin-bottom: 1rem;">Scan QR code with phone camera or click Pay Now below.</p>
 
             <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
                 <a id="qrModalPayBtn" href="https://square.link/u/xV2eBBtG?src=embed" target="_blank" style="display: inline-block; font-size: 15px; line-height: 40px; height: 40px; color: #ffffff !important; background-color: #006aff; padding: 0 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">Pay now</a>
