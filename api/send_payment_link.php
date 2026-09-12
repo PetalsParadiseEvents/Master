@@ -100,7 +100,7 @@ try {
         $baseTotal = floatval($orderRecord['total']);
     }
 
-    $onlineTaxVal  = round($baseTotal * 0.06, 2);
+    $onlineTaxVal  = round($baseTotal * 0.059, 2);
     $finalTotalVal = round($baseTotal + $onlineTaxVal, 2);
 
     $subtotalFmt   = number_format($subtotalVal, 2);
@@ -144,7 +144,7 @@ try {
         </div>";
     }
 
-    $subject = "💳 Online Payment Request (\${$finalTotalFmt}) - Order {$orderId} - Petals Paradise Events";
+    $subject = "💳 Payment Request (\${$finalTotalFmt}) - Order {$orderId} - Petals Paradise Events";
 
     $message = "
     <!DOCTYPE html>
@@ -205,11 +205,11 @@ try {
                         <td style='text-align: right; font-weight: bold;'>-\${$discountFmt}</td>
                     </tr>" : "") . "
                     <tr style='color: #006aff;'>
-                        <td>Online Payment Tax / Fee (6%):</td>
+                        <td>VA Sales Tax (5.9%):</td>
                         <td style='text-align: right; font-weight: bold;'>+\${$onlineTaxFmt}</td>
                     </tr>
                     <tr class='total-row'>
-                        <td style='padding-top: 10px; color: #1a202c;'>Final Amount Due (Online):</td>
+                        <td style='padding-top: 10px; color: #1a202c;'>Final Amount Due:</td>
                         <td style='text-align: right; padding-top: 10px; color: #006aff;'>\${$finalTotalFmt}</td>
                     </tr>
                 </table>

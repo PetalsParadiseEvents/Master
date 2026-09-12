@@ -964,7 +964,7 @@ if ($format === 'json') {
             const modalEl    = document.getElementById('qrModal');
 
             const numTotal   = parseFloat(total) || 0;
-            const taxAmount  = Math.round(numTotal * 0.06 * 100) / 100;
+            const taxAmount  = Math.round(numTotal * 0.059 * 100) / 100;
             const finalTotal = (numTotal + taxAmount).toFixed(2);
 
             if (orderIdEl)   orderIdEl.innerText = orderId;
@@ -1486,11 +1486,11 @@ if ($format === 'json') {
                     <span id="qrModalBaseTotal" style="font-weight: 600; color: #fff;">$0.00</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 6px; color: #38bdf8;">
-                    <span>Online Payment Tax (6%):</span>
+                    <span>VA Sales Tax (5.9%):</span>
                     <span id="qrModalTax" style="font-weight: 600;">+$0.00</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; border-top: 1px dashed var(--border-color, #444); padding-top: 6px; font-weight: bold; font-size: 0.98rem; color: #006aff;">
-                    <span>Final Total Due (Online):</span>
+                    <span>Final Amount Due:</span>
                     <span id="qrModalTotal">$0.00</span>
                 </div>
             </div>

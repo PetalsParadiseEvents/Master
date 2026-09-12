@@ -3201,7 +3201,7 @@ window.handleTrackOrder = async function() {
                     <!-- Square Online Payment & QR Code Section -->
                     ${(() => {
                         const baseAmt = parseFloat(order.total || 0);
-                        const taxAmt = Math.round(baseAmt * 0.06 * 100) / 100;
+                        const taxAmt = Math.round(baseAmt * 0.059 * 100) / 100;
                         const finalOnlineTotal = (baseAmt + taxAmt).toFixed(2);
                         return `
                         <div style="background: rgba(0,106,255,0.06); border: 1.5px solid #006aff; border-radius: 12px; padding: 1.2rem; margin-top: 1rem; text-align: center;">
@@ -3218,11 +3218,11 @@ window.handleTrackOrder = async function() {
                                     <span style="font-weight: 600;">$` + baseAmt.toFixed(2) + `</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 6px; color: #006aff;">
-                                    <span>Online Payment Tax / Fee (6%):</span>
+                                    <span>VA Sales Tax (5.9%):</span>
                                     <span style="font-weight: 600;">+$` + taxAmt.toFixed(2) + `</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; border-top: 1px dashed var(--border-color); padding-top: 6px; font-weight: bold; font-size: 1rem; color: #006aff;">
-                                    <span>Final Amount Due (Online):</span>
+                                    <span>Final Amount Due:</span>
                                     <span>$` + finalOnlineTotal + `</span>
                                 </div>
                             </div>
