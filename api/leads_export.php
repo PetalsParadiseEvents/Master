@@ -925,30 +925,38 @@ if ($format === 'json') {
             try {
                 const res = await fetch('send_payment_link.php' + (window.location.search || ''), {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ order_id: orderId })
                 });
-                const data = await res.json();
-                if (data.success) {
+                const rawText = await res.text();
+                let data = {};
+                try {
+                    data = JSON.parse(rawText);
+                } catch(e) {
+                    data = { error: rawText ? rawText.substring(0, 120) : 'Server returned invalid response' };
+                }
+
+                if (res.ok && data.success) {
                     if (payMsgDiv) {
                         payMsgDiv.style.color = '#10b981';
                         payMsgDiv.innerText = '💳 Payment email sent!';
                         setTimeout(() => { payMsgDiv.style.display = 'none'; }, 4000);
                     }
-                    alert('✅ Success: Online payment link & QR Code email sent to ' + data.customer_email);
+                    alert('✅ Success: Online payment link & QR Code email sent to ' + (data.customer_email || 'customer'));
                 } else {
                     if (payMsgDiv) {
                         payMsgDiv.style.color = '#ef4444';
-                        payMsgDiv.innerText = '❌ Failed to send link';
+                        payMsgDiv.innerText = '❌ ' + (data.error || 'Failed to send link');
                     }
-                    alert('⚠️ Error: ' + (data.error || 'Failed to send payment email.'));
+                    alert('⚠️ Error sending payment email: ' + (data.error || 'Failed to send payment email.'));
                 }
             } catch (err) {
                 if (payMsgDiv) {
                     payMsgDiv.style.color = '#ef4444';
                     payMsgDiv.innerText = '❌ Server connection error';
                 }
-                alert('⚠️ Server connection error while sending payment email.');
+                alert('⚠️ Server connection error while sending payment email: ' + err.message);
             }
         }
 

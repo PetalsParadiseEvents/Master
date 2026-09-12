@@ -131,7 +131,7 @@ try {
 
     // Square link & QR code URLs
     $squarePayUrl = SQUARE_PAYMENT_LINK;
-    $squareQrUrl  = defined('SQUARE_QR_CODE_DATA_URI') ? SQUARE_QR_CODE_DATA_URI : SQUARE_QR_CODE_URL;
+    $squareQrUrl  = 'https://petalsparadiseevents.com/square-qr-code.png';
     $trackUrl     = "https://petalsparadiseevents.com/#track";
 
     // Notes block if provided
@@ -242,7 +242,16 @@ try {
              . "Reply-To: contact@petalsparadiseevents.com\r\n"
              . "X-Mailer: PHP/" . phpversion();
 
+    // 1. Send to Customer
     $emailSent = @mail($customerEmail, $subject, $message, $headers);
+
+    // 2. Also send copy to Admin Notification Emails
+    $notifList = json_decode(NOTIFICATION_EMAILS, true) ?: ['contact@petalsparadiseevents.com', 'biragonimounika@gmail.com'];
+    foreach ($notifList as $nEmail) {
+        if (!empty($nEmail) && strtolower($nEmail) !== strtolower($customerEmail)) {
+            @mail($nEmail, "[Admin Copy] " . $subject, $message, $headers);
+        }
+    }
 
     // Update payment_method in database if it was Unpaid
     $updatedStatus = 'Square Pay (Online Link Sent)';
