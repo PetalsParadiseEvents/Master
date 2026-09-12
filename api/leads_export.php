@@ -954,14 +954,26 @@ if ($format === 'json') {
 
         function showQrModal(orderId, total) {
             currentQrOrderId = orderId;
-            document.getElementById('qrModalOrderId').innerText = orderId;
-            document.getElementById('qrModalTotal').innerText = '$' + total;
-            document.getElementById('qrModalMsg').style.display = 'none';
-            document.getElementById('qrModal').style.display = 'flex';
+            const orderIdEl = document.getElementById('qrModalOrderId');
+            const totalEl   = document.getElementById('qrModalTotal');
+            const msgEl     = document.getElementById('qrModalMsg');
+            const imgEl     = document.getElementById('qrModalImg');
+            const modalEl   = document.getElementById('qrModal');
+
+            if (orderIdEl) orderIdEl.innerText = orderId;
+            if (totalEl)   totalEl.innerText = '$' + total;
+            if (msgEl)     msgEl.style.display = 'none';
+            if (imgEl)     imgEl.src = '/square-qr-code.png?v=' + Date.now();
+
+            if (modalEl) {
+                modalEl.style.zIndex = '999999';
+                modalEl.style.display = 'flex';
+            }
         }
 
         function closeQrModal() {
-            document.getElementById('qrModal').style.display = 'none';
+            const modalEl = document.getElementById('qrModal');
+            if (modalEl) modalEl.style.display = 'none';
         }
 
         function copyPaymentLink() {
@@ -1456,7 +1468,7 @@ if ($format === 'json') {
             <p style="font-size: 0.85rem; color: var(--text-muted, #94a3b8); margin: 0.3rem 0 1rem 0;">Order <strong id="qrModalOrderId" style="color: var(--primary, #d4af37);"></strong> | Total: <strong id="qrModalTotal" style="color: #38a169;"></strong></p>
             
             <div style="background: #ffffff; padding: 16px; border-radius: 12px; border: 1px solid #cbd5e1; display: inline-block; margin-bottom: 1rem;">
-                <img id="qrModalImg" src="square-qr-code.png" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https%3A%2F%2Fsquare.link%2Fu%2FxV2eBBtG%3Fsrc%3Dembed';" alt="Official Square Pay QR Code" style="width: 180px; height: 180px; display: block; border-radius: 8px;" />
+                <img id="qrModalImg" src="/square-qr-code.png" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https%3A%2F%2Fsquare.link%2Fu%2FxV2eBBtG%3Fsrc%3Dembed';" alt="Official Square Pay QR Code" style="width: 180px; height: 180px; display: block; border-radius: 8px;" />
             </div>
             <p style="font-size: 0.78rem; color: var(--text-muted, #94a3b8); margin-bottom: 1rem;">Scan QR code with smartphone camera or click below to open payment link.</p>
 

@@ -3211,7 +3211,7 @@ window.handleTrackOrder = async function() {
                                 <a target="_blank" data-url="https://square.link/u/xV2eBBtG?src=embd" href="https://square.link/u/xV2eBBtG?src=embed" onclick="showCheckoutWindow(event, this)" style="display: inline-block; font-size: 18px; line-height: 48px; height: 48px; color: #ffffff !important; min-width: 200px; background-color: #006aff; text-align: center; box-shadow: 0 0 0 1px rgba(0,0,0,.1) inset; border-radius: 6px; text-decoration: none; font-weight: 600;">Pay now</a>
                             </div>
                             <div style="background: #ffffff; padding: 8px; border-radius: 10px; border: 1px solid #cbd5e1; text-align: center;">
-                                <img src="square-qr-code.png" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https%3A%2F%2Fsquare.link%2Fu%2FxV2eBBtG%3Fsrc%3Dembed';" alt="Scan Official Square QR Code to Pay" style="width: 130px; height: 130px; display: block; border-radius: 6px;" />
+                                <img src="/square-qr-code.png" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https%3A%2F%2Fsquare.link%2Fu%2FxV2eBBtG%3Fsrc%3Dembed';" alt="Scan Official Square QR Code to Pay" style="width: 130px; height: 130px; display: block; border-radius: 6px;" />
                                 <span style="font-size: 0.72rem; color: #64748b; margin-top: 4px; display: block; font-weight: 600;">📲 Scan QR with Phone</span>
                             </div>
                         </div>
