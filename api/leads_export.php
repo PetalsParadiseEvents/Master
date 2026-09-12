@@ -974,12 +974,20 @@ if ($format === 'json') {
             const numTotal   = parseFloat(total) || 0;
             const taxAmount  = Math.round(numTotal * 0.059 * 100) / 100;
             const finalTotal = (numTotal + taxAmount).toFixed(2);
+            currentQrFinalTotal = finalTotal;
+            const enterAmtEl = document.getElementById('qrModalEnterAmount');
+
+            const squarePayUrl = 'https://square.link/u/xV2eBBtG?src=embed&amount=' + finalTotal + '&total=' + finalTotal + '&price=' + finalTotal;
 
             if (orderIdEl)   orderIdEl.innerText = orderId;
             if (baseTotalEl) baseTotalEl.innerText = '$' + numTotal.toFixed(2);
             if (taxEl)       taxEl.innerText = '+$' + taxAmount.toFixed(2);
             if (totalEl)     totalEl.innerText = '$' + finalTotal;
-            if (payBtn)      payBtn.innerText = 'Pay now ($' + finalTotal + ')';
+            if (enterAmtEl)  enterAmtEl.innerText = '$' + finalTotal;
+            if (payBtn) {
+                payBtn.innerText = 'Pay now ($' + finalTotal + ')';
+                payBtn.href = squarePayUrl;
+            }
             if (msgEl)       msgEl.style.display = 'none';
 
             if (modalEl) {
@@ -994,7 +1002,7 @@ if ($format === 'json') {
         }
 
         function copyPaymentLink() {
-            const link = "https://square.link/u/xV2eBBtG?src=embed";
+            const link = 'https://square.link/u/xV2eBBtG?src=embed&amount=' + currentQrFinalTotal + '&total=' + currentQrFinalTotal + '&price=' + currentQrFinalTotal;
             navigator.clipboard.writeText(link).then(() => {
                 const msg = document.getElementById('qrModalMsg');
                 msg.style.display = 'block';
@@ -1501,6 +1509,11 @@ if ($format === 'json') {
                     <span>Final Amount Due:</span>
                     <span id="qrModalTotal">$0.00</span>
                 </div>
+            </div>
+
+            <div style="margin: 10px 0 14px 0; background: rgba(0, 106, 255, 0.08); border: 1px solid rgba(0, 106, 255, 0.25); border-radius: 8px; padding: 10px; text-align: center;">
+                <div style="font-size: 0.85rem; font-weight: bold; color: var(--text-primary, #fff);">📌 Amount to enter on Square: <span id="qrModalEnterAmount" style="color: #38bdf8; font-weight: 800; font-size: 1rem;">$0.00</span></div>
+                <div style="font-size: 0.75rem; color: var(--text-muted, #94a3b8); margin-top: 2px;">When redirected, enter this exact amount in the "Enter amount" box on Square.</div>
             </div>
 
             <div style="background: #ffffff; padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; display: inline-block; margin-bottom: 0.8rem;">

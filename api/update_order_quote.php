@@ -139,11 +139,19 @@ try {
     $fulfillment   = $orderRecord['fulfillment_method'] ?? 'Pickup';
     $status        = $orderRecord['status'] ?? 'Pending';
     
+    $baseTotalVal  = floatval($orderRecord['total'] ?? 0);
+    $onlineTaxVal  = round($baseTotalVal * 0.059, 2);
+    $finalTotalVal = round($baseTotalVal + $onlineTaxVal, 2);
+
     $subtotalFmt   = number_format(floatval($orderRecord['subtotal'] ?? 0), 2);
     $discountFmt   = number_format(floatval($orderRecord['discount'] ?? 0), 2);
     $deliveryFmt   = number_format($deliveryFee, 2);
     $setupFmt      = number_format($setupFee, 2);
-    $totalFmt      = number_format(floatval($orderRecord['total'] ?? 0), 2);
+    $baseTotalFmt  = number_format($baseTotalVal, 2);
+    $onlineTaxFmt  = number_format($onlineTaxVal, 2);
+    $finalTotalFmt = number_format($finalTotalVal, 2);
+
+    $squarePayUrl = function_exists('generateSquarePaymentUrl') ? generateSquarePaymentUrl($orderId, $finalTotalVal) : ((defined('SQUARE_PAYMENT_URL') ? SQUARE_PAYMENT_URL : 'https://square.link/u/xV2eBBtG') . '?src=embed&amount=' . urlencode($finalTotalFmt) . '&total=' . urlencode($finalTotalFmt) . '&price=' . urlencode($finalTotalFmt));
 
     $rawItems = $orderRecord['items'] ?? [];
     $itemsArr = is_string($rawItems) ? json_decode($rawItems, true) : (is_array($rawItems) ? $rawItems : []);
@@ -181,12 +189,10 @@ try {
                 .container { max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0; }
                 .header { text-align: center; border-bottom: 2px solid #d4af37; padding-bottom: 15px; margin-bottom: 20px; }
                 .header h2 { color: #1a202c; margin: 0; font-size: 22px; }
-                .status-badge { display: inline-block; background: rgba(212, 175, 55, 0.15); color: #d4af37; border: 1px solid #d4af37; font-weight: bold; padding: 6px 18px; border-radius: 20px; margin-top: 10px; font-size: 14px; }
                 .box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 18px; border-radius: 8px; margin: 18px 0; }
-                .track-btn { display: inline-block; background-color: #d4af37; color: #ffffff !important; padding: 14px 32px; text-decoration: none; border-radius: 30px; font-weight: bold; font-size: 16px; margin: 15px 0; text-align: center; }
-                .price-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-                .price-table td { padding: 6px 0; }
-                .price-table tr.total-row { border-top: 2px dashed #d4af37; font-size: 16px; font-weight: bold; }
+                .price-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+                .price-table td { padding: 5px 0; font-size: 14px; }
+                .price-table tr.total-row { border-top: 2px solid #006aff; font-weight: bold; font-size: 16px; }
                 .footer { font-size: 13px; color: #718096; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 15px; text-align: center; }
             </style>
         </head>
@@ -194,7 +200,7 @@ try {
             <div class='container'>
                 <div class='header'>
                     <h2>🌸 Petals Paradise Events</h2>
-                    <div class='status-badge'>Order ID: " . htmlspecialchars($orderId) . "</div>
+                    <p style='margin:5px 0 0 0; color:#718096; font-size:14px;'>Updated Quote Notice</p>
                 </div>
                 
                 <p>Hi <strong>" . htmlspecialchars($customerName) . "</strong>,</p>
@@ -222,9 +228,17 @@ try {
                             <td>Setup & Installation Fee:</td>
                             <td style='text-align: right; font-weight: bold; color: #d4af37;'>\${$setupFmt}</td>
                         </tr>
+                        <tr style='border-top: 1px solid #cbd5e1;'>
+                            <td>Quote Base Total:</td>
+                            <td style='text-align: right; font-weight: bold;'>\${$baseTotalFmt}</td>
+                        </tr>
+                        <tr style='color: #006aff;'>
+                            <td>VA Sales Tax (5.9%):</td>
+                            <td style='text-align: right; font-weight: bold;'>+\${$onlineTaxFmt}</td>
+                        </tr>
                         <tr class='total-row'>
-                            <td style='padding-top: 10px;'>Final Total Estimate:</td>
-                            <td style='text-align: right; padding-top: 10px; color: #d4af37;'>\${$totalFmt}</td>
+                            <td style='padding-top: 10px;'>Final Amount Due (Online):</td>
+                            <td style='text-align: right; padding-top: 10px; color: #006aff;'>\${$finalTotalFmt}</td>
                         </tr>
                     </table>
                 </div>
@@ -233,8 +247,12 @@ try {
                 <div style='background: #f8fafc; border: 2px solid #006aff; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;'>
                     <h3 style='margin-top:0; color:#006aff; font-size:17px;'>💳 Pay Online via Square</h3>
                     <p style='margin: 6px 0 15px 0; font-size: 14px; color: #475569;'>Click below or scan the QR code with your phone to pay securely using Credit Card, Debit Card, or Apple Pay.</p>
-                    <div style='margin-bottom: 18px;'>
-                        <a href='" . SQUARE_PAYMENT_LINK . "' target='_blank' style='display: inline-block; font-size: 18px; line-height: 48px; height: 48px; color: #ffffff !important; min-width: 212px; background-color: #006aff; text-align: center; box-shadow: 0 0 0 1px rgba(0,0,0,.1) inset; border-radius: 6px; text-decoration: none; font-weight: bold; padding: 0 24px;'>Pay now</a>
+                    <div style='margin-bottom: 12px;'>
+                        <a href='{$squarePayUrl}' target='_blank' style='display: inline-block; font-size: 18px; line-height: 48px; height: 48px; color: #ffffff !important; min-width: 212px; background-color: #006aff; text-align: center; box-shadow: 0 0 0 1px rgba(0,0,0,.1) inset; border-radius: 6px; text-decoration: none; font-weight: bold; padding: 0 24px;'>Pay now (\${$finalTotalFmt})</a>
+                    </div>
+                    <div style='margin: 0 auto 16px auto; max-width: 380px; font-size: 13px; color: #1e293b; font-weight: bold; background: #ffffff; border: 1px solid #bae6fd; padding: 10px 16px; border-radius: 8px;'>
+                        📌 Amount to Enter on Square: <span style='color: #006aff; font-size: 15px; font-weight: 800;'>\${$finalTotalFmt}</span>
+                        <div style='font-weight: normal; font-size: 12px; color: #64748b; margin-top: 2px;'>When Square opens, please enter <strong>\${$finalTotalFmt}</strong> in the \"Enter amount\" box.</div>
                     </div>
                     <div style='display: inline-block; background: #ffffff; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1;'>
                         <img src='" . SQUARE_QR_CODE_URL . "' alt='Scan to Pay via Square' width='160' height='160' style='display: block; border-radius: 6px;' />

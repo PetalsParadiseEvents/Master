@@ -129,10 +129,11 @@ try {
         }
     }
 
-    // Square link & QR code URLs
-    $squarePayUrl = SQUARE_PAYMENT_LINK;
-    $squareQrUrl  = 'https://petalsparadiseevents.com/square-qr-code.png';
-    $trackUrl     = "https://petalsparadiseevents.com/#track";
+    // Square link with pre-filled amount & QR code URLs
+    // Square link with pre-filled amount & QR code URLs
+    $squarePayUrl = function_exists('generateSquarePaymentUrl') ? generateSquarePaymentUrl($orderId, $finalTotalVal) : ((defined('SQUARE_PAYMENT_URL') ? SQUARE_PAYMENT_URL : 'https://square.link/u/xV2eBBtG') . '?src=embed&amount=' . urlencode($finalTotalFmt) . '&total=' . urlencode($finalTotalFmt) . '&price=' . urlencode($finalTotalFmt));
+    $squareQrUrl   = 'https://petalsparadiseevents.com/square-qr-code.png';
+    $trackUrl      = "https://petalsparadiseevents.com/#track";
 
     // Notes block if provided
     $notesHtml = "";
@@ -180,9 +181,13 @@ try {
             
             {$notesHtml}
 
-            <!-- SQUARE PAYMENT BUTTON -->
+            <!-- SQUARE PAYMENT BUTTON & AMOUNT CALLOUT -->
             <div style='text-align: center; margin: 25px 0;'>
                 <a href='{$squarePayUrl}' target='_blank' class='pay-btn'>Pay now (\${$finalTotalFmt})</a>
+                <div style='margin: 14px auto 0 auto; max-width: 400px; font-size: 13px; color: #1e293b; font-weight: bold; background: #f0f9ff; border: 1px solid #bae6fd; padding: 10px 16px; border-radius: 8px;'>
+                    📌 Amount to Enter on Square: <span style='color: #006aff; font-size: 16px; font-weight: 800;'>\${$finalTotalFmt}</span>
+                    <div style='font-weight: normal; font-size: 12px; color: #64748b; margin-top: 3px;'>When Square opens, please enter <strong>\${$finalTotalFmt}</strong> in the "Enter amount" box.</div>
+                </div>
             </div>
 
             <!-- QR CODE CARD -->
