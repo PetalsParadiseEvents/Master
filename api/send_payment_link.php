@@ -204,7 +204,7 @@ try {
                 <a href='{$squarePayUrl}' target='_blank' class='pay-btn'>Pay now (\${$finalTotalFmt})</a>
                 <div style='margin: 14px auto 0 auto; max-width: 400px; font-size: 13px; color: #1e293b; font-weight: bold; background: #f0f9ff; border: 1px solid #bae6fd; padding: 10px 16px; border-radius: 8px;'>
                     📌 Amount to Enter on Square: <span style='color: #006aff; font-size: 16px; font-weight: 800;'>\${$finalTotalFmt}</span>
-                    <div style='font-weight: normal; font-size: 12px; color: #64748b; margin-top: 3px;'>When Square opens, please enter <strong>\${$finalTotalFmt}</strong> in the "Enter amount" box.</div>
+                    <div style='font-weight: normal; font-size: 12px; color: #64748b; margin-top: 3px;'>When Square opens, please enter <strong>\${$finalTotalFmt}</strong> in the 'Enter amount' box.</div>
                 </div>
             </div>
 
