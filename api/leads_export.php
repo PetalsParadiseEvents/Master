@@ -1456,7 +1456,7 @@ if ($format === 'json') {
             <p style="font-size: 0.85rem; color: var(--text-muted, #94a3b8); margin: 0.3rem 0 1rem 0;">Order <strong id="qrModalOrderId" style="color: var(--primary, #d4af37);"></strong> | Total: <strong id="qrModalTotal" style="color: #38a169;"></strong></p>
             
             <div style="background: #ffffff; padding: 16px; border-radius: 12px; border: 1px solid #cbd5e1; display: inline-block; margin-bottom: 1rem;">
-                <img id="qrModalImg" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https%3A%2F%2Fsquare.link%2Fu%2FxV2eBBtG%3Fsrc%3Dembed" alt="Square Pay QR Code" style="width: 180px; height: 180px; display: block; border-radius: 8px;" />
+                <img id="qrModalImg" src="square-qr-code.png" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https%3A%2F%2Fsquare.link%2Fu%2FxV2eBBtG%3Fsrc%3Dembed';" alt="Official Square Pay QR Code" style="width: 180px; height: 180px; display: block; border-radius: 8px;" />
             </div>
             <p style="font-size: 0.78rem; color: var(--text-muted, #94a3b8); margin-bottom: 1rem;">Scan QR code with smartphone camera or click below to open payment link.</p>
 
