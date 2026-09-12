@@ -102,8 +102,8 @@ if (!defined('SQUARE_QR_CODE_URL'))       define('SQUARE_QR_CODE_URL',       'ht
  * (Uses Square API for exact prefilled payment link if token exists, or falls back to prefilled params)
  */
 function generateSquarePaymentUrl($orderId, $finalTotalVal) {
-    $token = defined('SQUARE_ACCESS_TOKEN') ? SQUARE_ACCESS_TOKEN : '';
-    $locId = defined('SQUARE_LOCATION_ID') ? SQUARE_LOCATION_ID : 'LV04RNB7PJKCA';
+    $token = defined('SQUARE_ACCESS_TOKEN') ? trim(SQUARE_ACCESS_TOKEN) : '';
+    $locId = defined('SQUARE_LOCATION_ID') ? trim(SQUARE_LOCATION_ID) : '';
     
     $formattedTotal = number_format((float)$finalTotalVal, 2, '.', '');
     $fallbackBase   = defined('SQUARE_PAYMENT_URL') ? SQUARE_PAYMENT_URL : 'https://square.link/u/xV2eBBtG';
@@ -113,6 +113,32 @@ function generateSquarePaymentUrl($orderId, $finalTotalVal) {
         return $fallbackUrl;
     }
 
+    // 1. Fetch Primary Location ID automatically if needed
+    if (empty($locId) || $locId === 'LV04RNB7PJKCA') {
+        $chLoc = curl_init('https://connect.squareup.com/v2/locations');
+        curl_setopt($chLoc, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . $token,
+            'Content-Type: application/json'
+        ]);
+        curl_setopt($chLoc, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($chLoc, CURLOPT_TIMEOUT, 5);
+        $locResp = curl_exec($chLoc);
+        $locCode = curl_getinfo($chLoc, CURLINFO_HTTP_CODE);
+        curl_close($chLoc);
+
+        if ($locCode === 200 && !empty($locResp)) {
+            $locJson = json_decode($locResp, true);
+            if (!empty($locJson['locations'][0]['id'])) {
+                $locId = $locJson['locations'][0]['id'];
+            }
+        }
+    }
+
+    if (empty($locId)) {
+        $locId = 'LV04RNB7PJKCA';
+    }
+
+    // 2. Create Payment Link via Square Online Checkout API
     $amountCents = (int)round((float)$finalTotalVal * 100);
     $payload = [
         'idempotency_key' => 'ppe_' . preg_replace('/[^a-zA-Z0-9_-]/', '', $orderId) . '_' . time(),
@@ -133,7 +159,6 @@ function generateSquarePaymentUrl($orderId, $finalTotalVal) {
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Square-Version: 2026-08-01',
         'Authorization: Bearer ' . $token,
         'Content-Type: application/json'
     ]);
@@ -144,13 +169,16 @@ function generateSquarePaymentUrl($orderId, $finalTotalVal) {
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
-    if ($httpCode === 200 && !empty($resp)) {
+    if (($httpCode === 200 || $httpCode === 201) && !empty($resp)) {
         $json = json_decode($resp, true);
         if (!empty($json['payment_link']['long_url'])) {
             return $json['payment_link']['long_url'];
         } elseif (!empty($json['payment_link']['url'])) {
             return $json['payment_link']['url'];
         }
+    } else {
+        $logMsg = date('Y-m-d H:i:s') . " - Order {$orderId} - Square API Error (HTTP {$httpCode}): " . $resp . "\n";
+        @file_put_contents(__DIR__ . '/square_debug.log', $logMsg, FILE_APPEND);
     }
 
     return $fallbackUrl;
