@@ -930,11 +930,13 @@ if ($format === 'json') {
                     body: JSON.stringify({ order_id: orderId })
                 });
                 const rawText = await res.text();
+                console.log('send_payment_link raw response:', rawText);
                 let data = {};
                 try {
                     data = JSON.parse(rawText);
                 } catch(e) {
-                    data = { error: rawText ? rawText.substring(0, 120) : 'Server returned invalid response' };
+                    const cleanText = rawText.replace(/<[^>]*>?/gm, '').trim();
+                    data = { error: cleanText ? cleanText.substring(0, 150) : 'Server returned invalid response (empty or non-JSON)' };
                 }
 
                 if (res.ok && data.success) {
@@ -945,11 +947,12 @@ if ($format === 'json') {
                     }
                     alert('✅ Success: Online payment link & QR Code email sent to ' + (data.customer_email || 'customer'));
                 } else {
+                    const errDetail = data.error || 'Failed to send payment email.';
                     if (payMsgDiv) {
                         payMsgDiv.style.color = '#ef4444';
-                        payMsgDiv.innerText = '❌ ' + (data.error || 'Failed to send link');
+                        payMsgDiv.innerText = '❌ ' + errDetail;
                     }
-                    alert('⚠️ Error sending payment email: ' + (data.error || 'Failed to send payment email.'));
+                    alert('⚠️ Error sending payment email: ' + errDetail);
                 }
             } catch (err) {
                 if (payMsgDiv) {

@@ -9,8 +9,6 @@ session_start();
 error_reporting(0);
 ini_set('display_errors', 0);
 
-require_once __DIR__ . '/config.php';
-
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -18,10 +16,12 @@ header('Access-Control-Allow-Headers: Content-Type');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     if (ob_get_length()) ob_clean();
-    exit(0);
+    exit;
 }
 
 try {
+    require_once __DIR__ . '/config.php';
+
     // 1. Admin Authentication
     $adminUser   = ADMIN_USER;
     $adminPass   = ADMIN_PASS;
@@ -34,9 +34,10 @@ try {
     $isAuthenticated = $isBypassed || (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) || $isCookieValid;
 
     if (!$isAuthenticated) {
+        if (ob_get_length()) ob_clean();
         http_response_code(401);
-        echo json_encode(['error' => 'Unauthorized admin access.']);
-        exit(0);
+        echo json_encode(['success' => false, 'error' => 'Unauthorized admin access.']);
+        exit;
     }
 
     // 2. Parse Input Data
@@ -48,9 +49,10 @@ try {
     $emailParam = isset($data['email']) ? trim($data['email']) : (isset($_POST['email']) ? trim($_POST['email']) : '');
 
     if (empty($orderId)) {
+        if (ob_get_length()) ob_clean();
         http_response_code(400);
-        echo json_encode(['error' => 'Order ID is required.']);
-        exit(0);
+        echo json_encode(['success' => false, 'error' => 'Order ID is required.']);
+        exit;
     }
 
     $pdo = getDbConnection();
@@ -83,9 +85,10 @@ try {
     }
 
     if (!$orderRecord) {
+        if (ob_get_length()) ob_clean();
         http_response_code(404);
-        echo json_encode(['error' => "Order {$orderId} not found."]);
-        exit(0);
+        echo json_encode(['success' => false, 'error' => "Order {$orderId} not found."]);
+        exit;
     }
 
     $customerEmail = !empty($emailParam) ? $emailParam : ($orderRecord['email'] ?? '');
@@ -113,9 +116,10 @@ try {
     $promoCode     = $orderRecord['promo_code'] ?? '';
 
     if (empty($customerEmail)) {
+        if (ob_get_length()) ob_clean();
         http_response_code(400);
-        echo json_encode(['error' => "No valid email address found for Order {$orderId}."]);
-        exit(0);
+        echo json_encode(['success' => false, 'error' => "No valid email address found for Order {$orderId}."]);
+        exit;
     }
 
     // Format items list
