@@ -923,20 +923,26 @@ if ($format === 'json') {
             }
 
             try {
-                const res = await fetch('send_payment_link.php' + (window.location.search || ''), {
+                let url = 'send_payment_link.php?order_id=' + encodeURIComponent(orderId);
+                if (window.location.search) {
+                    const cleanSearch = window.location.search.replace(/^\?/, '');
+                    if (cleanSearch) url += '&' + cleanSearch;
+                }
+
+                const res = await fetch(url, {
                     method: 'POST',
                     credentials: 'same-origin',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ order_id: orderId })
                 });
                 const rawText = await res.text();
-                console.log('send_payment_link raw response:', rawText);
+                console.log('send_payment_link raw response (HTTP ' + res.status + '):', rawText);
                 let data = {};
                 try {
                     data = JSON.parse(rawText);
                 } catch(e) {
                     const cleanText = rawText.replace(/<[^>]*>?/gm, '').trim();
-                    data = { error: cleanText ? cleanText.substring(0, 150) : 'Server returned invalid response (empty or non-JSON)' };
+                    data = { error: cleanText ? cleanText.substring(0, 180) : ('Server returned empty/non-JSON response (HTTP ' + res.status + ')') };
                 }
 
                 if (res.ok && data.success) {

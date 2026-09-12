@@ -6,12 +6,24 @@ session_start();
  * Petals Paradise Events
  */
 
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error !== null && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR])) {
+        if (ob_get_length()) ob_clean();
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'error'   => 'PHP Fatal Error: ' . $error['message'] . ' in ' . basename($error['file']) . ' on line ' . $error['line']
+        ], JSON_UNESCAPED_SLASHES);
+    }
+});
+
 error_reporting(0);
 ini_set('display_errors', 0);
 
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -22,13 +34,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     require_once __DIR__ . '/config.php';
 
-    // 1. Admin Authentication
+    // 1. Parse Input Data
+    $rawInput = file_get_contents('php://input');
+    $data     = json_decode($rawInput, true) ?: [];
+
+    // Admin Authentication
     $adminUser   = ADMIN_USER;
     $adminPass   = ADMIN_PASS;
     $adminSecret = ADMIN_SECRET;
     $cookieHash  = md5($adminUser . $adminPass . $adminSecret);
 
-    $providedKey     = isset($_GET['key']) ? $_GET['key'] : (isset($_POST['key']) ? $_POST['key'] : '');
+    $providedKey     = isset($data['key']) ? trim($data['key']) : (isset($_GET['key']) ? $_GET['key'] : (isset($_POST['key']) ? $_POST['key'] : ''));
     $isBypassed      = (!empty($adminSecret) && $providedKey === $adminSecret);
     $isCookieValid   = (isset($_COOKIE['ppe_auth']) && $_COOKIE['ppe_auth'] === $cookieHash);
     $isAuthenticated = $isBypassed || (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) || $isCookieValid;
@@ -40,13 +56,9 @@ try {
         exit;
     }
 
-    // 2. Parse Input Data
-    $rawInput = file_get_contents('php://input');
-    $data     = json_decode($rawInput, true) ?: [];
-
-    $orderId    = isset($data['order_id']) ? trim($data['order_id']) : (isset($_POST['order_id']) ? trim($_POST['order_id']) : '');
-    $customNote = isset($data['notes']) ? trim($data['notes']) : (isset($_POST['notes']) ? trim($_POST['notes']) : '');
-    $emailParam = isset($data['email']) ? trim($data['email']) : (isset($_POST['email']) ? trim($_POST['email']) : '');
+    $orderId    = !empty($data['order_id']) ? trim($data['order_id']) : (!empty($_POST['order_id']) ? trim($_POST['order_id']) : (!empty($_GET['order_id']) ? trim($_GET['order_id']) : ''));
+    $customNote = !empty($data['notes']) ? trim($data['notes']) : (!empty($_POST['notes']) ? trim($_POST['notes']) : (!empty($_GET['notes']) ? trim($_GET['notes']) : ''));
+    $emailParam = !empty($data['email']) ? trim($data['email']) : (!empty($_POST['email']) ? trim($_POST['email']) : (!empty($_GET['email']) ? trim($_GET['email']) : ''));
 
     if (empty($orderId)) {
         if (ob_get_length()) ob_clean();
