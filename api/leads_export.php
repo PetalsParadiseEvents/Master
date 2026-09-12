@@ -969,39 +969,54 @@ if ($format === 'json') {
             }
         }
 
-        function showQrModal(orderId, total) {
+        let currentQrFinalTotal = '0.00';
+        let currentQrPaymentUrl = '';
+
+        async function showQrModal(orderId, total) {
             currentQrOrderId = orderId;
-            const orderIdEl  = document.getElementById('qrModalOrderId');
+            const orderIdEl   = document.getElementById('qrModalOrderId');
             const baseTotalEl = document.getElementById('qrModalBaseTotal');
-            const taxEl      = document.getElementById('qrModalTax');
-            const totalEl    = document.getElementById('qrModalTotal');
-            const payBtn     = document.getElementById('qrModalPayBtn');
-            const msgEl      = document.getElementById('qrModalMsg');
-            const imgEl      = document.getElementById('qrModalImg');
-            const modalEl    = document.getElementById('qrModal');
+            const taxEl       = document.getElementById('qrModalTax');
+            const totalEl     = document.getElementById('qrModalTotal');
+            const payBtn      = document.getElementById('qrModalPayBtn');
+            const msgEl       = document.getElementById('qrModalMsg');
+            const modalEl     = document.getElementById('qrModal');
 
             const numTotal   = parseFloat(total) || 0;
             const taxAmount  = Math.round(numTotal * 0.059 * 100) / 100;
             const finalTotal = (numTotal + taxAmount).toFixed(2);
             currentQrFinalTotal = finalTotal;
-            const enterAmtEl = document.getElementById('qrModalEnterAmount');
+            currentQrPaymentUrl = 'https://square.link/u/xV2eBBtG?src=embed&amount=' + finalTotal + '&total=' + finalTotal + '&price=' + finalTotal;
 
-            const squarePayUrl = 'https://square.link/u/xV2eBBtG?src=embed&amount=' + finalTotal + '&total=' + finalTotal + '&price=' + finalTotal;
+            const enterAmtEl = document.getElementById('qrModalEnterAmount');
 
             if (orderIdEl)   orderIdEl.innerText = orderId;
             if (baseTotalEl) baseTotalEl.innerText = '$' + numTotal.toFixed(2);
             if (taxEl)       taxEl.innerText = '+$' + taxAmount.toFixed(2);
             if (totalEl)     totalEl.innerText = '$' + finalTotal;
             if (enterAmtEl)  enterAmtEl.innerText = '$' + finalTotal;
+
             if (payBtn) {
                 payBtn.innerText = 'Pay now ($' + finalTotal + ')';
-                payBtn.href = squarePayUrl;
+                payBtn.href = currentQrPaymentUrl;
             }
             if (msgEl)       msgEl.style.display = 'none';
 
             if (modalEl) {
                 modalEl.style.zIndex = '999999';
                 modalEl.style.display = 'flex';
+            }
+
+            // Asynchronously fetch exact dynamic Square Checkout API link
+            try {
+                const res = await fetch('get_square_url.php?order_id=' + encodeURIComponent(orderId) + '&total=' + encodeURIComponent(finalTotal));
+                const data = await res.json();
+                if (data.success && data.payment_url) {
+                    currentQrPaymentUrl = data.payment_url;
+                    if (payBtn) payBtn.href = data.payment_url;
+                }
+            } catch (e) {
+                // Fall back gracefully
             }
         }
 
@@ -1011,13 +1026,15 @@ if ($format === 'json') {
         }
 
         function copyPaymentLink() {
-            const link = 'https://square.link/u/xV2eBBtG?src=embed&amount=' + currentQrFinalTotal + '&total=' + currentQrFinalTotal + '&price=' + currentQrFinalTotal;
+            const link = currentQrPaymentUrl || ('https://square.link/u/xV2eBBtG?src=embed&amount=' + currentQrFinalTotal + '&total=' + currentQrFinalTotal + '&price=' + currentQrFinalTotal);
             navigator.clipboard.writeText(link).then(() => {
                 const msg = document.getElementById('qrModalMsg');
-                msg.style.display = 'block';
-                msg.style.color = '#10b981';
-                msg.innerText = '📋 Payment link copied to clipboard!';
-                setTimeout(() => { msg.style.display = 'none'; }, 3000);
+                if (msg) {
+                    msg.style.display = 'block';
+                    msg.style.color = '#10b981';
+                    msg.innerText = '📋 Payment link copied to clipboard!';
+                    setTimeout(() => { msg.style.display = 'none'; }, 3000);
+                }
             }).catch(() => {
                 alert('Payment Link: ' + link);
             });
