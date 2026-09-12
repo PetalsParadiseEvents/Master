@@ -76,6 +76,11 @@ if (!defined('DB_USER'))  define('DB_USER', $dbUser);
 if (!defined('DB_PASS'))  define('DB_PASS', $dbPass);
 if (!defined('DB_TABLE')) define('DB_TABLE', $dbTable);
 
+// Square Online Payment Constants
+if (!defined('SQUARE_PAYMENT_LINK')) define('SQUARE_PAYMENT_LINK', 'https://square.link/u/xV2eBBtG?src=embed');
+if (!defined('SQUARE_PAYMENT_URL'))  define('SQUARE_PAYMENT_URL',  'https://square.link/u/xV2eBBtG');
+if (!defined('SQUARE_QR_CODE_URL'))  define('SQUARE_QR_CODE_URL',  'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode('https://square.link/u/xV2eBBtG?src=embed'));
+
 /**
  * PDO Database Helper Function
  * Connects to Hostinger MySQL Database and auto-creates the clean `leads` table.

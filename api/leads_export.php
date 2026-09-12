@@ -735,9 +735,11 @@ if ($format === 'json') {
                                             <?php
                                             $payMethods = [
                                                 'Unpaid'                           => '💳 Unpaid',
-                                                'Cash'                             => '💵 Cash',
+                                                'Square Pay (Online Link Sent)'     => '💳 Square Pay (Sent)',
+                                                'Square Paid'                      => '✅ Square Paid',
                                                 'Online (Zelle / Venmo / CashApp)' => '📲 Online (Zelle/Venmo)',
                                                 'Credit / Debit Card'             => '💳 Credit/Debit Card',
+                                                'Cash'                             => '💵 Cash',
                                                 'Partial Deposit Paid'             => '💰 Partial Deposit Paid'
                                             ];
                                             foreach ($payMethods as $val => $lbl):
@@ -747,6 +749,15 @@ if ($format === 'json') {
                                             ?>
                                         </select>
                                         <div id="pay-msg-<?php echo htmlspecialchars($order['id']); ?>" style="font-size: 0.72rem; margin-top: 0.25rem; color: #38bdf8; display: none;"></div>
+                                        
+                                        <div style="margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">
+                                            <button onclick="sendPaymentLink('<?php echo htmlspecialchars($order['id']); ?>')" style="font-size: 0.72rem; padding: 4px 6px; background: #006aff; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                                                💳 Send Payment & QR
+                                            </button>
+                                            <button onclick="showQrModal('<?php echo htmlspecialchars($order['id']); ?>', '<?php echo htmlspecialchars(number_format((float)($order['total'] ?? 0), 2)); ?>')" style="font-size: 0.72rem; padding: 3px 6px; background: rgba(0,106,255,0.12); color: #006aff; border: 1px solid rgba(0,106,255,0.3); border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">
+                                                📱 View QR Code
+                                            </button>
+                                        </div>
                                     </td>
 
                                     <td style="white-space: nowrap; width: 160px;">
@@ -898,6 +909,77 @@ if ($format === 'json') {
                     msgDiv.style.color = '#ef4444';
                     msgDiv.innerText = '❌ Server connection error';
                 }
+            }
+        }
+
+        let currentQrOrderId = '';
+
+        async function sendPaymentLink(orderId) {
+            const payMsgDiv = document.getElementById('pay-msg-' + orderId);
+            if (payMsgDiv) {
+                payMsgDiv.style.display = 'block';
+                payMsgDiv.style.color = '#cbd5e1';
+                payMsgDiv.innerText = 'Sending payment email...';
+            }
+
+            try {
+                const res = await fetch('send_payment_link.php' + (window.location.search || ''), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ order_id: orderId })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (payMsgDiv) {
+                        payMsgDiv.style.color = '#10b981';
+                        payMsgDiv.innerText = '💳 Payment email sent!';
+                        setTimeout(() => { payMsgDiv.style.display = 'none'; }, 4000);
+                    }
+                    alert('✅ Success: Online payment link & QR Code email sent to ' + data.customer_email);
+                } else {
+                    if (payMsgDiv) {
+                        payMsgDiv.style.color = '#ef4444';
+                        payMsgDiv.innerText = '❌ Failed to send link';
+                    }
+                    alert('⚠️ Error: ' + (data.error || 'Failed to send payment email.'));
+                }
+            } catch (err) {
+                if (payMsgDiv) {
+                    payMsgDiv.style.color = '#ef4444';
+                    payMsgDiv.innerText = '❌ Server connection error';
+                }
+                alert('⚠️ Server connection error while sending payment email.');
+            }
+        }
+
+        function showQrModal(orderId, total) {
+            currentQrOrderId = orderId;
+            document.getElementById('qrModalOrderId').innerText = orderId;
+            document.getElementById('qrModalTotal').innerText = '$' + total;
+            document.getElementById('qrModalMsg').style.display = 'none';
+            document.getElementById('qrModal').style.display = 'flex';
+        }
+
+        function closeQrModal() {
+            document.getElementById('qrModal').style.display = 'none';
+        }
+
+        function copyPaymentLink() {
+            const link = "https://square.link/u/xV2eBBtG?src=embed";
+            navigator.clipboard.writeText(link).then(() => {
+                const msg = document.getElementById('qrModalMsg');
+                msg.style.display = 'block';
+                msg.style.color = '#10b981';
+                msg.innerText = '📋 Payment link copied to clipboard!';
+                setTimeout(() => { msg.style.display = 'none'; }, 3000);
+            }).catch(() => {
+                alert('Payment Link: ' + link);
+            });
+        }
+
+        function sendPaymentLinkFromModal() {
+            if (currentQrOrderId) {
+                sendPaymentLink(currentQrOrderId);
             }
         }
 
@@ -1363,6 +1445,27 @@ if ($format === 'json') {
                 <button onclick="saveSubstitutedItems(true)" style="font-size: 0.85rem; padding: 0.6rem 1.2rem; background: var(--primary); color: #000; font-weight: bold; border-radius: 8px; border: none; cursor: pointer;">✉️ Save &amp; Send Replacement Quote Email</button>
             </div>
             <div id="modalMsg" style="margin-top: 0.8rem; font-size: 0.8rem; text-align: center; display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Square Pay & QR Code Modal -->
+    <div id="qrModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+        <div style="background: var(--card-bg, #1a1a1a); border: 2px solid #006aff; width: 92%; max-width: 440px; border-radius: 16px; padding: 1.5rem; color: var(--text-primary, #fff); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); text-align: center; position: relative;">
+            <button onclick="closeQrModal()" style="position: absolute; top: 12px; right: 14px; background: transparent; border: none; color: #888; font-size: 1.4rem; cursor: pointer; line-height: 1;">&times;</button>
+            <h3 style="margin-top: 0; color: #006aff; font-size: 1.25rem;">💳 Square Online Payment</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted, #94a3b8); margin: 0.3rem 0 1rem 0;">Order <strong id="qrModalOrderId" style="color: var(--primary, #d4af37);"></strong> | Total: <strong id="qrModalTotal" style="color: #38a169;"></strong></p>
+            
+            <div style="background: #ffffff; padding: 16px; border-radius: 12px; border: 1px solid #cbd5e1; display: inline-block; margin-bottom: 1rem;">
+                <img id="qrModalImg" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https%3A%2F%2Fsquare.link%2Fu%2FxV2eBBtG%3Fsrc%3Dembed" alt="Square Pay QR Code" style="width: 180px; height: 180px; display: block; border-radius: 8px;" />
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted, #94a3b8); margin-bottom: 1rem;">Scan QR code with smartphone camera or click below to open payment link.</p>
+
+            <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                <a id="qrModalPayBtn" href="https://square.link/u/xV2eBBtG?src=embed" target="_blank" style="display: inline-block; font-size: 15px; line-height: 40px; height: 40px; color: #ffffff !important; background-color: #006aff; padding: 0 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">Pay now</a>
+                <button onclick="copyPaymentLink()" style="font-size: 14px; padding: 0 16px; height: 40px; background: transparent; color: var(--text-primary, #fff); border: 1px solid var(--border-color, #444); border-radius: 6px; cursor: pointer; font-weight: 600;">📋 Copy Link</button>
+                <button onclick="sendPaymentLinkFromModal()" id="qrModalSendBtn" style="font-size: 14px; padding: 0 16px; height: 40px; background: var(--primary, #d4af37); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">✉️ Send Email</button>
+            </div>
+            <div id="qrModalMsg" style="font-size: 0.8rem; margin-top: 0.8rem; display: none;"></div>
         </div>
     </div>
 </body>

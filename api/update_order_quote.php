@@ -229,6 +229,19 @@ try {
                     </table>
                 </div>
 
+                <!-- SQUARE ONLINE PAYMENT & QR CODE -->
+                <div style='background: #f8fafc; border: 2px solid #006aff; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;'>
+                    <h3 style='margin-top:0; color:#006aff; font-size:17px;'>💳 Pay Online via Square</h3>
+                    <p style='margin: 6px 0 15px 0; font-size: 14px; color: #475569;'>Click below or scan the QR code with your phone to pay securely using Credit Card, Debit Card, or Apple Pay.</p>
+                    <div style='margin-bottom: 18px;'>
+                        <a href='" . SQUARE_PAYMENT_LINK . "' target='_blank' style='display: inline-block; font-size: 18px; line-height: 48px; height: 48px; color: #ffffff !important; min-width: 212px; background-color: #006aff; text-align: center; box-shadow: 0 0 0 1px rgba(0,0,0,.1) inset; border-radius: 6px; text-decoration: none; font-weight: bold; padding: 0 24px;'>Pay now</a>
+                    </div>
+                    <div style='display: inline-block; background: #ffffff; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1;'>
+                        <img src='" . SQUARE_QR_CODE_URL . "' alt='Scan to Pay via Square' width='160' height='160' style='display: block; border-radius: 6px;' />
+                        <span style='font-size: 11px; color: #64748b; margin-top: 4px; display: block;'>Scan with Phone Camera</span>
+                    </div>
+                </div>
+
                 <div class='box'>
                     <h3 style='margin-top:0; color:#2d3748; font-size:16px;'>🛍️ Requested Items</h3>
                     <ul style='padding-left: 20px; margin-bottom: 0;'>" . 

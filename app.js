@@ -3197,6 +3197,25 @@ window.handleTrackOrder = async function() {
                             <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1rem; color: var(--primary-color); border-top: 1px solid var(--border-color); padding-top: 0.4rem; margin-top: 0.2rem;"><span>Total Estimate:</span> <span>$${parseFloat(order.total || 0).toFixed(2)}</span></div>
                         </div>
                     </div>
+
+                    <!-- Square Online Payment & QR Code Section -->
+                    <div style="background: rgba(0,106,255,0.06); border: 1.5px solid #006aff; border-radius: 12px; padding: 1.2rem; margin-top: 1rem; text-align: center;">
+                        <h4 style="color: #006aff; margin-top: 0; margin-bottom: 0.4rem; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                            💳 Pay Online via Square
+                        </h4>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 1rem 0;">
+                            Securely complete your payment online using Credit Card, Debit Card, or Apple Pay.
+                        </p>
+                        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1.2rem;">
+                            <div style="padding: 10px; background: #FFFFFF; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 10px; box-shadow: var(--shadow-sm);">
+                                <a target="_blank" data-url="https://square.link/u/xV2eBBtG?src=embd" href="https://square.link/u/xV2eBBtG?src=embed" onclick="showCheckoutWindow(event, this)" style="display: inline-block; font-size: 18px; line-height: 48px; height: 48px; color: #ffffff !important; min-width: 200px; background-color: #006aff; text-align: center; box-shadow: 0 0 0 1px rgba(0,0,0,.1) inset; border-radius: 6px; text-decoration: none; font-weight: 600;">Pay now</a>
+                            </div>
+                            <div style="background: #ffffff; padding: 8px; border-radius: 10px; border: 1px solid #cbd5e1; text-align: center;">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https%3A%2F%2Fsquare.link%2Fu%2FxV2eBBtG%3Fsrc%3Dembed" alt="Scan QR Code to Pay" style="width: 130px; height: 130px; display: block; border-radius: 6px;" />
+                                <span style="font-size: 0.72rem; color: #64748b; margin-top: 4px; display: block; font-weight: 600;">📲 Scan QR with Phone</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `;
         }).join('');
@@ -3207,5 +3226,29 @@ window.handleTrackOrder = async function() {
         const errDetail = err && err.message ? err.message : '';
         resultArea.innerHTML = `<p style="color: #ef4444; text-align: center;">❌ Connection error: ${escapeHtml(errDetail || 'Unable to reach order server')}. Please try again.</p>`;
     }
+};
+
+window.showCheckoutWindow = function(e, btn) {
+    if (e && e.preventDefault) e.preventDefault();
+    const target = btn || (e ? e.currentTarget : null);
+    const url = target ? (target.getAttribute('data-url') || target.getAttribute('href')) : 'https://square.link/u/xV2eBBtG?src=embed';
+    const title = 'Square Payment Links';
+
+    const topWindow = window.top ? window.top : window;
+    const dualScreenLeft = topWindow.screenLeft !== undefined ? topWindow.screenLeft : topWindow.screenX;
+    const dualScreenTop = topWindow.screenTop !== undefined ? topWindow.screenTop : topWindow.screenY;
+
+    const width = topWindow.innerWidth ? topWindow.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+    const height = topWindow.innerHeight ? topWindow.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+
+    const h = height * 0.75;
+    const w = 500;
+
+    const systemZoom = width / topWindow.screen.availWidth;
+    const left = (width - w) / 2 / systemZoom + dualScreenLeft;
+    const top = (height - h) / 2 / systemZoom + dualScreenTop;
+    const newWindow = window.open(url, title, `scrollbars=yes, width=${w / systemZoom}, height=${h / systemZoom}, top=${top}, left=${left}`);
+
+    if (window.focus && newWindow) newWindow.focus();
 };
 
