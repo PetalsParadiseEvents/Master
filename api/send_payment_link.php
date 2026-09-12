@@ -1,4 +1,5 @@
 <?php
+ob_start();
 session_start();
 /**
  * Send Online Payment Link & QR Code Email API
@@ -16,6 +17,7 @@ header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    if (ob_get_length()) ob_clean();
     exit(0);
 }
 
@@ -282,6 +284,7 @@ try {
         }
     }
 
+    if (ob_get_length()) ob_clean();
     echo json_encode([
         'success'        => true,
         'order_id'       => $orderId,
@@ -292,7 +295,8 @@ try {
         'message'        => "Online payment link & QR Code email sent successfully to {$customerEmail}."
     ]);
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
+    if (ob_get_length()) ob_clean();
     http_response_code(500);
     echo json_encode(['error' => 'Server error sending payment link: ' . $e->getMessage()]);
 }

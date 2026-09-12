@@ -81,10 +81,20 @@ $squareToken = '';
 $squareLocId = 'LV04RNB7PJKCA';
 
 if (file_exists($secretsFile)) {
-    $sec = require $secretsFile;
+    $sec = @include $secretsFile;
     if (is_array($sec)) {
         if (!empty($sec['SQUARE_ACCESS_TOKEN'])) $squareToken = $sec['SQUARE_ACCESS_TOKEN'];
         if (!empty($sec['SQUARE_LOCATION_ID']))  $squareLocId = $sec['SQUARE_LOCATION_ID'];
+    }
+    if (defined('SQUARE_ACCESS_TOKEN') && !empty(SQUARE_ACCESS_TOKEN)) {
+        $squareToken = SQUARE_ACCESS_TOKEN;
+    } elseif (isset($SQUARE_ACCESS_TOKEN) && !empty($SQUARE_ACCESS_TOKEN)) {
+        $squareToken = $SQUARE_ACCESS_TOKEN;
+    }
+    if (defined('SQUARE_LOCATION_ID') && !empty(SQUARE_LOCATION_ID)) {
+        $squareLocId = SQUARE_LOCATION_ID;
+    } elseif (isset($SQUARE_LOCATION_ID) && !empty($SQUARE_LOCATION_ID)) {
+        $squareLocId = $SQUARE_LOCATION_ID;
     }
 }
 if (!empty($_SERVER['SQUARE_ACCESS_TOKEN'])) $squareToken = $_SERVER['SQUARE_ACCESS_TOKEN'];
