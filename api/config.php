@@ -17,76 +17,69 @@ $notificationEmails = [
     'contact@petalsparadiseevents.com',
     'biragonimounika@gmail.com'
 ];
-$apiKey = '';
+$apiKey      = '';
 
 // Database Defaults (Hostinger phpMyAdmin)
-$dbHost  = 'localhost';
-$dbName  = 'u704222898_ParadiseDB';
-$dbUser  = '';
-$dbPass  = '';
-$dbTable = 'leads';
+$dbHost      = 'localhost';
+$dbName      = 'u704222898_ParadiseDB';
+$dbUser      = '';
+$dbPass      = '';
+$dbTable     = 'leads';
+
+// Square Defaults
+$squareToken = '';
+$squareLocId = 'LV04RNB7PJKCA';
 
 // 2. Load secrets from gitignored secrets.php if present on server
 $secretsFile = __DIR__ . '/secrets.php';
 if (file_exists($secretsFile)) {
-    $secResult = include $secretsFile;
+    $secResult = @include $secretsFile;
     if (is_array($secResult)) {
-        if (!empty($secResult['ADMIN_USER']))          $adminUser = $secResult['ADMIN_USER'];
-        if (!empty($secResult['ADMIN_PASS']))          $adminPass = $secResult['ADMIN_PASS'];
+        if (!empty($secResult['ADMIN_USER']))          $adminUser   = $secResult['ADMIN_USER'];
+        if (!empty($secResult['ADMIN_PASS']))          $adminPass   = $secResult['ADMIN_PASS'];
         if (!empty($secResult['ADMIN_SECRET']))        $adminSecret = $secResult['ADMIN_SECRET'];
         if (!empty($secResult['NOTIFICATION_EMAILS']))  $notificationEmails = (array)$secResult['NOTIFICATION_EMAILS'];
-        if (!empty($secResult['GEMINI_API_KEY']))      $apiKey = $secResult['GEMINI_API_KEY'];
+        if (!empty($secResult['GEMINI_API_KEY']))      $apiKey      = $secResult['GEMINI_API_KEY'];
         
-        // Database secrets
-        if (!empty($secResult['DB_HOST']))  $dbHost = $secResult['DB_HOST'];
-        if (!empty($secResult['DB_NAME']))  $dbName = $secResult['DB_NAME'];
-        if (!empty($secResult['DB_USER']))  $dbUser = $secResult['DB_USER'];
-        if (!empty($secResult['DB_PASS']))  $dbPass = $secResult['DB_PASS'];
+        if (!empty($secResult['DB_HOST']))  $dbHost  = $secResult['DB_HOST'];
+        if (!empty($secResult['DB_NAME']))  $dbName  = $secResult['DB_NAME'];
+        if (!empty($secResult['DB_USER']))  $dbUser  = $secResult['DB_USER'];
+        if (!empty($secResult['DB_PASS']))  $dbPass  = $secResult['DB_PASS'];
         if (!empty($secResult['DB_TABLE'])) $dbTable = $secResult['DB_TABLE'];
 
-        // Square secrets
         if (!empty($secResult['SQUARE_ACCESS_TOKEN'])) $squareToken = $secResult['SQUARE_ACCESS_TOKEN'];
         if (!empty($secResult['SQUARE_LOCATION_ID']))  $squareLocId = $secResult['SQUARE_LOCATION_ID'];
     }
 
-    // Check for defined constants or variables set inside secrets.php
-    if (defined('ADMIN_USER') && !empty(ADMIN_USER))          $adminUser = ADMIN_USER;
-    elseif (isset($ADMIN_USER) && !empty($ADMIN_USER))         $adminUser = $ADMIN_USER;
+    // Check for defined constants (safe with constant() in PHP 7 & 8)
+    if (defined('ADMIN_USER') && constant('ADMIN_USER') !== '')          $adminUser   = constant('ADMIN_USER');
+    if (defined('ADMIN_PASS') && constant('ADMIN_PASS') !== '')          $adminPass   = constant('ADMIN_PASS');
+    if (defined('ADMIN_SECRET') && constant('ADMIN_SECRET') !== '')      $adminSecret = constant('ADMIN_SECRET');
 
-    if (defined('ADMIN_PASS') && !empty(ADMIN_PASS))          $adminPass = ADMIN_PASS;
-    elseif (isset($ADMIN_PASS) && !empty($ADMIN_PASS))         $adminPass = $ADMIN_PASS;
+    if (defined('SQUARE_ACCESS_TOKEN') && constant('SQUARE_ACCESS_TOKEN') !== '') $squareToken = constant('SQUARE_ACCESS_TOKEN');
+    if (defined('SQUARE_LOCATION_ID') && constant('SQUARE_LOCATION_ID') !== '')   $squareLocId = constant('SQUARE_LOCATION_ID');
 
-    if (defined('ADMIN_SECRET') && !empty(ADMIN_SECRET))      $adminSecret = ADMIN_SECRET;
-    elseif (isset($ADMIN_SECRET) && !empty($ADMIN_SECRET))     $adminSecret = $ADMIN_SECRET;
+    if (defined('GEMINI_API_KEY') && constant('GEMINI_API_KEY') !== '')  $apiKey  = constant('GEMINI_API_KEY');
 
-    if (defined('SQUARE_ACCESS_TOKEN') && !empty(SQUARE_ACCESS_TOKEN)) $squareToken = SQUARE_ACCESS_TOKEN;
-    elseif (isset($SQUARE_ACCESS_TOKEN) && !empty($SQUARE_ACCESS_TOKEN)) $squareToken = $SQUARE_ACCESS_TOKEN;
+    if (defined('DB_HOST') && constant('DB_HOST') !== '')  $dbHost  = constant('DB_HOST');
+    if (defined('DB_NAME') && constant('DB_NAME') !== '')  $dbName  = constant('DB_NAME');
+    if (defined('DB_USER') && constant('DB_USER') !== '')  $dbUser  = constant('DB_USER');
+    if (defined('DB_PASS') && constant('DB_PASS') !== '')  $dbPass  = constant('DB_PASS');
 
-    if (defined('SQUARE_LOCATION_ID') && !empty(SQUARE_LOCATION_ID))   $squareLocId = SQUARE_LOCATION_ID;
-    elseif (isset($SQUARE_LOCATION_ID) && !empty($SQUARE_LOCATION_ID))   $squareLocId = $SQUARE_LOCATION_ID;
-
-    if (defined('GEMINI_API_KEY') && !empty(GEMINI_API_KEY))  $apiKey = GEMINI_API_KEY;
-    elseif (isset($GEMINI_API_KEY) && !empty($GEMINI_API_KEY)) $apiKey = $GEMINI_API_KEY;
-
-    if (defined('DB_HOST') && !empty(DB_HOST))  $dbHost = DB_HOST;
-    elseif (isset($DB_HOST) && !empty($DB_HOST)) $dbHost = $DB_HOST;
-
-    if (defined('DB_NAME') && !empty(DB_NAME))  $dbName = DB_NAME;
-    elseif (isset($DB_NAME) && !empty($DB_NAME)) $dbName = $DB_NAME;
-
-    if (defined('DB_USER') && !empty(DB_USER))  $dbUser = DB_USER;
-    elseif (isset($DB_USER) && !empty($DB_USER)) $dbUser = $DB_USER;
-
-    if (defined('DB_PASS') && !empty(DB_PASS))  $dbPass = DB_PASS;
-    elseif (isset($DB_PASS) && !empty($DB_PASS)) $dbPass = $DB_PASS;
+    // Check for global variables if secrets.php defined $SQUARE_ACCESS_TOKEN = '...'
+    if (isset($SQUARE_ACCESS_TOKEN) && !empty($SQUARE_ACCESS_TOKEN)) $squareToken = $SQUARE_ACCESS_TOKEN;
+    if (isset($SQUARE_LOCATION_ID) && !empty($SQUARE_LOCATION_ID))   $squareLocId = $SQUARE_LOCATION_ID;
+    if (isset($ADMIN_USER) && !empty($ADMIN_USER))                   $adminUser   = $ADMIN_USER;
+    if (isset($ADMIN_PASS) && !empty($ADMIN_PASS))                   $adminPass   = $ADMIN_PASS;
+    if (isset($ADMIN_SECRET) && !empty($ADMIN_SECRET))               $adminSecret = $ADMIN_SECRET;
 }
 
 // 3. Fallback check for Environment Variables
-if (!empty($_SERVER['ADMIN_USER']))   $adminUser = $_SERVER['ADMIN_USER'];
-if (!empty($_SERVER['ADMIN_PASS']))   $adminPass = $_SERVER['ADMIN_PASS'];
-if (!empty($_SERVER['DB_USER']))     $dbUser = $_SERVER['DB_USER'];
-if (!empty($_SERVER['DB_PASS']))     $dbPass = $_SERVER['DB_PASS'];
-if (!empty($_SERVER['DB_NAME']))     $dbName = $_SERVER['DB_NAME'];
+if (!empty($_SERVER['ADMIN_USER']))          $adminUser   = $_SERVER['ADMIN_USER'];
+if (!empty($_SERVER['ADMIN_PASS']))          $adminPass   = $_SERVER['ADMIN_PASS'];
+if (!empty($_SERVER['DB_USER']))            $dbUser      = $_SERVER['DB_USER'];
+if (!empty($_SERVER['DB_PASS']))            $dbPass      = $_SERVER['DB_PASS'];
+if (!empty($_SERVER['DB_NAME']))            $dbName      = $_SERVER['DB_NAME'];
 if (!empty($_SERVER['SQUARE_ACCESS_TOKEN'])) $squareToken = $_SERVER['SQUARE_ACCESS_TOKEN'];
 if (!empty($_SERVER['SQUARE_LOCATION_ID']))  $squareLocId = $_SERVER['SQUARE_LOCATION_ID'];
 
