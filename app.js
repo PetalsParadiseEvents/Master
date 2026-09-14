@@ -529,16 +529,17 @@ function renderBanner() {
         <div class="promo-banner">
             <div class="ticker-wrap">
                 <div class="ticker">
-                    <span class="ticker-item">☀️ SUMMER CELEBRATION SPECIAL ☀️</span>
-                    <span class="ticker-item">✨ CELEBRATE EVERY MOMENT THIS SUMMER! ✨</span>
-                    <span class="ticker-item">🌸 WEDDINGS • BIRTHDAYS • BABY SHOWERS • CORPORATE EVENTS 🌸</span>
-                    <span class="ticker-item">📞 QUESTIONS? CALL US AT +1 848-448-6993</span>
-                    <span class="ticker-item">🚚 WE OFFER DELIVERY & PICKUP OPTIONS! 🚚</span>
+                    <span class="ticker-item">🍂 FALL 2026 SPECIAL: 15% OFF OUTDOOR TENTS & FALL BACKDROPS 🍂</span>
+                    <span class="ticker-item">🍁 CELEBRATE AUTUMN IN STYLE • WEDDINGS • HALDI &amp; MEHNDI • BIRTHDAYS • BABY SHOWERS 🍁</span>
+                    <span class="ticker-item">🌾 WARM AMBER BACKDROPS, MARQUEE LIGHTS &amp; HARVEST DECOR 🌾</span>
+                    <span class="ticker-item">✨ FREE DELIVERY ON ORDERS OVER $200 IN LOUDOUN COUNTY &amp; DMV! ✨</span>
+                    <span class="ticker-item">📞 QUESTIONS &amp; CUSTOM FALL QUOTES: CALL OR TEXT +1 848-448-6993</span>
                     <!-- Duplicate for seamless loop -->
-                    <span class="ticker-item">☀️ SUMMER CELEBRATION SPECIAL ☀️</span>
-                    <span class="ticker-item">✨ CELEBRATE EVERY MOMENT THIS SUMMER! ✨</span>
-                    <span class="ticker-item">🌸 WEDDINGS • BIRTHDAYS • BABY SHOWERS • CORPORATE EVENTS 🌸</span>
-                    <span class="ticker-item">📞 QUESTIONS? CALL US AT +1 848-448-6993</span>
+                    <span class="ticker-item">🍂 FALL 2026 SPECIAL: 15% OFF OUTDOOR TENTS & FALL BACKDROPS 🍂</span>
+                    <span class="ticker-item">🍁 CELEBRATE AUTUMN IN STYLE • WEDDINGS • HALDI &amp; MEHNDI • BIRTHDAYS • BABY SHOWERS 🍁</span>
+                    <span class="ticker-item">🌾 WARM AMBER BACKDROPS, MARQUEE LIGHTS &amp; HARVEST DECOR 🌾</span>
+                    <span class="ticker-item">✨ FREE DELIVERY ON ORDERS OVER $200 IN LOUDOUN COUNTY &amp; DMV! ✨</span>
+                    <span class="ticker-item">📞 QUESTIONS &amp; CUSTOM FALL QUOTES: CALL OR TEXT +1 848-448-6993</span>
                 </div>
             </div>
         </div>
@@ -725,12 +726,150 @@ function renderHome() {
         <!-- HERO -->
         <section class="hero">
             <div class="hero-content">
-                <div class="hero-eyebrow">🌸 Serving Loudoun County &amp; the DMV Since 2025</div>
+                <div class="hero-eyebrow">🍂 Fall 2026 Season Specials · Serving Loudoun &amp; DMV</div>
                 <h1>Your Celebration Partner,<br>For Every Chapter of Life</h1>
                 <p>From your baby's first birthday to your dream wedding — Petals Paradise Events is with you at every milestone. One team. One call. Every celebration.</p>
                 <div class="hero-btns">
                     <a href="#rentals" class="btn btn-primary">Explore Rentals</a>
-                    <a href="#contact" class="btn btn-outline">✨ Plan My Event</a>
+                    <a href="#fall-specials" class="btn btn-outline">🍂 Fall Specials &amp; Estimator</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- FALL 2026 SEASON SPECIALS & INTERACTIVE ESTIMATOR -->
+        <section class="fall-specials-section" id="fall-specials">
+            <div class="container">
+                <div class="text-center">
+                    <span class="fall-badge">🍂 Fall 2026 Season Specials</span>
+                    <h2 class="section-title">Celebrate Autumn With Petals Paradise</h2>
+                    <p class="section-subtitle">Discover curated Fall Event décor packages &amp; calculate your custom party rental estimate in real-time.</p>
+                </div>
+
+                <!-- FALL FEATURED PACKAGES GRID -->
+                <div class="fall-packages-grid">
+                    <div class="fall-package-card">
+                        <div class="fall-card-tag">🍁 Fall Wedding &amp; Gala</div>
+                        <h3>Autumn Golden Elegance</h3>
+                        <p class="fall-card-desc">Warm amber drape backdrop, 16×26 ft wedding tent, 50 adult chairs, round banquet tables &amp; hand-carved accent seating.</p>
+                        <div class="fall-card-price">
+                            <span class="fall-price-num">$399</span>
+                            <span class="fall-price-saving">Save $80 · Limited Season Offer</span>
+                        </div>
+                        <ul class="fall-package-features">
+                            <li>✨ 16×26 ft Outdoor Wedding Tent</li>
+                            <li>✨ Pipe &amp; Drape Warm Amber Backdrop</li>
+                            <li>✨ 50 Adult Folding Chairs + Round Tables</li>
+                            <li>✨ Hand-Carved Accent Chair + Full Setup</li>
+                        </ul>
+                        <button type="button" class="btn btn-primary fall-book-btn" onclick="selectFallPackage('Autumn Golden Wedding', 399)">Book Fall Wedding Package →</button>
+                    </div>
+
+                    <div class="fall-package-card fall-card-featured">
+                        <div class="fall-featured-label">Popular Fall Choice</div>
+                        <div class="fall-card-tag">🌾 Traditional Autumn Ceremonies</div>
+                        <h3>Autumn Haldi &amp; Mehndi Setup</h3>
+                        <p class="fall-card-desc">Authentic Haldi Urli / Maiyan Tub, vibrant Mehandi Umbrella Set (10 pcs), pipe &amp; drape backdrop, buffet warmers &amp; easel.</p>
+                        <div class="fall-card-price">
+                            <span class="fall-price-num">$275</span>
+                            <span class="fall-price-saving">Save $50 · Complete Ceremony Kit</span>
+                        </div>
+                        <ul class="fall-package-features">
+                            <li>✨ Premium Haldi Urli / Maiyan Tub ($125 value)</li>
+                            <li>✨ 10 Handcrafted Mehandi Umbrellas</li>
+                            <li>✨ Photo / Event Drape Backdrop ($150 value)</li>
+                            <li>✨ Buffet Warmers Set &amp; Display Easel</li>
+                        </ul>
+                        <button type="button" class="btn btn-primary fall-book-btn" onclick="selectFallPackage('Autumn Haldi & Mehndi Setup', 275)">Book Haldi/Mehndi Package →</button>
+                    </div>
+
+                    <div class="fall-package-card">
+                        <div class="fall-card-tag">🎃 Autumn Birthdays &amp; Parties</div>
+                        <h3>Cozy Fall Backyard Party</h3>
+                        <p class="fall-card-desc">10×20 ft Canopy Tent, 30 chairs, 4 rectangular folding tables, "Happy Birthday" Neon Sign &amp; 4FT Marquee Numbers.</p>
+                        <div class="fall-card-price">
+                            <span class="fall-price-num">$220</span>
+                            <span class="fall-price-saving">Save $45 · Perfect Backyard Setup</span>
+                        </div>
+                        <ul class="fall-package-features">
+                            <li>✨ 10×20 ft Weatherproof Canopy Tent</li>
+                            <li>✨ 30 Adult Folding Chairs + 4 Rectangular Tables</li>
+                            <li>✨ 4FT Lighted Marquee Number + Neon Sign</li>
+                            <li>✨ Set of 5 Round Cylinder Pedestals</li>
+                        </ul>
+                        <button type="button" class="btn btn-primary fall-book-btn" onclick="selectFallPackage('Cozy Fall Backyard Birthday', 220)">Book Backyard Party Package →</button>
+                    </div>
+                </div>
+
+                <!-- INTERACTIVE ESTIMATOR CONTAINER -->
+                <div class="estimator-container">
+                    <div class="estimator-header text-center">
+                        <h3>🧮 Interactive Fall Event Cost Estimator</h3>
+                        <p>Customize your equipment selection below for an instant real-time price estimate!</p>
+                    </div>
+                    <div class="estimator-grid">
+                        <div class="estimator-col">
+                            <label class="estimator-label" for="est-event-type">1. Select Your Event Type:</label>
+                            <select id="est-event-type" class="estimator-select" onchange="updateEstimate()">
+                                <option value="Fall Wedding / Reception">🍁 Fall Wedding / Reception</option>
+                                <option value="Haldi / Mehndi Ceremony">🌺 Haldi / Mehndi Ceremony</option>
+                                <option value="Birthday Celebration">🎂 Birthday Party / Sweet 16</option>
+                                <option value="Baby Shower / Seemantham">🤰 Baby Shower / Seemantham</option>
+                                <option value="Backyard Autumn Gathering">🏡 Backyard Fall Party</option>
+                                <option value="Corporate / Community Event">🎉 Corporate / Community Event</option>
+                            </select>
+
+                            <label class="estimator-label" for="est-chairs" style="margin-top: 1.2rem;">2. Number of Chairs Needed:</label>
+                            <div class="estimator-counter-wrap">
+                                <input type="number" id="est-chairs" class="estimator-input" value="30" min="0" max="300" oninput="updateEstimate()">
+                                <span class="counter-hint">($1.50/ea for 30+, $2.00/ea below)</span>
+                            </div>
+
+                            <label class="estimator-label" for="est-tables" style="margin-top: 1.2rem;">3. Tables Needed:</label>
+                            <div class="estimator-counter-wrap">
+                                <input type="number" id="est-tables" class="estimator-input" value="4" min="0" max="50" oninput="updateEstimate()">
+                                <span class="counter-hint">($8 rect / $12 round avg: ~$10/ea)</span>
+                            </div>
+                        </div>
+
+                        <div class="estimator-col">
+                            <label class="estimator-label">4. Select Tents &amp; Decor Add-ons:</label>
+                            <div class="estimator-checkboxes">
+                                <label class="est-checkbox-label">
+                                    <input type="checkbox" id="est-wedding-tent" value="150" onchange="updateEstimate()">
+                                    <span>🎪 16×26 ft Outdoor Wedding Tent ($150)</span>
+                                </label>
+                                <label class="est-checkbox-label">
+                                    <input type="checkbox" id="est-canopy-tent" value="100" checked onchange="updateEstimate()">
+                                    <span>⛺ 10×20 ft Canopy Tent ($100)</span>
+                                </label>
+                                <label class="est-checkbox-label">
+                                    <input type="checkbox" id="est-backdrop" value="150" checked onchange="updateEstimate()">
+                                    <span>🎭 Photo / Event Drape Backdrop ($150)</span>
+                                </label>
+                                <label class="est-checkbox-label">
+                                    <input type="checkbox" id="est-marquee" value="40" onchange="updateEstimate()">
+                                    <span>✨ Marquee Letters / Numbers ($40)</span>
+                                </label>
+                                <label class="est-checkbox-label">
+                                    <input type="checkbox" id="est-urli" value="125" onchange="updateEstimate()">
+                                    <span>🪔 Haldi Urli / Maiyan Tub ($125)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ESTIMATOR RESULT SUMMARY -->
+                    <div class="estimator-result-bar">
+                        <div class="result-text">
+                            <span class="result-label">Estimated Event Total:</span>
+                            <span class="result-amount" id="est-total-amount">$335</span>
+                            <span class="result-note">*Subject to delivery location &amp; setup options</span>
+                        </div>
+                        <div class="result-actions">
+                            <button type="button" class="btn btn-primary" onclick="sendEstimateToWhatsApp()">📲 Send Estimate to WhatsApp</button>
+                            <button type="button" class="btn btn-outline" onclick="requestEstimateQuote()">✉️ Request Official Quote</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -2650,6 +2789,88 @@ function router(preserveScroll = false) {
     }
 
 }
+
+// Global Helpers for Fall Specials & Cost Estimator
+window.updateEstimate = function() {
+    const chairsCount = parseInt(document.getElementById('est-chairs')?.value || 0, 10);
+    const tablesCount = parseInt(document.getElementById('est-tables')?.value || 0, 10);
+    
+    const chairPrice = chairsCount >= 30 ? 1.5 : 2.0;
+    let total = (chairsCount * chairPrice) + (tablesCount * 10);
+    
+    if (document.getElementById('est-wedding-tent')?.checked) total += 150;
+    if (document.getElementById('est-canopy-tent')?.checked) total += 100;
+    if (document.getElementById('est-backdrop')?.checked) total += 150;
+    if (document.getElementById('est-marquee')?.checked) total += 40;
+    if (document.getElementById('est-urli')?.checked) total += 125;
+
+    const totalEl = document.getElementById('est-total-amount');
+    if (totalEl) {
+        totalEl.textContent = `$${Math.round(total)}`;
+    }
+};
+
+window.selectFallPackage = function(packageName, price) {
+    const contactSection = document.getElementById('contact') || document.getElementById('fall-specials');
+    if (contactSection) {
+        contactSection.scrollIntoView({ behavior: 'smooth' });
+    }
+    setTimeout(() => {
+        const messageInput = document.getElementById('form-message') || document.querySelector('textarea[name="message"]') || document.querySelector('textarea');
+        if (messageInput) {
+            messageInput.value = `Hi Petals Paradise Events! I would like to book the "${packageName}" Fall Special Package ($${price}). Please contact me with availability for my event date.`;
+            messageInput.focus();
+        }
+    }, 300);
+};
+
+window.sendEstimateToWhatsApp = function() {
+    const eventType = document.getElementById('est-event-type')?.value || 'Fall Event';
+    const chairsCount = parseInt(document.getElementById('est-chairs')?.value || 0, 10);
+    const tablesCount = parseInt(document.getElementById('est-tables')?.value || 0, 10);
+    const totalText = document.getElementById('est-total-amount')?.textContent || '$0';
+
+    let items = [];
+    if (chairsCount > 0) items.push(`${chairsCount} Chairs`);
+    if (tablesCount > 0) items.push(`${tablesCount} Tables`);
+    if (document.getElementById('est-wedding-tent')?.checked) items.push('16x26ft Wedding Tent');
+    if (document.getElementById('est-canopy-tent')?.checked) items.push('10x20ft Canopy Tent');
+    if (document.getElementById('est-backdrop')?.checked) items.push('Drape Backdrop');
+    if (document.getElementById('est-marquee')?.checked) items.push('Marquee Display');
+    if (document.getElementById('est-urli')?.checked) items.push('Haldi Urli Tub');
+
+    const msg = `Hi Petals Paradise Events! I'm planning a ${eventType} for Fall 2026. My estimated rental selection: ${items.join(', ')}. Estimated Total: ${totalText}. Please let me know availability!`;
+    const whatsappUrl = `https://wa.me/18484486993?text=${encodeURIComponent(msg)}`;
+    window.open(whatsappUrl, '_blank');
+};
+
+window.requestEstimateQuote = function() {
+    const eventType = document.getElementById('est-event-type')?.value || 'Fall Event';
+    const chairsCount = parseInt(document.getElementById('est-chairs')?.value || 0, 10);
+    const tablesCount = parseInt(document.getElementById('est-tables')?.value || 0, 10);
+    const totalText = document.getElementById('est-total-amount')?.textContent || '$0';
+
+    let items = [];
+    if (chairsCount > 0) items.push(`${chairsCount} Chairs`);
+    if (tablesCount > 0) items.push(`${tablesCount} Tables`);
+    if (document.getElementById('est-wedding-tent')?.checked) items.push('16x26ft Wedding Tent');
+    if (document.getElementById('est-canopy-tent')?.checked) items.push('10x20ft Canopy Tent');
+    if (document.getElementById('est-backdrop')?.checked) items.push('Drape Backdrop');
+    if (document.getElementById('est-marquee')?.checked) items.push('Marquee Display');
+    if (document.getElementById('est-urli')?.checked) items.push('Haldi Urli Tub');
+
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+        contactSection.scrollIntoView({ behavior: 'smooth' });
+    }
+    setTimeout(() => {
+        const messageInput = document.getElementById('form-message') || document.querySelector('textarea[name="message"]') || document.querySelector('textarea');
+        if (messageInput) {
+            messageInput.value = `Hi Petals Paradise Events! I built an estimate for my ${eventType}: Selected items: ${items.join(', ')}. Estimated Total: ${totalText}. Please send me an official quote and date confirmation!`;
+            messageInput.focus();
+        }
+    }, 300);
+};
 
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
