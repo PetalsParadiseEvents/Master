@@ -174,7 +174,8 @@ function generateSquarePaymentUrl($orderId, $finalTotalVal) {
                 'location_id' => $locId
             ],
             'checkout_options' => [
-                'redirect_url' => 'https://petalsparadiseevents.com/#confirmation'
+                'allow_tipping' => true,
+                'redirect_url'  => 'https://petalsparadiseevents.com/#confirmation'
             ]
         ];
 
