@@ -73,16 +73,27 @@ a {
   height: 72px;
 }
 
+#top-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--banner-height, 40px);
+  z-index: 1100;
+}
+
 .promo-banner {
   min-height: var(--banner-height, 40px);
-  height: auto;
+  height: var(--banner-height, 40px);
   background: linear-gradient(90deg, #b8860b, #d4af37, #f1c40f, #d4af37, #b8860b);
   background-size: 200% auto;
   color: #0d0f12;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   z-index: 1100;
   box-shadow: 0 2px 15px rgba(0,0,0,0.4);
@@ -847,9 +858,15 @@ footer {
 }
 
 @media (max-width: 768px) {
+  #top-banner,
   .promo-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
     min-height: 40px;
-    height: auto;
+    z-index: 1100;
   }
   
   :root {
@@ -857,7 +874,12 @@ footer {
   }
 
   .glass-nav {
-    padding: 1rem;
+    position: fixed;
+    top: 40px;
+    left: 0;
+    width: 100%;
+    padding: 0.8rem 1rem;
+    z-index: 1000;
   }
 
   .ticker {
