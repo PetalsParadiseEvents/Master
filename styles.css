@@ -311,18 +311,23 @@ main {
   animation: fadeIn 0.6s ease-out;
 }
 
-/* Ensure page section headers clear the fixed banner (40px) + navbar (72px) = 112px */
-main > .container,
-main > section:not(.hero):not(.hero-skeleton),
-main > div > .container {
-  padding-top: calc(112px + 2.5rem);
+/* Scroll margin offset for anchor link navigation (#rentals, #services, #contact, #about) */
+section, [id] {
+  scroll-margin-top: 120px;
+}
+
+/* For standalone subpages or first sections without a hero, ensure header clearance */
+main > .container:first-child,
+main > section:first-child:not(.hero):not(.hero-skeleton),
+main > div:first-child > .container {
+  padding-top: calc(112px + 2rem);
 }
 
 @media (max-width: 768px) {
-  main > .container,
-  main > section:not(.hero):not(.hero-skeleton),
-  main > div > .container {
-    padding-top: calc(100px + 1.8rem);
+  main > .container:first-child,
+  main > section:first-child:not(.hero):not(.hero-skeleton),
+  main > div:first-child > .container {
+    padding-top: calc(100px + 1.5rem);
   }
 }
 
@@ -406,8 +411,8 @@ main > div > .container {
 
 /* Hero Section */
 .hero {
-  min-height: 100vh;
-  padding: calc(120px + 2.5rem) 1.5rem 4rem 1.5rem; /* top = fixed nav(72px)+banner(40px)+breathing room */
+  min-height: auto;
+  padding: calc(112px + 2rem) 1.5rem 2.5rem 1.5rem; /* top = fixed nav(72px)+banner(40px)+tight breathing room */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -934,7 +939,7 @@ footer {
 @media (max-width: 768px) {
   .hero {
     min-height: auto;
-    padding: calc(112px + 1.5rem) 1.25rem 3rem 1.25rem;
+    padding: calc(100px + 1.2rem) 1.25rem 2rem 1.25rem;
   }
 
   .hero-content {
@@ -2043,7 +2048,7 @@ textarea:focus-visible {
 
 /* 1. Life Stages Journey Section */
 .life-stages-section {
-  padding: 4.5rem 0;
+  padding: 3rem 0;
   background: var(--surface-color);
   border-top: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
@@ -2133,7 +2138,7 @@ textarea:focus-visible {
 
 /* 2. How We Work With You Section */
 .how-we-work-section {
-  padding: 4.5rem 0;
+  padding: 3rem 0;
 }
 
 .how-we-work-grid {
@@ -2205,7 +2210,7 @@ textarea:focus-visible {
 
 /* 3. Three Service Tiers Section */
 .tiers-section {
-  padding: 4.5rem 0;
+  padding: 3rem 0;
   background: var(--surface-color);
   border-top: 1px solid var(--border-color);
 }
@@ -2320,7 +2325,7 @@ textarea:focus-visible {
 
 /* 4. About & Promise Section */
 .about-section {
-  padding: 4.5rem 0;
+  padding: 3rem 0;
 }
 
 .about-grid {
