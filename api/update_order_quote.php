@@ -243,32 +243,52 @@ try {
                     </table>
                 </div>
 
-                <!-- MULTI-PAYMENT OPTIONS CARD (Square, Zelle, Venmo, Cash App) -->
+                <!-- MULTI-PAYMENT OPTIONS CARD (Zelle/Venmo/Cash App Preferred #1, Square #2) -->
                 <div style='background: #f8fafc; border: 2px solid #006aff; border-radius: 12px; padding: 20px; margin: 20px 0;'>
                     <h3 style='margin-top:0; color:#006aff; font-size:17px; text-align: center;'>💳 Select Your Preferred Payment Method</h3>
                     <p style='text-align: center; font-size: 13px; color: #475569; margin-top: -4px; margin-bottom: 16px;'>Final Amount Due: <strong style='color: #006aff; font-size: 16px;'>\${$finalTotalFmt}</strong></p>
 
-                    <!-- OPTION 1: SQUARE ONLINE CHECKOUT (Card / Apple Pay / Cash App Pay) -->
-                    <div style='background: #ffffff; border: 1px solid #006aff; border-radius: 10px; padding: 14px; margin-bottom: 14px; text-align: center;'>
-                        <div style='font-size: 14px; font-weight: bold; color: #1e293b; margin-bottom: 8px;'>1. Pay Online via Square (Credit/Debit Card, Apple Pay, Cash App Pay)</div>
-                        <a href='{$squarePayUrl}' target='_blank' style='display: inline-block; font-size: 16px; line-height: 44px; height: 44px; color: #ffffff !important; background-color: #006aff; text-align: center; border-radius: 6px; text-decoration: none; font-weight: bold; padding: 0 24px;'>Pay now (\${$finalTotalFmt})</a>
-                        <div style='margin: 12px auto 0 auto; max-width: 380px; font-size: 12px; color: #1e293b; background: #f0f9ff; border: 1px solid #bae6fd; padding: 8px 12px; border-radius: 6px;'>
-                            📌 Amount to Enter on Square: <strong style='color: #006aff;'>\${$finalTotalFmt}</strong>
+                    <!-- PREFERRED OPTION 1: ZELLE / VENMO / CASH APP -->
+                    <div style='background: #ffffff; border: 2px solid #10b981; border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: left;'>
+                        <div style='display: inline-block; background: #d1fae5; color: #047857; font-weight: bold; font-size: 11px; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; margin-bottom: 8px;'>⭐ Preferred Method #1</div>
+                        <div style='font-size: 15px; font-weight: bold; color: #0f172a; margin-bottom: 12px;'>1. Direct Mobile Pay (Zelle, Venmo, Cash App)</div>
+                        
+                        <!-- ZELLE BOX WITH QR CODE -->
+                        <div style='font-size: 13px; color: #334155; margin-bottom: 12px; padding: 12px; background: #f0fdf4; border-radius: 8px; border-left: 4px solid #10b981;'>
+                            <table role='presentation' border='0' cellpadding='0' cellspacing='0' width='100%'>
+                                <tr>
+                                    <td style='vertical-align: top;'>
+                                        <strong style='color: #065f46; font-size: 14px;'>📲 Zelle Instant Bank Transfer:</strong><br>
+                                        Account Name: <strong>Mounika Biragoni</strong><br>
+                                        Send <strong>\${$finalTotalFmt}</strong> to Zelle Email:<br>
+                                        <a href='mailto:biragonimounika@gmail.com' style='color: #006aff; font-weight: bold; font-size: 14px; text-decoration: none;'>biragonimounika@gmail.com</a>
+                                    </td>
+                                    <td style='vertical-align: top; text-align: right; width: 115px;'>
+                                        <img src='https://petalsparadiseevents.com/zelle-qr-code.png' alt='Zelle QR Code' style='width: 105px; height: 105px; border-radius: 6px; border: 1px solid #cbd5e1; display: block;' />
+                                    </td>
+                                </tr>
+                            </table>
                         </div>
+
+                        <!-- VENMO AND CASH APP BUTTONS (TABLE LAYOUT FOR EMAIL COMPATIBILITY) -->
+                        <table role='presentation' border='0' cellpadding='0' cellspacing='0' width='100%'>
+                            <tr>
+                                <td width='49%' style='vertical-align: top; padding-right: 2%;'>
+                                    <a href='https://venmo.com/u/MounikaBiragoni' target='_blank' style='display: block; text-align: center; background-color: #008CFF; color: #ffffff !important; padding: 11px 8px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px;'>💙 Pay on Venmo (@MounikaBiragoni)</a>
+                                </td>
+                                <td width='49%' style='vertical-align: top;'>
+                                    <a href='https://cash.app/$Mounikabiragoni' target='_blank' style='display: block; text-align: center; background-color: #00D632; color: #ffffff !important; padding: 11px 8px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px;'>💚 Pay on Cash App ($Mounikabiragoni)</a>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
 
-                    <!-- OPTION 2: ZELLE / VENMO / CASH APP -->
-                    <div style='background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; text-align: left;'>
-                        <div style='font-size: 14px; font-weight: bold; color: #0f172a; margin-bottom: 10px; text-align: center;'>2. Direct Mobile Pay (Zelle, Venmo, Cash App)</div>
-                        
-                        <div style='font-size: 13px; color: #334155; margin-bottom: 10px; padding: 10px 12px; background: #f1f5f9; border-radius: 6px; border-left: 4px solid #6366f1;'>
-                            <strong>📲 Zelle Instant Bank Transfer:</strong><br>
-                            Send <strong>\${$finalTotalFmt}</strong> to Zelle Email: <span style='color: #006aff; font-weight: bold; font-size: 14px;'>biragonimounika@gmail.com</span>
-                        </div>
-
-                        <div style='display: flex; gap: 8px; flex-wrap: wrap;'>
-                            <a href='https://venmo.com/u/MounikaBiragoni' target='_blank' style='flex: 1; min-width: 140px; text-align: center; background: #008CFF; color: #ffffff !important; padding: 10px 8px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px;'>💙 Pay on Venmo (@MounikaBiragoni)</a>
-                            <a href='https://cash.app/$Mounikabiragoni' target='_blank' style='flex: 1; min-width: 140px; text-align: center; background: #00D632; color: #ffffff !important; padding: 10px 8px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px;'>💚 Pay on Cash App ($Mounikabiragoni)</a>
+                    <!-- OPTION 2: SQUARE ONLINE CHECKOUT (Card / Apple Pay) -->
+                    <div style='background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; text-align: center;'>
+                        <div style='font-size: 14px; font-weight: bold; color: #1e293b; margin-bottom: 8px;'>2. Pay Online via Square (Credit/Debit Card, Apple Pay)</div>
+                        <a href='{$squarePayUrl}' target='_blank' style='display: inline-block; font-size: 15px; line-height: 42px; height: 42px; color: #ffffff !important; background-color: #006aff; text-align: center; border-radius: 6px; text-decoration: none; font-weight: bold; padding: 0 24px;'>Pay now (\${$finalTotalFmt})</a>
+                        <div style='margin: 10px auto 0 auto; max-width: 380px; font-size: 12px; color: #1e293b; background: #f0f9ff; border: 1px solid #bae6fd; padding: 8px 12px; border-radius: 6px;'>
+                            📌 Amount to Enter on Square: <strong style='color: #006aff;'>\${$finalTotalFmt}</strong>
                         </div>
                     </div>
                 </div>

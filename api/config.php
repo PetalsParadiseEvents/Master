@@ -119,6 +119,8 @@ if (!defined('SQUARE_QR_CODE_URL'))       define('SQUARE_QR_CODE_URL',       'ht
 
 // Direct Mobile Payment Constants (Zelle, Venmo, Cash App)
 if (!defined('ZELLE_EMAIL'))               define('ZELLE_EMAIL',              'biragonimounika@gmail.com');
+if (!defined('ZELLE_NAME'))                define('ZELLE_NAME',               'Mounika Biragoni');
+if (!defined('ZELLE_QR_CODE_URL'))         define('ZELLE_QR_CODE_URL',        'https://petalsparadiseevents.com/zelle-qr-code.png');
 if (!defined('VENMO_LINK'))                define('VENMO_LINK',               'https://venmo.com/u/MounikaBiragoni');
 if (!defined('VENMO_HANDLE'))              define('VENMO_HANDLE',             '@MounikaBiragoni');
 if (!defined('CASHAPP_LINK'))              define('CASHAPP_LINK',             'https://cash.app/$Mounikabiragoni');

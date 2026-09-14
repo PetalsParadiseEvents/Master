@@ -1826,10 +1826,10 @@ if ($format === 'json') {
 
     <!-- Square Pay & QR Code Modal -->
     <div id="qrModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 999999; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
-        <div style="background: var(--card-bg, #1e2736); border: 2px solid #006aff; width: 92%; max-width: 440px; border-radius: 16px; padding: 1.5rem; color: var(--text-primary, #fff); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); text-align: center; position: relative;">
+        <div style="background: var(--card-bg, #1e2736); border: 2px solid #006aff; width: 92%; max-width: 480px; border-radius: 16px; padding: 1.5rem; color: var(--text-primary, #fff); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); text-align: center; position: relative; max-height: 90vh; overflow-y: auto;">
             <button onclick="closeQrModal()" style="position: absolute; top: 12px; right: 14px; background: transparent; border: none; color: #888; font-size: 1.4rem; cursor: pointer; line-height: 1;">&times;</button>
             <h3 style="margin-top: 0; color: #006aff; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
-                💳 Square Online Payment
+                💳 Customer Payment Options & Links
             </h3>
             <p style="font-size: 0.85rem; color: var(--text-muted, #94a3b8); margin: 0.3rem 0 0.8rem 0;">
                 Order <strong id="qrModalOrderId" style="color: var(--primary, #d4af37);"></strong>
@@ -1850,33 +1850,49 @@ if ($format === 'json') {
                 </div>
             </div>
 
-            <div style="margin: 10px 0 14px 0; background: rgba(0, 106, 255, 0.08); border: 1px solid rgba(0, 106, 255, 0.25); border-radius: 8px; padding: 10px; text-align: center;">
-                <div style="font-size: 0.85rem; font-weight: bold; color: var(--text-primary, #fff);">📌 Amount to enter on Square: <span id="qrModalEnterAmount" style="color: #38bdf8; font-weight: 800; font-size: 1rem;">$0.00</span></div>
-                <div style="font-size: 0.75rem; color: var(--text-muted, #94a3b8); margin-top: 2px;">When redirected, enter this exact amount in the "Enter amount" box on Square.</div>
-            </div>
-
-            <div id="qrModalContainer" style="background: #ffffff; padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; display: inline-flex; align-items: center; justify-content: center; min-width: 204px; min-height: 204px; margin-bottom: 0.8rem;">
-                <img id="qrModalImg" src="https://quickchart.io/qr?size=250&text=https%3A%2F%2Fsquare.link%2Fu%2FxV2eBBtG%3Fsrc%3Dembed" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https%3A%2F%2Fsquare.link%2Fu%2FxV2eBBtG%3Fsrc%3Dembed';" alt="Square Payment QR Code" style="width: 180px; height: 180px; display: block; border-radius: 8px;" />
-            </div>
-            <p style="font-size: 0.76rem; color: var(--text-muted, #94a3b8); margin-bottom: 1rem;">Scan QR code with phone camera or click Pay Now below.</p>
-
-            <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
-                <a id="qrModalPayBtn" href="https://square.link/u/xV2eBBtG?src=embed" target="_blank" style="display: inline-block; font-size: 15px; line-height: 40px; height: 40px; color: #ffffff !important; background-color: #006aff; padding: 0 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">Pay now</a>
-                <button onclick="copyPaymentLink()" style="font-size: 14px; padding: 0 16px; height: 40px; background: transparent; color: var(--text-primary, #fff); border: 1px solid var(--border-color, #444); border-radius: 6px; cursor: pointer; font-weight: 600;">📋 Copy Link</button>
-                <button onclick="sendPaymentLinkFromModal()" id="qrModalSendBtn" style="font-size: 14px; padding: 0 16px; height: 40px; background: var(--primary, #d4af37); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">✉️ Send Email</button>
-            </div>
-            <div id="qrModalMsg" style="font-size: 0.8rem; margin-top: 0.8rem; display: none;"></div>
-
-            <!-- Direct Mobile Payment Links Box -->
-            <div style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 0.8rem; text-align: left; font-size: 0.78rem;">
-                <div style="font-weight: bold; color: var(--primary, #d4af37); margin-bottom: 6px; text-align: center;">📲 Direct Mobile Payment Options:</div>
-                <div style="background: rgba(255,255,255,0.06); padding: 7px 10px; border-radius: 6px; margin-bottom: 6px; color: #e2e8f0; font-size: 0.77rem;">
-                    <strong>📲 Zelle:</strong> <span style="color: #38bdf8; font-weight: bold;">biragonimounika@gmail.com</span>
+            <!-- PREFERRED METHOD 1: DIRECT MOBILE PAY (Zelle, Venmo, Cash App) -->
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1.5px solid #10b981; border-radius: 12px; padding: 12px; margin-bottom: 1rem; text-align: left;">
+                <div style="display: inline-block; background: #10b981; color: #ffffff; font-weight: bold; font-size: 0.7rem; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; margin-bottom: 6px;">⭐ Preferred Method #1</div>
+                <div style="font-weight: bold; color: #34d399; font-size: 0.9rem; margin-bottom: 8px;">1. Direct Mobile Pay (Zelle, Venmo, Cash App)</div>
+                
+                <!-- ZELLE DETAIL BOX WITH IMAGE -->
+                <div style="background: rgba(255,255,255,0.06); padding: 10px; border-radius: 8px; margin-bottom: 8px; color: #e2e8f0; font-size: 0.78rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                        <div>
+                            <strong style="color: #6ee7b7; font-size: 0.85rem;">📲 Zelle Instant Bank Transfer:</strong><br>
+                            Account Name: <strong>Mounika Biragoni</strong><br>
+                            Send to Email: <span style="color: #38bdf8; font-weight: bold;">biragonimounika@gmail.com</span>
+                        </div>
+                        <img src="/zelle-qr-code.png" alt="Zelle QR Code" style="width: 85px; height: 85px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; flex-shrink: 0;" />
+                    </div>
                 </div>
+
                 <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                    <a href="https://venmo.com/u/MounikaBiragoni" target="_blank" style="flex: 1; min-width: 140px; text-align: center; padding: 7px 8px; background: #008CFF; color: #fff !important; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.76rem;">💙 Venmo (@MounikaBiragoni)</a>
-                    <a href="https://cash.app/$Mounikabiragoni" target="_blank" style="flex: 1; min-width: 140px; text-align: center; padding: 7px 8px; background: #00D632; color: #fff !important; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.76rem;">💚 Cash App ($Mounikabiragoni)</a>
+                    <a href="https://venmo.com/u/MounikaBiragoni" target="_blank" style="flex: 1; min-width: 140px; text-align: center; padding: 8px; background: #008CFF; color: #fff !important; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.76rem;">💙 Venmo (@MounikaBiragoni)</a>
+                    <a href="https://cash.app/$Mounikabiragoni" target="_blank" style="flex: 1; min-width: 140px; text-align: center; padding: 8px; background: #00D632; color: #fff !important; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.76rem;">💚 Cash App ($Mounikabiragoni)</a>
                 </div>
+            </div>
+
+            <!-- METHOD 2: SQUARE ONLINE PAYMENT -->
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 12px; text-align: center;">
+                <div style="font-weight: bold; color: #93c5fd; font-size: 0.88rem; margin-bottom: 8px;">2. Pay Online via Square (Credit/Debit Card, Apple Pay)</div>
+                
+                <div style="margin: 6px 0 10px 0; background: rgba(0, 106, 255, 0.08); border: 1px solid rgba(0, 106, 255, 0.25); border-radius: 8px; padding: 8px; text-align: center;">
+                    <div style="font-size: 0.8rem; font-weight: bold; color: var(--text-primary, #fff);">📌 Amount to enter on Square: <span id="qrModalEnterAmount" style="color: #38bdf8; font-weight: 800; font-size: 0.95rem;">$0.00</span></div>
+                    <div style="font-size: 0.72rem; color: var(--text-muted, #94a3b8); margin-top: 2px;">When redirected, enter this exact amount on Square.</div>
+                </div>
+
+                <div id="qrModalContainer" style="background: #ffffff; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; display: inline-flex; align-items: center; justify-content: center; min-width: 170px; min-height: 170px; margin-bottom: 0.6rem;">
+                    <img id="qrModalImg" src="https://quickchart.io/qr?size=250&text=https%3A%2F%2Fsquare.link%2Fu%2FxV2eBBtG%3Fsrc%3Dembed" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https%3A%2F%2Fsquare.link%2Fu%2FxV2eBBtG%3Fsrc%3Dembed';" alt="Square Payment QR Code" style="width: 150px; height: 150px; display: block; border-radius: 6px;" />
+                </div>
+                <p style="font-size: 0.74rem; color: var(--text-muted, #94a3b8); margin-bottom: 0.8rem;">Scan Square QR code with phone camera or click Pay Now below.</p>
+
+                <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                    <a id="qrModalPayBtn" href="https://square.link/u/xV2eBBtG?src=embed" target="_blank" style="display: inline-block; font-size: 14px; line-height: 38px; height: 38px; color: #ffffff !important; background-color: #006aff; padding: 0 18px; border-radius: 6px; text-decoration: none; font-weight: bold;">Pay now</a>
+                    <button onclick="copyPaymentLink()" style="font-size: 13px; padding: 0 14px; height: 38px; background: transparent; color: var(--text-primary, #fff); border: 1px solid var(--border-color, #444); border-radius: 6px; cursor: pointer; font-weight: 600;">📋 Copy Link</button>
+                    <button onclick="sendPaymentLinkFromModal()" id="qrModalSendBtn" style="font-size: 13px; padding: 0 14px; height: 38px; background: var(--primary, #d4af37); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">✉️ Send Email</button>
+                </div>
+                <div id="qrModalMsg" style="font-size: 0.8rem; margin-top: 0.8rem; display: none;"></div>
             </div>
         </div>
     </div>
