@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ DIY Decor Studio & Stage Builder | Petals Paradise Events</title>
+    <meta name="description" content="Design and build your custom stage setup & event decor interactively. Arrange backdrops, loveseats, marquee letters, neon signs, urli, and tents on virtual venue backgrounds or your own venue photo!">
+    <link rel="icon" type="image/png" href="./wp-content/uploads/2025/07/image-150x150.png">
+    
+    <!-- Google Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- html2canvas for instant stage mockup image rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --builder-bg: #0f172a;
+            --builder-panel: #1e293b;
+            --builder-card: #334155;
+            --builder-accent: #d4af37;
+            --builder-blue: #006aff;
+            --builder-green: #10b981;
+            --builder-text: #f8fafc;
+            --builder-muted: #94a3b8;
+            --builder-border: rgba(255, 255, 255, 0.12);
+        }
+
+        body.builder-body {
+            background-color: var(--builder-bg);
+            color: var(--builder-text);
+            font-family: 'Outfit', 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Header Navigation */
+        .studio-header {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--builder-border);
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .studio-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .studio-brand img {
+            height: 38px;
+            border-radius: 6px;
+        }
+
+        .studio-brand span {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--builder-accent);
+        }
+
+        .studio-badge {
+            background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(0,106,255,0.2));
+            border: 1px solid var(--builder-accent);
+            color: var(--builder-accent);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .studio-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-studio {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-studio-secondary {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            border: 1px solid var(--builder-border);
+        }
+        .btn-studio-secondary:hover {
+            background: rgba(255,255,255,0.16);
+            border-color: #fff;
+        }
+
+        .btn-studio-primary {
+            background: linear-gradient(135deg, #d4af37, #b89628);
+            color: #000;
+            font-weight: 700;
+            box-shadow: 0 4px 14px rgba(212,175,55,0.3);
+        }
+        .btn-studio-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(212,175,55,0.45);
+        }
+
+        .btn-studio-blue {
+            background: #006aff;
+            color: #fff;
+            font-weight: 700;
+        }
+        .btn-studio-blue:hover {
+            background: #0056cc;
+        }
+
+        /* Main Workspace Layout */
+        .studio-container {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            flex: 1;
+            height: calc(100vh - 61px);
+            overflow: hidden;
+        }
+
+        @media (max-width: 992px) {
+            .studio-container {
+                grid-template-columns: 1fr;
+                height: auto;
+                overflow: visible;
+            }
+        }
+
+        /* Left Drawer / Item Catalog */
+        .catalog-drawer {
+            background: var(--builder-panel);
+            border-right: 1px solid var(--builder-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .catalog-header {
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid var(--builder-border);
+        }
+
+        .catalog-title {
+            margin: 0 0 10px 0;
+            font-size: 1.05rem;
+            color: var(--builder-accent);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .category-pills {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scrollbar-width: thin;
+        }
+
+        .pill-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--builder-border);
+            color: var(--builder-muted);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.76rem;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .pill-btn.active, .pill-btn:hover {
+            background: var(--builder-blue);
+            color: #fff;
+            border-color: var(--builder-blue);
+        }
+
+        .catalog-grid {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .item-card {
+            background: var(--builder-card);
+            border: 1px solid var(--builder-border);
+            border-radius: 10px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .item-card:hover {
+            border-color: var(--builder-accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+
+        .item-thumb {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 6px;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .item-name {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #fff;
+            margin: 6px 0 2px 0;
+            line-height: 1.2;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .item-price {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--builder-accent);
+        }
+
+        .btn-add-item {
+            background: rgba(212,175,55,0.15);
+            border: 1px solid var(--builder-accent);
+            color: var(--builder-accent);
+            width: 100%;
+            padding: 5px;
+            border-radius: 6px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 6px;
+            transition: all 0.2s ease;
+        }
+        .btn-add-item:hover {
+            background: var(--builder-accent);
+            color: #000;
+        }
+
+        /* Custom Upload Box inside Catalog Drawer */
+        .upload-tab-box {
+            background: rgba(255,255,255,0.04);
+            border: 2px dashed var(--builder-accent);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 12px;
+            grid-column: span 2;
+        }
+        .upload-tab-box p {
+            margin: 0 0 8px 0;
+            font-size: 0.76rem;
+            color: var(--builder-muted);
+        }
+
+        /* Right Pane - Stage Viewport Workspace */
+        .viewport-area {
+            background: #090d16;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Viewport Toolbar */
+        .viewport-toolbar {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--builder-border);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            z-index: 10;
+            flex-wrap: wrap;
+        }
+
+        .bg-selector-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+        }
+        .bg-selector-group label {
+            color: var(--builder-muted);
+            font-weight: 600;
+        }
+        .bg-select {
+            background: var(--builder-bg);
+            color: #fff;
+            border: 1px solid var(--builder-border);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        /* Stage Canvas Wrapper */
+        .stage-canvas-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            background-color: #0b1120;
+        }
+
+        #stageCanvas {
+            width: 100%;
+            max-width: 900px;
+            height: 540px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-image: url('https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=80');
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7), 0 0 0 1px var(--builder-border);
+            position: relative;
+            overflow: hidden;
+            user-select: none;
+            touch-action: none;
+        }
+
+        /* Canvas Stage Grid Overlay (Subtle) */
+        #stageCanvas::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        /* Placed Item Element on Stage */
+        .stage-object {
+            position: absolute;
+            cursor: move;
+            display: inline-block;
+            transition: outline 0.15s ease;
+            z-index: 10;
+        }
+        .stage-object.selected {
+            outline: 2px dashed var(--builder-accent);
+            outline-offset: 4px;
+        }
+        .stage-object img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            pointer-events: none;
+        }
+
+        /* Controls Popup Box for Active Object */
+        .object-toolbar {
+            position: absolute;
+            top: -46px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--builder-accent);
+            border-radius: 8px;
+            padding: 4px 8px;
+            display: none;
+            gap: 6px;
+            z-index: 9999;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            white-space: nowrap;
+        }
+        .stage-object.selected .object-toolbar {
+            display: flex;
+        }
+        .tool-icon-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            width: 26px;
+            height: 26px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .tool-icon-btn:hover {
+            background: var(--builder-accent);
+            color: #000;
+        }
+        .tool-icon-btn.btn-del:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        /* Bottom Summary Bar */
+        .summary-bar {
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--builder-border);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            z-index: 20;
+        }
+
+        .summary-info {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+        .summary-item-count {
+            font-size: 0.85rem;
+            color: var(--builder-muted);
+        }
+        .summary-item-count strong {
+            color: #fff;
+        }
+        .summary-total {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--builder-accent);
+        }
+        .summary-total span {
+            font-size: 0.8rem;
+            color: var(--builder-muted);
+            font-weight: normal;
+        }
+
+        /* Request Quote Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(6px);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-card {
+            background: var(--builder-panel);
+            border: 2px solid var(--builder-accent);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 580px;
+            max-height: 92vh;
+            overflow-y: auto;
+            padding: 1.8rem;
+            color: #fff;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+        }
+        .modal-close {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: var(--builder-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--builder-muted);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 9px 12px;
+            background: var(--builder-bg);
+            border: 1px solid var(--builder-border);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.88rem;
+            box-sizing: border-box;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--builder-accent);
+        }
+
+        .preview-mockup-img {
+            width: 100%;
+            max-height: 180px;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 1px solid var(--builder-border);
+            background: #000;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body class="builder-body">
+
+    <!-- Top Studio Header -->
+    <header class="studio-header">
+        <a href="index.html" class="studio-brand">
+            <img src="./wp-content/uploads/2025/07/image-150x150.png" alt="Petals Paradise Events Logo">
+            <span>Petals Paradise Events</span>
+            <span class="studio-badge">✨ DIY Decor Studio</span>
+        </a>
+
+        <div class="studio-actions">
+            <button onclick="clearStageCanvas()" class="btn-studio btn-studio-secondary">🗑️ Clear Canvas</button>
+            <button onclick="exportStageImage()" class="btn-studio btn-studio-secondary">📸 Download PNG</button>
+            <button onclick="openQuoteModal()" class="btn-studio btn-studio-primary">📩 Request Quote for Setup</button>
+            <a href="index.html" class="btn-studio btn-studio-secondary">🏠 Back to Website</a>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <div class="studio-container">
+
+        <!-- Left Drawer: Catalog & Custom Image Upload -->
+        <aside class="catalog-drawer">
+            <div class="catalog-header">
+                <div class="catalog-title">
+                    <span>📦 Event Decor Inventory</span>
+                    <span style="font-size: 0.75rem; color: var(--builder-muted);">Click "+ Add" to place on stage</span>
+                </div>
+                <div class="category-pills">
+                    <button class="pill-btn active" onclick="filterCatalog('All')">All</button>
+                    <button class="pill-btn" onclick="filterCatalog('Backdrops')">Backdrops</button>
+                    <button class="pill-btn" onclick="filterCatalog('Chairs')">Seating</button>
+                    <button class="pill-btn" onclick="filterCatalog('Tables')">Tables &amp; Pedestals</button>
+                    <button class="pill-btn" onclick="filterCatalog('Neon Signs')">Neon &amp; Lights</button>
+                    <button class="pill-btn" onclick="filterCatalog('Marquee Letters')">Marquee</button>
+                    <button class="pill-btn" onclick="filterCatalog('Traditional Decor')">Traditional</button>
+                    <button class="pill-btn" onclick="filterCatalog('Tents')">Tents</button>
+                </div>
+            </div>
+
+            <div class="catalog-grid" id="catalogGrid">
+                <!-- Custom Upload Box inside Grid -->
+                <div class="upload-tab-box">
+                    <p>📸 <strong>Have custom inspo or photo?</strong></p>
+                    <input type="file" id="customItemInput" accept="image/*" style="display: none;" onchange="handleCustomItemUpload(event)">
+                    <button onclick="document.getElementById('customItemInput').click()" class="btn-studio btn-studio-blue" style="font-size: 0.76rem; padding: 5px 12px;">📤 Upload Custom Item Image</button>
+                </div>
+                <!-- Catalog items rendered via JS -->
+            </div>
+        </aside>
+
+        <!-- Right Pane: Interactive Canvas Viewport -->
+        <main class="viewport-area">
+            <!-- Viewport Toolbar -->
+            <div class="viewport-toolbar">
+                <div class="bg-selector-group">
+                    <label>🖼️ Virtual Stage Background:</label>
+                    <select id="bgSelect" class="bg-select" onchange="changeStageBackground(this.value)">
+                        <option value="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=80">🏛️ Grand Ballroom Stage</option>
+                        <option value="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=80">🌸 Floral Arch Stage</option>
+                        <option value="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=80">🌿 Outdoor Garden Lawn</option>
+                        <option value="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80">✨ Luxury Draped Stage</option>
+                        <option value="solid">🎨 Solid Dark Slate Studio</option>
+                    </select>
+                    
+                    <input type="file" id="venueBgInput" accept="image/*" style="display: none;" onchange="handleVenueBgUpload(event)">
+                    <button onclick="document.getElementById('venueBgInput').click()" class="btn-studio btn-studio-secondary" style="font-size: 0.76rem; padding: 4px 10px;">📸 Upload Venue Photo</button>
+                </div>
+
+                <div style="font-size: 0.78rem; color: var(--builder-muted);">
+                    💡 <em>Tip: Click &amp; drag items on stage to move. Use popup controls to scale, rotate, or layer!</em>
+                </div>
+            </div>
+
+            <!-- Stage Workspace -->
+            <div class="stage-canvas-wrapper" onclick="deselectAllObjects(event)">
+                <div id="stageCanvas">
+                    <!-- Dynamic placed objects will render here -->
+                </div>
+            </div>
+
+            <!-- Bottom Live Summary Bar -->
+            <div class="summary-bar">
+                <div class="summary-info">
+                    <div class="summary-item-count">Placed Items: <strong id="summaryItemCount">0 items</strong></div>
+                    <div class="summary-total">Estimated Total: <span id="summaryPrice">$0.00</span></div>
+                </div>
+
+                <div>
+                    <button onclick="openQuoteModal()" class="btn-studio btn-studio-primary">📩 Request Quote for this Setup</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Quote Submission Modal -->
+    <div class="modal-overlay" id="quoteModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeQuoteModal()">&times;</button>
+            <h3 style="margin-top:0; color: var(--builder-accent); font-family: 'Playfair Display', serif; font-size: 1.35rem;">
+                🌸 Request Official Quote for Your Decor Layout
+            </h3>
+            <p style="font-size: 0.8rem; color: var(--builder-muted); margin-bottom: 1rem;">
+                Send your custom DIY stage layout directly to our event specialists. We will review your design and reply with exact pricing and availability!
+            </p>
+
+            <img id="modalMockupPreview" class="preview-mockup-img" src="" alt="Decor Layout Mockup Preview">
+
+            <form id="builderQuoteForm" onsubmit="handleQuoteSubmission(event)">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label>Your Name *</label>
+                        <input type="text" id="quoteName" class="form-control" required placeholder="e.g. Priya Sharma">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <input type="email" id="quoteEmail" class="form-control" required placeholder="name@example.com">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label>Phone Number *</label>
+                        <input type="tel" id="quotePhone" class="form-control" required placeholder="(703) 555-0199">
+                    </div>
+                    <div class="form-group">
+                        <label>Event Date *</label>
+                        <input type="date" id="quoteDate" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Venue Location / Address</label>
+                    <input type="text" id="quoteLocation" class="form-control" placeholder="e.g. Ashburn VA / Marriott Hotel Ballroom">
+                </div>
+
+                <div class="form-group">
+                    <label>Special Instructions / Custom Requests</label>
+                    <textarea id="quoteNotes" class="form-control" rows="3" placeholder="Tell us your theme, color preferences, or any specific setup time requirements..."></textarea>
+                </div>
+
+                <div id="quoteFormMsg" style="font-size: 0.85rem; margin-bottom: 10px; display: none;"></div>
+
+                <div style="text-align: right;">
+                    <button type="button" onclick="closeQuoteModal()" class="btn-studio btn-studio-secondary" style="margin-right: 8px;">Cancel</button>
+                    <button type="submit" id="btnSubmitQuote" class="btn-studio btn-studio-primary">🚀 Send Quote Inquiry with Layout</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripting Engine -->
+    <script src="app.js"></script>
+    <script>
+        // Global Canvas State
+        let stageObjects = [];
+        let activeObjectId = null;
+        let isDragging = false;
+        let startX = 0, startY = 0;
+        let currentFilter = 'All';
+
+        // Initialize Builder
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCatalogItems('All');
+            updateSummary();
+        });
+
+        // Filter Catalog Items
+        function filterCatalog(category) {
+            currentFilter = category;
+            document.querySelectorAll('.pill-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText === category || (category === 'All' && btn.innerText === 'All'));
+            });
+            renderCatalogItems(category);
+        }
+
+        // Render Inventory Grid
+        function renderCatalogItems(category) {
+            const grid = document.getElementById('catalogGrid');
+            const customUploadHtml = `
+                <div class="upload-tab-box">
+                    <p>📸 <strong>Have custom inspo or photo?</strong></p>
+                    <input type="file" id="customItemInput" accept="image/*" style="display: none;" onchange="handleCustomItemUpload(event)">
+                    <button onclick="document.getElementById('customItemInput').click()" class="btn-studio btn-studio-blue" style="font-size: 0.76rem; padding: 5px 12px;">📤 Upload Custom Item Image</button>
+                </div>`;
+
+            let items = rentalItems || [];
+            if (category !== 'All') {
+                items = items.filter(item => item.category === category);
+            }
+
+            let cardsHtml = items.map(item => `
+                <div class="item-card">
+                    <img src="${item.img}" class="item-thumb" alt="${item.title}" onerror="this.src='./wp-content/uploads/2025/07/image-150x150.png'">
+                    <div class="item-name">${item.title}</div>
+                    <div class="item-price">${typeof item.price === 'number' ? '$' + item.price : item.price}</div>
+                    <button onclick="addItemToStage(${item.id})" class="btn-add-item">➕ Add to Stage</button>
+                </div>
+            `).join('');
+
+            grid.innerHTML = customUploadHtml + cardsHtml;
+        }
+
+        // Add Item to Interactive Stage Canvas
+        function addItemToStage(itemId) {
+            const item = rentalItems.find(i => i.id === itemId);
+            if (!item) return;
+
+            const newObj = {
+                id: 'obj_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                itemId: item.id,
+                title: item.title,
+                price: typeof item.price === 'number' ? item.price : 0,
+                img: item.img,
+                x: 150 + (stageObjects.length * 20) % 200,
+                y: 120 + (stageObjects.length * 20) % 150,
+                width: 180,
+                height: 180,
+                rotation: 0,
+                scale: 1,
+                flipped: false,
+                zIndex: stageObjects.length + 1
+            };
+
+            stageObjects.push(newObj);
+            renderStageObjects();
+            selectObject(newObj.id);
+            updateSummary();
+        }
+
+        // Handle Custom User Cutout Image Upload
+        function handleCustomItemUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const newObj = {
+                    id: 'custom_' + Date.now(),
+                    itemId: null,
+                    title: 'Custom Inspo Item',
+                    price: 0,
+                    img: e.target.result,
+                    x: 200,
+                    y: 150,
+                    width: 180,
+                    height: 180,
+                    rotation: 0,
+                    scale: 1,
+                    flipped: false,
+                    zIndex: stageObjects.length + 1
+                };
+                stageObjects.push(newObj);
+                renderStageObjects();
+                selectObject(newObj.id);
+                updateSummary();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Render Objects on Stage
+        function renderStageObjects() {
+            const canvas = document.getElementById('stageCanvas');
+            canvas.querySelectorAll('.stage-object').forEach(el => el.remove());
+
+            stageObjects.sort((a, b) => a.zIndex - b.zIndex).forEach(obj => {
+                const el = document.createElement('div');
+                el.className = 'stage-object' + (obj.id === activeObjectId ? ' selected' : '');
+                el.id = obj.id;
+                el.style.left = obj.x + 'px';
+                el.style.top = obj.y + 'px';
+                el.style.width = (obj.width * obj.scale) + 'px';
+                el.style.height = (obj.height * obj.scale) + 'px';
+                el.style.transform = `rotate(${obj.rotation}deg) scaleX(${obj.flipped ? -1 : 1})`;
+                el.style.zIndex = obj.zIndex;
+
+                el.innerHTML = `
+                    <div class="object-toolbar" onclick="event.stopPropagation()">
+                        <button class="tool-icon-btn" onclick="scaleObject('${obj.id}', 1.1)" title="Zoom In">🔍+</button>
+                        <button class="tool-icon-btn" onclick="scaleObject('${obj.id}', 0.9)" title="Zoom Out">🔍-</button>
+                        <button class="tool-icon-btn" onclick="rotateObject('${obj.id}', 15)" title="Rotate">🔄</button>
+                        <button class="tool-icon-btn" onclick="flipObject('${obj.id}')" title="Flip">↔️</button>
+                        <button class="tool-icon-btn" onclick="changeZIndex('${obj.id}', 1)" title="Bring Forward">⬆️</button>
+                        <button class="tool-icon-btn" onclick="changeZIndex('${obj.id}', -1)" title="Send Back">⬇️</button>
+                        <button class="tool-icon-btn btn-del" onclick="deleteObject('${obj.id}')" title="Delete">🗑️</button>
+                    </div>
+                    <img src="${obj.img}" alt="${obj.title}">
+                `;
+
+                // Dragging Handlers
+                el.addEventListener('mousedown', (e) => startDrag(e, obj.id));
+                el.addEventListener('touchstart', (e) => startDrag(e, obj.id), {passive: false});
+
+                canvas.appendChild(el);
+            });
+        }
+
+        // Dragging Logic
+        function startDrag(e, id) {
+            e.stopPropagation();
+            selectObject(id);
+            isDragging = true;
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+            const obj = stageObjects.find(o => o.id === id);
+            if (!obj) return;
+
+            startX = clientX - obj.x;
+            startY = clientY - obj.y;
+
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('mouseup', stopDrag);
+            document.addEventListener('touchmove', onDrag, {passive: false});
+            document.addEventListener('touchend', stopDrag);
+        }
+
+        function onDrag(e) {
+            if (!isDragging || !activeObjectId) return;
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+            const obj = stageObjects.find(o => o.id === activeObjectId);
+            if (obj) {
+                obj.x = clientX - startX;
+                obj.y = clientY - startY;
+                const el = document.getElementById(obj.id);
+                if (el) {
+                    el.style.left = obj.x + 'px';
+                    el.style.top = obj.y + 'px';
+                }
+            }
+        }
+
+        function stopDrag() {
+            isDragging = false;
+            document.removeEventListener('mousemove', onDrag);
+            document.removeEventListener('mouseup', stopDrag);
+            document.removeEventListener('touchmove', onDrag);
+            document.removeEventListener('touchend', stopDrag);
+        }
+
+        // Object Operations
+        function selectObject(id) {
+            activeObjectId = id;
+            document.querySelectorAll('.stage-object').forEach(el => {
+                el.classList.toggle('selected', el.id === id);
+            });
+        }
+
+        function deselectAllObjects(e) {
+            if (e.target.id === 'stageCanvas' || e.target.classList.contains('stage-canvas-wrapper')) {
+                activeObjectId = null;
+                document.querySelectorAll('.stage-object').forEach(el => el.classList.remove('selected'));
+            }
+        }
+
+        function scaleObject(id, factor) {
+            const obj = stageObjects.find(o => o.id === id);
+            if (obj) {
+                obj.scale = Math.max(0.3, Math.min(3.0, obj.scale * factor));
+                renderStageObjects();
+            }
+        }
+
+        function rotateObject(id, deg) {
+            const obj = stageObjects.find(o => o.id === id);
+            if (obj) {
+                obj.rotation = (obj.rotation + deg) % 360;
+                renderStageObjects();
+            }
+        }
+
+        function flipObject(id) {
+            const obj = stageObjects.find(o => o.id === id);
+            if (obj) {
+                obj.flipped = !obj.flipped;
+                renderStageObjects();
+            }
+        }
+
+        function changeZIndex(id, dir) {
+            const obj = stageObjects.find(o => o.id === id);
+            if (obj) {
+                obj.zIndex = Math.max(1, obj.zIndex + dir);
+                renderStageObjects();
+            }
+        }
+
+        function deleteObject(id) {
+            stageObjects = stageObjects.filter(o => o.id !== id);
+            if (activeObjectId === id) activeObjectId = null;
+            renderStageObjects();
+            updateSummary();
+        }
+
+        function clearStageCanvas() {
+            if (stageObjects.length === 0) return;
+            if (confirm('Are you sure you want to clear all items from the stage?')) {
+                stageObjects = [];
+                activeObjectId = null;
+                renderStageObjects();
+                updateSummary();
+            }
+        }
+
+        // Stage Background Switcher
+        function changeStageBackground(val) {
+            const canvas = document.getElementById('stageCanvas');
+            if (val === 'solid') {
+                canvas.style.backgroundImage = 'none';
+                canvas.style.backgroundColor = '#1e293b';
+            } else {
+                canvas.style.backgroundColor = 'transparent';
+                canvas.style.backgroundImage = `url('${val}')`;
+            }
+        }
+
+        // Handle Custom Venue Photo Upload
+        function handleVenueBgUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const canvas = document.getElementById('stageCanvas');
+                canvas.style.backgroundImage = `url('${e.target.result}')`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Live Summary & Total Calculation
+        function updateSummary() {
+            const countEl = document.getElementById('summaryItemCount');
+            const priceEl = document.getElementById('summaryPrice');
+
+            const totalNum = stageObjects.reduce((acc, o) => acc + (typeof o.price === 'number' ? o.price : 0), 0);
+            const count = stageObjects.length;
+
+            if (countEl) countEl.innerText = count + (count === 1 ? ' item' : ' items');
+            if (priceEl) priceEl.innerText = '$' + totalNum.toFixed(2);
+        }
+
+        // Export Stage as PNG Image
+        async function exportStageImage() {
+            const canvasEl = document.getElementById('stageCanvas');
+            // Temporarily hide selection outlines
+            const prevActive = activeObjectId;
+            activeObjectId = null;
+            renderStageObjects();
+
+            try {
+                const rendered = await html2canvas(canvasEl, { useCORS: true, scale: 2 });
+                const link = document.createElement('a');
+                link.download = 'Petals-Paradise-Decor-Layout.png';
+                link.href = rendered.toDataURL('image/png');
+                link.click();
+            } catch (e) {
+                alert('Could not export layout image: ' + e.message);
+            } finally {
+                activeObjectId = prevActive;
+                renderStageObjects();
+            }
+        }
+
+        // Open Quote Request Modal
+        async function openQuoteModal() {
+            if (stageObjects.length === 0) {
+                alert('Please add at least one decor item to your stage before requesting a quote!');
+                return;
+            }
+
+            const modal = document.getElementById('quoteModal');
+            const mockupImg = document.getElementById('modalMockupPreview');
+
+            // Render stage image preview for modal
+            const canvasEl = document.getElementById('stageCanvas');
+            const prevActive = activeObjectId;
+            activeObjectId = null;
+            renderStageObjects();
+
+            try {
+                const rendered = await html2canvas(canvasEl, { useCORS: true, scale: 1.5 });
+                mockupImg.src = rendered.toDataURL('image/png');
+            } catch (e) {
+                mockupImg.style.display = 'none';
+            } finally {
+                activeObjectId = prevActive;
+                renderStageObjects();
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function closeQuoteModal() {
+            document.getElementById('quoteModal').style.display = 'none';
+        }
+
+        // Submit Quote Request with Stage Layout
+        async function handleQuoteSubmission(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitQuote');
+            const msg = document.getElementById('quoteFormMsg');
+            btn.disabled = true;
+            btn.innerText = '⌛ Submitting Quote Request...';
+
+            const name = document.getElementById('quoteName').value.trim();
+            const email = document.getElementById('quoteEmail').value.trim();
+            const phone = document.getElementById('quotePhone').value.trim();
+            const date = document.getElementById('quoteDate').value;
+            const location = document.getElementById('quoteLocation').value.trim();
+            const notes = document.getElementById('quoteNotes').value.trim();
+
+            const placedItemsList = stageObjects.map(o => o.title + (o.price ? ' ($' + o.price + ')' : '')).join(', ');
+            const totalNum = stageObjects.reduce((acc, o) => acc + (typeof o.price === 'number' ? o.price : 0), 0);
+            const mockupSrc = document.getElementById('modalMockupPreview').src;
+
+            const payload = {
+                name: name,
+                email: email,
+                phone: phone,
+                event_date: date,
+                location: location,
+                event_type: 'DIY Decor Studio Inquiry',
+                service_tier: 'Custom Visualizer Stage Layout',
+                budget: '$' + totalNum.toFixed(2),
+                notes: `[DIY STAGE BUILDER LAYOUT]\nItems Placed: ${placedItemsList}\nEst Total: $${totalNum.toFixed(2)}\n\nUser Notes: ${notes}`,
+                source: 'DIY Decor Studio'
+            };
+
+            try {
+                const res = await fetch('./api/save_lead.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    msg.style.display = 'block';
+                    msg.style.color = '#10b981';
+                    msg.innerHTML = '🎉 <strong>Quote Request Sent Successfully!</strong> Our decor team will review your visual layout and reply shortly with exact confirmation.';
+                    setTimeout(() => {
+                        closeQuoteModal();
+                        document.getElementById('builderQuoteForm').reset();
+                        msg.style.display = 'none';
+                    }, 3500);
+                } else {
+                    throw new Error(data.message || 'Failed to submit quote request');
+                }
+            } catch (err) {
+                msg.style.display = 'block';
+                msg.style.color = '#ef4444';
+                msg.innerText = '❌ Error sending request: ' + err.message;
+            } finally {
+                btn.disabled = false;
+                btn.innerText = '🚀 Send Quote Inquiry with Layout';
+            }
+        }
+    </script>
+</body>
+</html>
