@@ -1430,6 +1430,9 @@ if ($format === 'json') {
                     msgDiv.style.color = '#ef4444';
                     msgDiv.innerText = '❌ Server connection error';
                 }
+            }
+        }
+
         // ═══════════════════════════════════════════════════════════
         // CREATE NEW PHONE / MANUAL QUOTE MODAL LOGIC
         // ═══════════════════════════════════════════════════════════
