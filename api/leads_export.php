@@ -412,6 +412,9 @@ if ($format === 'json') {
             </p>
         </div>
         <div class="action-btns">
+            <button onclick="openCreateQuoteModal()" class="btn" style="background: linear-gradient(135deg, #006aff, #38bdf8); color: #ffffff; font-weight: bold; border: none; box-shadow: 0 4px 12px rgba(0,106,255,0.3); cursor: pointer;">
+                ➕ Create Quote (Phone / Manual)
+            </button>
             <a href="?format=csv&type=leads<?php echo !empty($providedKey) ? '&key=' . urlencode($providedKey) : ''; ?>" id="downloadLeadsCsvBtn" class="btn btn-primary">
                 📥 Download Leads CSV
             </a>
@@ -1427,6 +1430,188 @@ if ($format === 'json') {
                     msgDiv.style.color = '#ef4444';
                     msgDiv.innerText = '❌ Server connection error';
                 }
+        // ═══════════════════════════════════════════════════════════
+        // CREATE NEW PHONE / MANUAL QUOTE MODAL LOGIC
+        // ═══════════════════════════════════════════════════════════
+        function openCreateQuoteModal() {
+            document.getElementById('createName').value = '';
+            document.getElementById('createEmail').value = '';
+            document.getElementById('createPhone').value = '';
+            document.getElementById('createEventDate').value = '';
+            document.getElementById('createVenue').value = '';
+            document.getElementById('createFulfillment').value = 'Pickup';
+            document.getElementById('createDeliveryAddress').value = '';
+            document.getElementById('createDiscount').value = '0.00';
+            document.getElementById('createPromo').value = '';
+            document.getElementById('createDelFee').value = '0.00';
+            document.getElementById('createSetupFee').value = '0.00';
+            document.getElementById('createNotes').value = '';
+            document.getElementById('createMsg').style.display = 'none';
+
+            const tbody = document.getElementById('createModalItemsBody');
+            tbody.innerHTML = '';
+            appendCreateModalRow('Sample Rental Item', 1, 10.00);
+            recalcCreateModalSubtotal();
+            toggleCreateFulfillmentFields();
+
+            document.getElementById('createQuoteModal').style.display = 'flex';
+        }
+
+        function closeCreateQuoteModal() {
+            document.getElementById('createQuoteModal').style.display = 'none';
+        }
+
+        function toggleCreateFulfillmentFields() {
+            const method = document.getElementById('createFulfillment').value;
+            const addrDiv = document.getElementById('createDeliveryAddrGroup');
+            if (addrDiv) {
+                addrDiv.style.display = (method === 'Delivery') ? 'block' : 'none';
+            }
+        }
+
+        function appendCreateModalRow(title, qty, price) {
+            const tbody = document.getElementById('createModalItemsBody');
+            const tr = document.createElement('tr');
+            tr.style.borderBottom = '1px solid var(--border-color)';
+            tr.innerHTML = `
+                <td style="padding: 0.4rem;"><input type="text" value="${escapeHtml(title)}" class="create-title-input" placeholder="Item description" style="width: 100%; padding: 5px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: var(--text-primary);"></td>
+                <td style="padding: 0.4rem;"><input type="number" min="1" value="${qty}" class="create-qty-input" oninput="recalcCreateModalSubtotal()" style="width: 100%; padding: 5px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: var(--text-primary);"></td>
+                <td style="padding: 0.4rem;"><input type="number" step="0.01" min="0" value="${parseFloat(price).toFixed(2)}" class="create-price-input" oninput="recalcCreateModalSubtotal()" style="width: 100%; padding: 5px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg); color: #d4af37; font-weight: bold;"></td>
+                <td style="padding: 0.4rem; font-weight: bold; color: var(--primary);" class="create-row-total">$0.00</td>
+                <td style="padding: 0.4rem; text-align: center;"><button onclick="this.closest('tr').remove(); recalcCreateModalSubtotal();" style="background: none; border: none; color: #ef4444; font-size: 1rem; cursor: pointer;">🗑️</button></td>
+            `;
+            tbody.appendChild(tr);
+            recalcCreateModalSubtotal();
+        }
+
+        function addCatalogItemToCreateModal() {
+            const picker = document.getElementById('createCatalogPicker');
+            if (!picker.value) return;
+            const parts = picker.value.split('|');
+            appendCreateModalRow(parts[0], 1, parseFloat(parts[1]) || 0);
+            picker.value = '';
+        }
+
+        function addCustomRowToCreateModal() {
+            appendCreateModalRow('Custom Item / Service', 1, 0.00);
+        }
+
+        function recalcCreateModalSubtotal() {
+            let subtotal = 0;
+            document.querySelectorAll('#createModalItemsBody tr').forEach(tr => {
+                const qtyInput = tr.querySelector('.create-qty-input');
+                const priceInput = tr.querySelector('.create-price-input');
+                if (qtyInput && priceInput) {
+                    const qty = parseFloat(qtyInput.value) || 0;
+                    const price = parseFloat(priceInput.value) || 0;
+                    const total = qty * price;
+                    subtotal += total;
+                    const totalTd = tr.querySelector('.create-row-total');
+                    if (totalTd) totalTd.innerText = '$' + total.toFixed(2);
+                }
+            });
+
+            const discount = parseFloat(document.getElementById('createDiscount').value) || 0;
+            const delFee   = parseFloat(document.getElementById('createDelFee').value) || 0;
+            const setupFee = parseFloat(document.getElementById('createSetupFee').value) || 0;
+
+            const baseTotal = Math.max(0, subtotal - discount + delFee + setupFee);
+            const taxVal    = Math.round(baseTotal * 0.059 * 100) / 100;
+            const finalTotal = baseTotal + taxVal;
+
+            document.getElementById('createSubtotalDisplay').innerText = '$' + subtotal.toFixed(2);
+            document.getElementById('createBaseTotalDisplay').innerText = '$' + baseTotal.toFixed(2);
+            document.getElementById('createTaxDisplay').innerText = '+$' + taxVal.toFixed(2);
+            document.getElementById('createFinalTotalDisplay').innerText = '$' + finalTotal.toFixed(2);
+        }
+
+        async function saveNewManualQuote(sendEmail) {
+            const name  = document.getElementById('createName').value.trim();
+            const email = document.getElementById('createEmail').value.trim();
+            const phone = document.getElementById('createPhone').value.trim();
+
+            if (!name) {
+                alert('Please enter customer name.');
+                return;
+            }
+            if (sendEmail && !email) {
+                alert('Customer email address is required to send quote email.');
+                return;
+            }
+
+            const items = [];
+            document.querySelectorAll('#createModalItemsBody tr').forEach(tr => {
+                const titleInput = tr.querySelector('.create-title-input');
+                const qtyInput   = tr.querySelector('.create-qty-input');
+                const priceInput = tr.querySelector('.create-price-input');
+
+                if (titleInput && qtyInput && priceInput) {
+                    const title = titleInput.value.trim();
+                    const qty   = parseInt(qtyInput.value) || 1;
+                    const price = parseFloat(priceInput.value) || 0;
+                    if (title) {
+                        items.push({ title: title, quantity: qty, price: price });
+                    }
+                }
+            });
+
+            if (items.length === 0) {
+                alert('Please add at least one item to the quote.');
+                return;
+            }
+
+            const msgDiv = document.getElementById('createMsg');
+            if (msgDiv) {
+                msgDiv.style.display = 'block';
+                msgDiv.style.color = '#cbd5e1';
+                msgDiv.innerText = sendEmail ? 'Creating quote and sending customer email...' : 'Creating quote order quietly...';
+            }
+
+            const payload = {
+                name:                name,
+                email:               email,
+                phone:               phone,
+                event_date:          document.getElementById('createEventDate').value,
+                venue_location:      document.getElementById('createVenue').value.trim(),
+                fulfillment_method:  document.getElementById('createFulfillment').value,
+                delivery_address:    document.getElementById('createDeliveryAddress').value.trim(),
+                items:               items,
+                discount:            parseFloat(document.getElementById('createDiscount').value) || 0,
+                promo_code:          document.getElementById('createPromo').value.trim(),
+                delivery_fee:        parseFloat(document.getElementById('createDelFee').value) || 0,
+                setup_fee:           parseFloat(document.getElementById('createSetupFee').value) || 0,
+                admin_notes:         document.getElementById('createNotes').value.trim(),
+                notify:              sendEmail
+            };
+
+            try {
+                const res = await fetch('create_manual_order.php' + (window.location.search || ''), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    if (msgDiv) {
+                        msgDiv.style.color = '#10b981';
+                        msgDiv.innerText = sendEmail ? ('✅ Order ' + data.order_id + ' created & quote emailed to ' + data.customer_email + '!') : ('✅ Order ' + data.order_id + ' created successfully!');
+                    }
+                    setTimeout(() => {
+                        closeCreateQuoteModal();
+                        window.location.reload();
+                    }, 1200);
+                } else {
+                    if (msgDiv) {
+                        msgDiv.style.color = '#ef4444';
+                        msgDiv.innerText = '❌ ' + (data.error || 'Failed to create quote');
+                    }
+                }
+            } catch (err) {
+                if (msgDiv) {
+                    msgDiv.style.color = '#ef4444';
+                    msgDiv.innerText = '❌ Server connection error';
+                }
             }
         }
     </script>
@@ -1553,6 +1738,157 @@ if ($format === 'json') {
                 <button onclick="sendPaymentLinkFromModal()" id="qrModalSendBtn" style="font-size: 14px; padding: 0 16px; height: 40px; background: var(--primary, #d4af37); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">✉️ Send Email</button>
             </div>
             <div id="qrModalMsg" style="font-size: 0.8rem; margin-top: 0.8rem; display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Create Phone / Manual Quote Modal -->
+    <div id="createQuoteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); z-index: 99999; align-items: center; justify-content: center; padding: 1rem;">
+        <div style="background: var(--surface); border: 2px solid var(--primary); border-radius: 16px; width: 100%; max-width: 720px; max-height: 92vh; overflow-y: auto; padding: 1.8rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+                <h3 style="color: var(--primary); font-family: Georgia, serif; font-size: 1.35rem; margin: 0;">🌸 Create New Quote / Order (Phone or Direct Inquiry)</h3>
+                <button onclick="closeCreateQuoteModal()" style="background: none; border: none; color: var(--text-muted); font-size: 1.6rem; cursor: pointer;">&times;</button>
+            </div>
+
+            <!-- Customer Details Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.8rem; margin-bottom: 1rem;">
+                <div>
+                    <label style="display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 3px; font-weight: bold;">👤 Customer Name *</label>
+                    <input type="text" id="createName" placeholder="e.g. Sarah Johnson" style="width: 100%; padding: 7px; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg); color: var(--text-primary);" required>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 3px; font-weight: bold;">📧 Email Address *</label>
+                    <input type="email" id="createEmail" placeholder="customer@example.com" style="width: 100%; padding: 7px; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg); color: var(--text-primary);">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 3px; font-weight: bold;">📞 Phone Number</label>
+                    <input type="tel" id="createPhone" placeholder="+1 703-555-0199" style="width: 100%; padding: 7px; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg); color: var(--text-primary);">
+                </div>
+            </div>
+
+            <!-- Event & Logistics Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.8rem; margin-bottom: 1rem;">
+                <div>
+                    <label style="display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 3px; font-weight: bold;">🗓️ Event Date</label>
+                    <input type="text" id="createEventDate" placeholder="e.g. Oct 25, 2026" style="width: 100%; padding: 7px; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg); color: var(--text-primary);">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 3px; font-weight: bold;">📍 Venue Location / City</label>
+                    <input type="text" id="createVenue" placeholder="e.g. Ashburn, VA" style="width: 100%; padding: 7px; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg); color: var(--text-primary);">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 3px; font-weight: bold;">🚚 Fulfillment Method</label>
+                    <select id="createFulfillment" onchange="toggleCreateFulfillmentFields()" style="width: 100%; padding: 7px; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg); color: #d4af37; font-weight: bold;">
+                        <option value="Pickup">📦 Customer Pickup</option>
+                        <option value="Delivery">🚚 Delivery &amp; Setup</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="createDeliveryAddrGroup" style="display: none; margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 3px; font-weight: bold;">🏡 Delivery Address</label>
+                <input type="text" id="createDeliveryAddress" placeholder="Full street address, city, state, zip" style="width: 100%; padding: 7px; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg); color: var(--text-primary);">
+            </div>
+
+            <!-- Store Catalog Quick Add -->
+            <div style="background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.8rem; margin-bottom: 1.2rem; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+                <span style="font-size: 0.8rem; font-weight: bold; color: var(--primary);">➕ Quick Add Item:</span>
+                <select id="createCatalogPicker" class="filter-select" style="flex: 1; min-width: 200px; font-size: 0.82rem; padding: 0.4rem; background: var(--bg); color: var(--text-primary); border: 1px solid var(--border-color);">
+                    <option value="">-- Select Store Item --</option>
+                    <option value="Round Fold-In-Half Table|12.00">Round Fold-In-Half Table ($12.00)</option>
+                    <option value="Cocktail Table (With Cloths)|11.00">Cocktail Table ($11.00)</option>
+                    <option value="Adult Rectangular Folding Table Rental|8.00">Adult Rectangular Table ($8.00)</option>
+                    <option value="Adult Folding Chair|1.50">Adult Folding Chair ($1.50)</option>
+                    <option value="Wedding Tent (16x26)|150.00">Wedding Tent (16x26) ($150.00)</option>
+                    <option value="Tent (10x20)|100.00">Tent (10x20) ($100.00)</option>
+                    <option value="Round Cylinder Pedestal Display|30.00">Round Cylinder Pedestal ($30.00)</option>
+                    <option value="Buffet Food Warmers|10.00">Buffet Food Warmer ($10.00)</option>
+                    <option value="Loveseat for rental|100.00">Loveseat ($100.00)</option>
+                    <option value="Haldi Urli`s|125.00">Haldi Urli`s ($125.00)</option>
+                    <option value="Pipe and Drape Backdrop Stand|50.00">Pipe and Drape Backdrop Stand ($50.00)</option>
+                    <option value="GRAD Marquee Letters|40.00">GRAD Marquee Letters ($40.00)</option>
+                    <option value="4FT Marquee Numbers|20.00">4FT Marquee Numbers ($20.00)</option>
+                    <option value="Photo/Any Event Backdrop|150.00">Photo / Event Backdrop ($150.00)</option>
+                    <option value="New Born Baby Photo Prop|20.00">New Born Baby Photo Prop ($20.00)</option>
+                    <option value="Seemantham/Baby Shower Backdrop|150.00">Seemantham / Baby Shower Backdrop ($150.00)</option>
+                    <option value="VEVOR Metal Wedding Centerpiece (2PCS)|25.00">Metal Wedding Centerpiece ($25.00)</option>
+                    <option value="Happy Birthday Neon Sign|10.00">Happy Birthday Neon Sign ($10.00)</option>
+                    <option value="Good Vibes Only Neon Sign|10.00">Good Vibes Only Neon Sign ($10.00)</option>
+                </select>
+                <button onclick="addCatalogItemToCreateModal()" style="font-size: 0.8rem; padding: 0.4rem 0.8rem; background: var(--primary); color: #000; font-weight: bold; border-radius: 6px; border: none; cursor: pointer;">Add Item</button>
+            </div>
+
+            <!-- Dynamic Items Table -->
+            <div style="margin-bottom: 1.2rem;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                    <thead>
+                        <tr style="background: rgba(255,255,255,0.05); text-align: left;">
+                            <th style="padding: 0.5rem;">Item Description</th>
+                            <th style="padding: 0.5rem; width: 70px;">Qty</th>
+                            <th style="padding: 0.5rem; width: 90px;">Price ($)</th>
+                            <th style="padding: 0.5rem; width: 80px;">Total</th>
+                            <th style="padding: 0.5rem; width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="createModalItemsBody">
+                        <!-- Dynamic Rows -->
+                    </tbody>
+                </table>
+                <button onclick="addCustomRowToCreateModal()" style="margin-top: 0.6rem; font-size: 0.78rem; padding: 0.35rem 0.75rem; background: transparent; color: var(--primary); border: 1px dashed var(--primary); border-radius: 6px; cursor: pointer; font-weight: bold;">➕ Add Custom Row</button>
+            </div>
+
+            <!-- Financial Inputs & Live Calculations -->
+            <div style="background: var(--bg); border: 1px solid var(--border-color); padding: 1rem; border-radius: 10px; margin-bottom: 1.2rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.6rem; margin-bottom: 0.8rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 2px;">Disc ($)</label>
+                        <input type="number" step="0.01" min="0" id="createDiscount" value="0.00" oninput="recalcCreateModalSubtotal()" style="width: 100%; padding: 4px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--surface); color: #38a169; font-weight: bold;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 2px;">Coupon Code</label>
+                        <input type="text" id="createPromo" placeholder="e.g. PHONE10" style="width: 100%; padding: 4px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--surface); color: var(--text-primary);">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 2px;">Del Fee ($)</label>
+                        <input type="number" step="0.01" min="0" id="createDelFee" value="0.00" oninput="recalcCreateModalSubtotal()" style="width: 100%; padding: 4px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--surface); color: #d4af37; font-weight: bold;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 2px;">Setup Fee ($)</label>
+                        <input type="number" step="0.01" min="0" id="createSetupFee" value="0.00" oninput="recalcCreateModalSubtotal()" style="width: 100%; padding: 4px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--surface); color: #d4af37; font-weight: bold;">
+                    </div>
+                </div>
+
+                <div style="font-size: 0.85rem; line-height: 1.6; border-top: 1px dashed var(--border-color); padding-top: 0.6rem;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Items Subtotal:</span>
+                        <span id="createSubtotalDisplay" style="font-weight: bold; color: var(--text-primary);">$0.00</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Quote Base Total:</span>
+                        <span id="createBaseTotalDisplay" style="font-weight: bold; color: var(--text-primary);">$0.00</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; color: #006aff;">
+                        <span>VA Sales Tax (5.9%):</span>
+                        <span id="createTaxDisplay" style="font-weight: bold;">+$0.00</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: bold; color: #d4af37; border-top: 1px solid var(--border-color); padding-top: 0.4rem; margin-top: 0.4rem;">
+                        <span>Final Amount Due:</span>
+                        <span id="createFinalTotalDisplay">$0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes & Explanation for Email -->
+            <div style="margin-bottom: 1.4rem;">
+                <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem; font-weight: bold;">💬 Notes / Quote Message for Customer Email:</label>
+                <textarea id="createNotes" placeholder="e.g. 'Thank you for calling us today! Here is your custom rental quote including setup and delivery for your event...'" style="width: 100%; min-height: 55px; font-size: 0.8rem; padding: 6px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg); color: var(--text-primary); resize: vertical;"></textarea>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end; flex-wrap: wrap;">
+                <button onclick="saveNewManualQuote(false)" style="font-size: 0.85rem; padding: 0.65rem 1.2rem; background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); font-weight: bold; border-radius: 8px; cursor: pointer;">💾 Save Order quietly</button>
+                <button onclick="saveNewManualQuote(true)" style="font-size: 0.85rem; padding: 0.65rem 1.2rem; background: linear-gradient(135deg, #006aff, #38bdf8); color: #fff; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,106,255,0.3);">✉️ Create Order &amp; Send Quote Email</button>
+            </div>
+            <div id="createMsg" style="margin-top: 0.8rem; font-size: 0.85rem; text-align: center; display: none;"></div>
         </div>
     </div>
 </body>
