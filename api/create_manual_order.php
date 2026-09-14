@@ -109,7 +109,7 @@ try {
     $setupFee    = isset($data['setup_fee']) ? max(0, floatval($data['setup_fee'])) : 0.00;
 
     $baseTotal     = max(0, $subtotal - $discount + $deliveryFee + $setupFee);
-    $onlineTaxVal  = round($baseTotal * 0.059, 2);
+    $onlineTaxVal  = round($baseTotal * 0.06, 2);
     $finalTotalVal = round($baseTotal + $onlineTaxVal, 2);
 
     // Generate Custom Order ID
@@ -298,7 +298,7 @@ try {
                             <td style='text-align: right; font-weight: bold;'>\${$baseTotalFmt}</td>
                         </tr>
                         <tr style='color: #006aff;'>
-                            <td>VA Sales Tax (5.9%):</td>
+                            <td>VA Sales Tax (6%):</td>
                             <td style='text-align: right; font-weight: bold;'>+\${$onlineTaxFmt}</td>
                         </tr>
                         <tr class='total-row'>
@@ -308,20 +308,33 @@ try {
                     </table>
                 </div>
 
-                <!-- SQUARE ONLINE PAYMENT & QR CODE -->
-                <div style='background: #f8fafc; border: 2px solid #006aff; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;'>
-                    <h3 style='margin-top:0; color:#006aff; font-size:17px;'>💳 Pay Online via Square</h3>
-                    <p style='margin: 6px 0 15px 0; font-size: 14px; color: #475569;'>Click below or scan the QR code with your smartphone camera to pay securely using Credit Card, Debit Card, or Apple Pay.</p>
-                    <div style='margin-bottom: 12px;'>
-                        <a href='{$squarePayUrl}' target='_blank' style='display: inline-block; font-size: 18px; line-height: 48px; height: 48px; color: #ffffff !important; min-width: 212px; background-color: #006aff; text-align: center; box-shadow: 0 0 0 1px rgba(0,0,0,.1) inset; border-radius: 6px; text-decoration: none; font-weight: bold; padding: 0 24px;'>Pay now (\${$finalTotalFmt})</a>
+                <!-- MULTI-PAYMENT OPTIONS CARD (Square, Zelle, Venmo, Cash App) -->
+                <div style='background: #f8fafc; border: 2px solid #006aff; border-radius: 12px; padding: 20px; margin: 20px 0;'>
+                    <h3 style='margin-top:0; color:#006aff; font-size:17px; text-align: center;'>💳 Select Your Preferred Payment Method</h3>
+                    <p style='text-align: center; font-size: 13px; color: #475569; margin-top: -4px; margin-bottom: 16px;'>Final Amount Due: <strong style='color: #006aff; font-size: 16px;'>\${$finalTotalFmt}</strong></p>
+
+                    <!-- OPTION 1: SQUARE ONLINE CHECKOUT (Card / Apple Pay / Cash App Pay) -->
+                    <div style='background: #ffffff; border: 1px solid #006aff; border-radius: 10px; padding: 14px; margin-bottom: 14px; text-align: center;'>
+                        <div style='font-size: 14px; font-weight: bold; color: #1e293b; margin-bottom: 8px;'>1. Pay Online via Square (Credit/Debit Card, Apple Pay, Cash App Pay)</div>
+                        <a href='{$squarePayUrl}' target='_blank' style='display: inline-block; font-size: 16px; line-height: 44px; height: 44px; color: #ffffff !important; background-color: #006aff; text-align: center; border-radius: 6px; text-decoration: none; font-weight: bold; padding: 0 24px;'>Pay now (\${$finalTotalFmt})</a>
+                        <div style='margin: 12px auto 0 auto; max-width: 380px; font-size: 12px; color: #1e293b; background: #f0f9ff; border: 1px solid #bae6fd; padding: 8px 12px; border-radius: 6px;'>
+                            📌 Amount to Enter on Square: <strong style='color: #006aff;'>\${$finalTotalFmt}</strong>
+                        </div>
                     </div>
-                    <div style='margin: 0 auto 16px auto; max-width: 380px; font-size: 13px; color: #1e293b; font-weight: bold; background: #ffffff; border: 1px solid #bae6fd; padding: 10px 16px; border-radius: 8px;'>
-                        📌 Amount to Enter on Square: <span style='color: #006aff; font-size: 15px; font-weight: 800;'>\${$finalTotalFmt}</span>
-                        <div style='font-weight: normal; font-size: 12px; color: #64748b; margin-top: 2px;'>When Square opens, please enter <strong>\${$finalTotalFmt}</strong> in the 'Enter amount' box.</div>
-                    </div>
-                    <div style='display: inline-block; background: #ffffff; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1;'>
-                        <img src='{$squareQrUrl}' alt='Scan to Pay via Square' width='160' height='160' style='display: block; border-radius: 6px;' />
-                        <span style='font-size: 11px; color: #64748b; margin-top: 4px; display: block;'>Scan with Phone Camera</span>
+
+                    <!-- OPTION 2: ZELLE / VENMO / CASH APP -->
+                    <div style='background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; text-align: left;'>
+                        <div style='font-size: 14px; font-weight: bold; color: #0f172a; margin-bottom: 10px; text-align: center;'>2. Direct Mobile Pay (Zelle, Venmo, Cash App)</div>
+                        
+                        <div style='font-size: 13px; color: #334155; margin-bottom: 10px; padding: 10px 12px; background: #f1f5f9; border-radius: 6px; border-left: 4px solid #6366f1;'>
+                            <strong>📲 Zelle Instant Bank Transfer:</strong><br>
+                            Send <strong>\${$finalTotalFmt}</strong> to Zelle Email: <span style='color: #006aff; font-weight: bold; font-size: 14px;'>biragonimounika@gmail.com</span>
+                        </div>
+
+                        <div style='display: flex; gap: 8px; flex-wrap: wrap;'>
+                            <a href='https://venmo.com/u/MounikaBiragoni' target='_blank' style='flex: 1; min-width: 140px; text-align: center; background: #008CFF; color: #ffffff !important; padding: 10px 8px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px;'>💙 Pay on Venmo (@MounikaBiragoni)</a>
+                            <a href='https://cash.app/$Mounikabiragoni' target='_blank' style='flex: 1; min-width: 140px; text-align: center; background: #00D632; color: #ffffff !important; padding: 10px 8px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px;'>💚 Pay on Cash App ($Mounikabiragoni)</a>
+                        </div>
                     </div>
                 </div>
 

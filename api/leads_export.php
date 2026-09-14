@@ -341,6 +341,7 @@ if ($format === 'json') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Petals Paradise Events - Admin Portal</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7BoceUK04hZXBFfRYmnRJSUSmflVkmKEUXxvu26TxgRJbuLESzLmddwNdfJX9JJ38sV0486zN19xA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         :root {
             --bg: #0b0f17;
@@ -1023,6 +1024,48 @@ if ($format === 'json') {
         let currentQrFinalTotal = '0.00';
         let currentQrPaymentUrl = '';
 
+        function updateQrCodeImage(url) {
+            if (!url) return;
+            const container = document.getElementById('qrModalContainer');
+            if (!container) return;
+
+            const encodedUrl = encodeURIComponent(url);
+            const primarySrc = 'https://quickchart.io/qr?size=250&text=' + encodedUrl;
+            const fallbackSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodedUrl;
+
+            container.innerHTML = '';
+
+            if (typeof QRCode !== 'undefined') {
+                try {
+                    new QRCode(container, {
+                        text: url,
+                        width: 180,
+                        height: 180,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                    return;
+                } catch (e) {
+                    console.warn('QRCode JS render failed:', e);
+                }
+            }
+
+            const img = document.createElement('img');
+            img.id = 'qrModalImg';
+            img.style.width = '180px';
+            img.style.height = '180px';
+            img.style.display = 'block';
+            img.style.borderRadius = '8px';
+            img.alt = 'Square Payment QR Code';
+            img.src = primarySrc;
+            img.onerror = function() {
+                this.onerror = null;
+                this.src = fallbackSrc;
+            };
+            container.appendChild(img);
+        }
+
         async function showQrModal(orderId, total) {
             currentQrOrderId = orderId;
             const orderIdEl   = document.getElementById('qrModalOrderId');
@@ -1034,7 +1077,7 @@ if ($format === 'json') {
             const modalEl     = document.getElementById('qrModal');
 
             const numTotal   = parseFloat(total) || 0;
-            const taxAmount  = Math.round(numTotal * 0.059 * 100) / 100;
+            const taxAmount  = Math.round(numTotal * 0.06 * 100) / 100;
             const finalTotal = (numTotal + taxAmount).toFixed(2);
             currentQrFinalTotal = finalTotal;
             currentQrPaymentUrl = 'https://square.link/u/xV2eBBtG?src=embed&amount=' + finalTotal + '&total=' + finalTotal + '&price=' + finalTotal;
@@ -1053,6 +1096,9 @@ if ($format === 'json') {
             }
             if (msgEl)       msgEl.style.display = 'none';
 
+            // Instantly render QR code for initial payment link
+            updateQrCodeImage(currentQrPaymentUrl);
+
             if (modalEl) {
                 modalEl.style.zIndex = '999999';
                 modalEl.style.display = 'flex';
@@ -1065,6 +1111,7 @@ if ($format === 'json') {
                 if (data.success && data.payment_url) {
                     currentQrPaymentUrl = data.payment_url;
                     if (payBtn) payBtn.href = data.payment_url;
+                    updateQrCodeImage(data.payment_url);
                 }
             } catch (e) {
                 // Fall back gracefully
@@ -1567,7 +1614,7 @@ if ($format === 'json') {
             const setupFee = parseFloat(document.getElementById('createSetupFee').value) || 0;
 
             const baseTotal = Math.max(0, subtotal - discount + delFee + setupFee);
-            const taxVal    = Math.round(baseTotal * 0.059 * 100) / 100;
+            const taxVal    = Math.round(baseTotal * 0.06 * 100) / 100;
             const finalTotal = baseTotal + taxVal;
 
             document.getElementById('createSubtotalDisplay').innerText = '$' + subtotal.toFixed(2);
@@ -1794,7 +1841,7 @@ if ($format === 'json') {
                     <span id="qrModalBaseTotal" style="font-weight: 600; color: #fff;">$0.00</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 6px; color: #38bdf8;">
-                    <span>VA Sales Tax (5.9%):</span>
+                    <span>VA Sales Tax (6%):</span>
                     <span id="qrModalTax" style="font-weight: 600;">+$0.00</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; border-top: 1px dashed var(--border-color, #444); padding-top: 6px; font-weight: bold; font-size: 0.98rem; color: #006aff;">
@@ -1808,8 +1855,8 @@ if ($format === 'json') {
                 <div style="font-size: 0.75rem; color: var(--text-muted, #94a3b8); margin-top: 2px;">When redirected, enter this exact amount in the "Enter amount" box on Square.</div>
             </div>
 
-            <div style="background: #ffffff; padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; display: inline-block; margin-bottom: 0.8rem;">
-                <img id="qrModalImg" src="<?php echo defined('SQUARE_QR_CODE_DATA_URI') ? SQUARE_QR_CODE_DATA_URI : '/square-qr-code.png'; ?>" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https%3A%2F%2Fsquare.link%2Fu%2FxV2eBBtG%3Fsrc%3Dembed';" alt="Official Square Pay QR Code" style="width: 180px; height: 180px; display: block; border-radius: 8px;" />
+            <div id="qrModalContainer" style="background: #ffffff; padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; display: inline-flex; align-items: center; justify-content: center; min-width: 204px; min-height: 204px; margin-bottom: 0.8rem;">
+                <img id="qrModalImg" src="https://quickchart.io/qr?size=250&text=https%3A%2F%2Fsquare.link%2Fu%2FxV2eBBtG%3Fsrc%3Dembed" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https%3A%2F%2Fsquare.link%2Fu%2FxV2eBBtG%3Fsrc%3Dembed';" alt="Square Payment QR Code" style="width: 180px; height: 180px; display: block; border-radius: 8px;" />
             </div>
             <p style="font-size: 0.76rem; color: var(--text-muted, #94a3b8); margin-bottom: 1rem;">Scan QR code with phone camera or click Pay Now below.</p>
 
@@ -1819,6 +1866,18 @@ if ($format === 'json') {
                 <button onclick="sendPaymentLinkFromModal()" id="qrModalSendBtn" style="font-size: 14px; padding: 0 16px; height: 40px; background: var(--primary, #d4af37); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">✉️ Send Email</button>
             </div>
             <div id="qrModalMsg" style="font-size: 0.8rem; margin-top: 0.8rem; display: none;"></div>
+
+            <!-- Direct Mobile Payment Links Box -->
+            <div style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 0.8rem; text-align: left; font-size: 0.78rem;">
+                <div style="font-weight: bold; color: var(--primary, #d4af37); margin-bottom: 6px; text-align: center;">📲 Direct Mobile Payment Options:</div>
+                <div style="background: rgba(255,255,255,0.06); padding: 7px 10px; border-radius: 6px; margin-bottom: 6px; color: #e2e8f0; font-size: 0.77rem;">
+                    <strong>📲 Zelle:</strong> <span style="color: #38bdf8; font-weight: bold;">biragonimounika@gmail.com</span>
+                </div>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <a href="https://venmo.com/u/MounikaBiragoni" target="_blank" style="flex: 1; min-width: 140px; text-align: center; padding: 7px 8px; background: #008CFF; color: #fff !important; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.76rem;">💙 Venmo (@MounikaBiragoni)</a>
+                    <a href="https://cash.app/$Mounikabiragoni" target="_blank" style="flex: 1; min-width: 140px; text-align: center; padding: 7px 8px; background: #00D632; color: #fff !important; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.76rem;">💚 Cash App ($Mounikabiragoni)</a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1948,7 +2007,7 @@ if ($format === 'json') {
                         <span id="createBaseTotalDisplay" style="font-weight: bold; color: var(--text-primary);">$0.00</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; color: #006aff;">
-                        <span>VA Sales Tax (5.9%):</span>
+                        <span>VA Sales Tax (6%):</span>
                         <span id="createTaxDisplay" style="font-weight: bold;">+$0.00</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: bold; color: #d4af37; border-top: 1px solid var(--border-color); padding-top: 0.4rem; margin-top: 0.4rem;">
