@@ -177,6 +177,14 @@ try {
                 <p style='margin: 0; color: #595959; font-size: 14px; white-space: pre-wrap;'>" . htmlspecialchars($adminNotes) . "</p>
             </div>";
         }
+        $zelleEmail  = defined('ZELLE_EMAIL')  ? ZELLE_EMAIL  : 'biragonimounika@gmail.com';
+        $zelleName   = defined('ZELLE_NAME')   ? ZELLE_NAME   : 'Mounika Biragoni';
+        $venmoLink   = defined('VENMO_LINK')   ? VENMO_LINK   : 'https://venmo.com/u/MounikaBiragoni';
+        $venmoHandle = defined('VENMO_HANDLE') ? VENMO_HANDLE : '@MounikaBiragoni';
+        $cashAppLink = defined('CASHAPP_LINK') ? CASHAPP_LINK : 'https://cash.app/$Mounikabiragoni';
+        $cashAppTag  = defined('CASHAPP_TAG')  ? CASHAPP_TAG  : '$Mounikabiragoni';
+        $discountVal = floatval($orderRecord['discount'] ?? 0);
+        $promoCode   = $orderRecord['promo_code'] ?? '';
 
         $message = "
         <!DOCTYPE html>
@@ -209,15 +217,15 @@ try {
                 {$notesHtml}
 
                 <div class='box'>
-                    <h3 style='margin-top:0; color:#2d3748; font-size:16px;'>💰 Updated Quote & Financial Breakdown</h3>
+                    <h3 style='margin-top:0; color:#2d3748; font-size:16px;'>📋 Financial Breakdown &amp; Order Quote</h3>
                     <table class='price-table'>
                         <tr>
                             <td>Items Subtotal:</td>
                             <td style='text-align: right; font-weight: bold;'>\${$subtotalFmt}</td>
                         </tr>" .
-                        (floatval($orderRecord['discount'] ?? 0) > 0 || !empty($orderRecord['promo_code']) ? "
+                        ($discountVal > 0 || !empty($promoCode) ? "
                         <tr style='color: #38a169;'>
-                            <td>Coupon / Discount Applied" . (!empty($orderRecord['promo_code']) ? " (" . htmlspecialchars($orderRecord['promo_code']) . ")" : "") . ":</td>
+                            <td>Discount Applied" . (!empty($promoCode) ? " (" . htmlspecialchars($promoCode) . ")" : "") . ":</td>
                             <td style='text-align: right; font-weight: bold;'>-\${$discountFmt}</td>
                         </tr>" : "") . "
                         <tr>
@@ -225,7 +233,7 @@ try {
                             <td style='text-align: right; font-weight: bold; color: #d4af37;'>\${$deliveryFmt}</td>
                         </tr>
                         <tr>
-                            <td>Setup & Installation Fee:</td>
+                            <td>Setup &amp; Installation Fee:</td>
                             <td style='text-align: right; font-weight: bold; color: #d4af37;'>\${$setupFmt}</td>
                         </tr>
                         <tr style='border-top: 1px solid #cbd5e1;'>
@@ -259,9 +267,9 @@ try {
                                 <tr>
                                     <td style='vertical-align: top;'>
                                         <strong style='color: #065f46; font-size: 14px;'>📲 Zelle Instant Bank Transfer:</strong><br>
-                                        Account Name: <strong>Mounika Biragoni</strong><br>
+                                        Account Name: <strong>{$zelleName}</strong><br>
                                         Send <strong>\${$finalTotalFmt}</strong> to Zelle Email:<br>
-                                        <a href='mailto:biragonimounika@gmail.com' style='color: #006aff; font-weight: bold; font-size: 14px; text-decoration: none;'>biragonimounika@gmail.com</a>
+                                        <a href='mailto:{$zelleEmail}' style='color: #006aff; font-weight: bold; font-size: 14px; text-decoration: none;'>{$zelleEmail}</a>
                                     </td>
                                     <td style='vertical-align: top; text-align: right; width: 115px;'>
                                         <img src='https://petalsparadiseevents.com/zelle-qr-code.png' alt='Zelle QR Code' style='width: 105px; height: 105px; border-radius: 6px; border: 1px solid #cbd5e1; display: block;' />
@@ -274,10 +282,10 @@ try {
                         <table role='presentation' border='0' cellpadding='0' cellspacing='0' width='100%'>
                             <tr>
                                 <td width='49%' style='vertical-align: top; padding-right: 2%;'>
-                                    <a href='https://venmo.com/u/MounikaBiragoni' target='_blank' style='display: block; text-align: center; background-color: #008CFF; color: #ffffff !important; padding: 11px 8px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px;'>💙 Pay on Venmo (@MounikaBiragoni)</a>
+                                    <a href='{$venmoLink}' target='_blank' style='display: block; text-align: center; background-color: #008CFF; color: #ffffff !important; padding: 11px 8px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px;'>💙 Pay on Venmo ({$venmoHandle})</a>
                                 </td>
                                 <td width='49%' style='vertical-align: top;'>
-                                    <a href='https://cash.app/$Mounikabiragoni' target='_blank' style='display: block; text-align: center; background-color: #00D632; color: #ffffff !important; padding: 11px 8px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px;'>💚 Pay on Cash App ($Mounikabiragoni)</a>
+                                    <a href='{$cashAppLink}' target='_blank' style='display: block; text-align: center; background-color: #00D632; color: #ffffff !important; padding: 11px 8px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px;'>💚 Pay on Cash App ({$cashAppTag})</a>
                                 </td>
                             </tr>
                         </table>
