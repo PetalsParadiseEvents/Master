@@ -397,6 +397,12 @@ if ($format === 'json') {
         .contact-info a { color: var(--primary); text-decoration: none; }
         .contact-info a:hover { text-decoration: underline; }
         .empty-state { padding: 4rem 2rem; text-align: center; color: var(--text-muted); }
+
+        .notes-cell-wrapper { max-width: 250px; min-width: 170px; position: relative; }
+        .notes-preview { font-size: 0.83rem; color: var(--text-muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: color 0.2s; }
+        .notes-preview:hover { color: var(--primary); }
+        .btn-read-more { display: inline-flex; align-items: center; gap: 4px; margin-top: 5px; font-size: 0.72rem; padding: 2px 7px; background: rgba(212,175,55,0.12); color: var(--primary); border: 1px solid rgba(212,175,55,0.3); border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+        .btn-read-more:hover { background: rgba(212,175,55,0.28); color: #fff; }
     </style>
 </head>
 <body>
@@ -504,7 +510,28 @@ if ($format === 'json') {
                                         </td>
                                         <td><?php echo htmlspecialchars($lead['location'] ?? 'DMV Area'); ?></td>
                                         <td><span style="font-size: 0.8rem; color: var(--text-muted);"><?php echo htmlspecialchars($lead['source'] ?? 'Website'); ?></span></td>
-                                        <td style="max-width: 250px; font-size: 0.85rem; color: var(--text-muted); white-space: pre-wrap;"><?php echo htmlspecialchars($lead['notes'] ?? '-'); ?></td>
+                                        <td class="notes-cell-wrapper">
+                                            <?php 
+                                            $notesText = trim($lead['notes'] ?? '');
+                                            if (empty($notesText) || $notesText === '-'): 
+                                            ?>
+                                                <span style="font-size: 0.83rem; color: var(--text-muted);">-</span>
+                                            <?php else: 
+                                                $leadAuthor = ($lead['name'] ?? 'Inquiry Lead') . ' (' . ($lead['event_type'] ?? 'General') . ')';
+                                                $isLongNote = mb_strlen($notesText) > 55 || strpos($notesText, "\n") !== false;
+                                                $authorJson = htmlspecialchars(json_encode($leadAuthor), ENT_QUOTES, 'UTF-8');
+                                                $noteJson   = htmlspecialchars(json_encode($notesText), ENT_QUOTES, 'UTF-8');
+                                            ?>
+                                                <div class="notes-preview" title="<?php echo htmlspecialchars($notesText); ?>" onclick="openViewNoteModal(<?php echo $authorJson; ?>, <?php echo $noteJson; ?>)">
+                                                    <?php echo htmlspecialchars($notesText); ?>
+                                                </div>
+                                                <?php if ($isLongNote): ?>
+                                                    <button class="btn-read-more" onclick="openViewNoteModal(<?php echo $authorJson; ?>, <?php echo $noteJson; ?>)">
+                                                        🔍 Read Full Note
+                                                    </button>
+                                                <?php endif; ?>
+                                            <?php endif; ?>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -795,7 +822,28 @@ if ($format === 'json') {
                                         </select>
                                         <div id="status-msg-<?php echo htmlspecialchars($order['id']); ?>" style="font-size: 0.72rem; margin-top: 0.3rem; color: #10b981; display: none;"></div>
                                     </td>
-                                    <td style="max-width: 180px; font-size: 0.8rem; color: var(--text-muted); white-space: pre-wrap;"><?php echo htmlspecialchars($order['special_requests'] ?? '-'); ?></td>
+                                    <td class="notes-cell-wrapper">
+                                        <?php 
+                                        $reqText = trim($order['special_requests'] ?? '');
+                                        if (empty($reqText) || $reqText === '-'): 
+                                        ?>
+                                            <span style="font-size: 0.83rem; color: var(--text-muted);">-</span>
+                                        <?php else: 
+                                            $orderAuthor = ($order['name'] ?? 'Order') . ' (' . ($order['id'] ?? '') . ')';
+                                            $isLongReq   = mb_strlen($reqText) > 55 || strpos($reqText, "\n") !== false;
+                                            $ordAuthorJson = htmlspecialchars(json_encode($orderAuthor), ENT_QUOTES, 'UTF-8');
+                                            $reqJson       = htmlspecialchars(json_encode($reqText), ENT_QUOTES, 'UTF-8');
+                                        ?>
+                                            <div class="notes-preview" title="<?php echo htmlspecialchars($reqText); ?>" onclick="openViewNoteModal(<?php echo $ordAuthorJson; ?>, <?php echo $reqJson; ?>)">
+                                                <?php echo htmlspecialchars($reqText); ?>
+                                            </div>
+                                            <?php if ($isLongReq): ?>
+                                                <button class="btn-read-more" onclick="openViewNoteModal(<?php echo $ordAuthorJson; ?>, <?php echo $reqJson; ?>)">
+                                                    🔍 Read Full Note
+                                                </button>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -1617,6 +1665,36 @@ if ($format === 'json') {
                 }
             }
         }
+
+        let currentNoteModalText = '';
+
+        function openViewNoteModal(author, text) {
+            currentNoteModalText = text || '';
+            const authorEl  = document.getElementById('noteModalAuthor');
+            const contentEl = document.getElementById('noteModalContent');
+            const modalEl   = document.getElementById('viewNoteModal');
+
+            if (authorEl)  authorEl.innerText = author || 'Customer Note';
+            if (contentEl) contentEl.innerText = text || '-';
+            if (modalEl) {
+                modalEl.style.zIndex = '9999999';
+                modalEl.style.display = 'flex';
+            }
+        }
+
+        function closeViewNoteModal() {
+            const modalEl = document.getElementById('viewNoteModal');
+            if (modalEl) modalEl.style.display = 'none';
+        }
+
+        function copyNoteModalText() {
+            if (!currentNoteModalText) return;
+            navigator.clipboard.writeText(currentNoteModalText).then(() => {
+                alert('📋 Note text copied to clipboard!');
+            }).catch(() => {
+                prompt('Copy note text:', currentNoteModalText);
+            });
+        }
     </script>
 
     <!-- Item Substitution Modal Container -->
@@ -1892,6 +1970,26 @@ if ($format === 'json') {
                 <button onclick="saveNewManualQuote(true)" style="font-size: 0.85rem; padding: 0.65rem 1.2rem; background: linear-gradient(135deg, #006aff, #38bdf8); color: #fff; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,106,255,0.3);">✉️ Create Order &amp; Send Quote Email</button>
             </div>
             <div id="createMsg" style="margin-top: 0.8rem; font-size: 0.85rem; text-align: center; display: none;"></div>
+        </div>
+    </div>
+
+    <!-- View Full Note Modal Container -->
+    <div id="viewNoteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 9999999; align-items: center; justify-content: center; padding: 1rem;">
+        <div style="background: var(--surface); border: 2px solid var(--primary); border-radius: 16px; width: 100%; max-width: 520px; max-height: 85vh; overflow-y: auto; padding: 1.6rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); position: relative;">
+            <button onclick="closeViewNoteModal()" style="position: absolute; top: 12px; right: 14px; background: transparent; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; line-height: 1;">&times;</button>
+            <h3 style="color: var(--primary); font-family: Georgia, serif; font-size: 1.25rem; margin-top: 0; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem;">
+                📝 Full Note / Inquiry Details
+            </h3>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">
+                Customer / Source: <strong id="noteModalAuthor" style="color: #fff;"></strong>
+            </p>
+
+            <div style="background: var(--bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem; margin-bottom: 1.2rem; font-size: 0.88rem; color: var(--text-primary); line-height: 1.6; white-space: pre-wrap; word-break: break-word; max-height: 350px; overflow-y: auto;" id="noteModalContent"></div>
+
+            <div style="display: flex; gap: 0.6rem; justify-content: flex-end;">
+                <button onclick="copyNoteModalText()" style="font-size: 0.82rem; padding: 0.5rem 1rem; background: rgba(212,175,55,0.15); color: var(--primary); border: 1px solid rgba(212,175,55,0.4); border-radius: 6px; cursor: pointer; font-weight: bold;">📋 Copy Note</button>
+                <button onclick="closeViewNoteModal()" style="font-size: 0.82rem; padding: 0.5rem 1rem; background: var(--primary); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Close</button>
+            </div>
         </div>
     </div>
 </body>
