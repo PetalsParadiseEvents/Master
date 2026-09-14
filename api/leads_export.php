@@ -755,24 +755,11 @@ if ($format === 'json') {
                                         
                                         <div style="margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">
                                             <button onclick="sendPaymentLink('<?php echo htmlspecialchars($order['id']); ?>')" style="font-size: 0.72rem; padding: 4px 6px; background: #006aff; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
-                                                💳 Send Payment Email
+                                                💳 Send Payment & QR
                                             </button>
-                                            <div style="display: flex; gap: 4px;">
-                                                <button onclick="sendSmsQuote('<?php echo htmlspecialchars(addslashes($order['phone'] ?? '')); ?>', '<?php echo htmlspecialchars($order['id']); ?>', '<?php echo htmlspecialchars(addslashes($order['name'] ?? '')); ?>', '<?php echo htmlspecialchars(number_format((float)($order['total'] ?? 0) * 1.059, 2)); ?>')" style="font-size: 0.72rem; padding: 3px 4px; background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); border-radius: 4px; cursor: pointer; font-weight: bold; flex: 1;" title="Send SMS Text Quote">
-                                                    📱 SMS
-                                                </button>
-                                                <button onclick="sendWhatsAppQuote('<?php echo htmlspecialchars(addslashes($order['phone'] ?? '')); ?>', '<?php echo htmlspecialchars($order['id']); ?>', '<?php echo htmlspecialchars(addslashes($order['name'] ?? '')); ?>', '<?php echo htmlspecialchars(number_format((float)($order['total'] ?? 0) * 1.059, 2)); ?>')" style="font-size: 0.72rem; padding: 3px 4px; background: rgba(37,211,102,0.15); color: #25d366; border: 1px solid rgba(37,211,102,0.3); border-radius: 4px; cursor: pointer; font-weight: bold; flex: 1;" title="Send WhatsApp Quote">
-                                                    💬 WhatsApp
-                                                </button>
-                                            </div>
-                                            <div style="display: flex; gap: 4px;">
-                                                <button onclick="showQrModal('<?php echo htmlspecialchars($order['id']); ?>', '<?php echo htmlspecialchars(number_format((float)($order['total'] ?? 0), 2)); ?>', '<?php echo htmlspecialchars(addslashes($order['phone'] ?? '')); ?>', '<?php echo htmlspecialchars(addslashes($order['name'] ?? '')); ?>')" style="font-size: 0.72rem; padding: 3px 6px; background: rgba(0,106,255,0.12); color: #006aff; border: 1px solid rgba(0,106,255,0.3); border-radius: 4px; cursor: pointer; font-weight: bold; flex: 1;">
-                                                    📱 View QR Code
-                                                </button>
-                                                <button onclick="copySmsQuoteText('<?php echo htmlspecialchars($order['id']); ?>', '<?php echo htmlspecialchars(addslashes($order['name'] ?? '')); ?>', '<?php echo htmlspecialchars(number_format((float)($order['total'] ?? 0) * 1.059, 2)); ?>')" style="font-size: 0.72rem; padding: 3px 6px; background: rgba(212,175,55,0.15); color: var(--primary); border: 1px solid rgba(212,175,55,0.3); border-radius: 4px; cursor: pointer; font-weight: bold;" title="Copy SMS Quote Text">
-                                                    📋 Text
-                                                </button>
-                                            </div>
+                                            <button onclick="showQrModal('<?php echo htmlspecialchars($order['id']); ?>', '<?php echo htmlspecialchars(number_format((float)($order['total'] ?? 0), 2)); ?>')" style="font-size: 0.72rem; padding: 3px 6px; background: rgba(0,106,255,0.12); color: #006aff; border: 1px solid rgba(0,106,255,0.3); border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">
+                                                📱 View QR Code
+                                            </button>
                                         </div>
                                     </td>
 
@@ -987,67 +974,9 @@ if ($format === 'json') {
 
         let currentQrFinalTotal = '0.00';
         let currentQrPaymentUrl = '';
-        let currentQrCustomerPhone = '';
-        let currentQrCustomerName = '';
 
-        function formatPhoneNumberForUri(phoneStr) {
-            if (!phoneStr) return '';
-            let cleaned = phoneStr.replace(/\D/g, '');
-            if (cleaned.length === 10) {
-                cleaned = '1' + cleaned;
-            }
-            return cleaned;
-        }
-
-        function generateSmsQuoteText(orderId, name, total, paymentUrl) {
-            const trackingUrl = 'https://petalsparadiseevents.com/#track';
-            const payUrl = paymentUrl || ('https://square.link/u/xV2eBBtG?src=embed&amount=' + total + '&total=' + total + '&price=' + total);
-            return `Hi ${name || 'there'}! Here is your Event Rental Quote from Petals Paradise Events:\n\nOrder ID: ${orderId}\nTotal Amount Due: $${total}\n\nPay securely via Square online link:\n${payUrl}\n\nTrack order live:\n${trackingUrl}\n\nThank you for choosing Petals Paradise Events! 🌸`;
-        }
-
-        function sendSmsQuote(phone, orderId, name, total, paymentUrl) {
-            let cleanPhone = formatPhoneNumberForUri(phone);
-            if (!cleanPhone) {
-                cleanPhone = prompt('Enter customer phone number to send SMS quote (e.g. 7035550199):', '') || '';
-                cleanPhone = formatPhoneNumberForUri(cleanPhone);
-            }
-            const text = generateSmsQuoteText(orderId, name, total, paymentUrl);
-            const uri = 'sms:' + cleanPhone + (cleanPhone ? '?' : '?') + 'body=' + encodeURIComponent(text);
-            window.open(uri, '_blank');
-        }
-
-        function sendWhatsAppQuote(phone, orderId, name, total, paymentUrl) {
-            let cleanPhone = formatPhoneNumberForUri(phone);
-            if (!cleanPhone) {
-                cleanPhone = prompt('Enter customer phone number with country code for WhatsApp (e.g. 17035550199):', '') || '';
-                cleanPhone = formatPhoneNumberForUri(cleanPhone);
-            }
-            const text = generateSmsQuoteText(orderId, name, total, paymentUrl);
-            const uri = 'https://wa.me/' + cleanPhone + '?text=' + encodeURIComponent(text);
-            window.open(uri, '_blank');
-        }
-
-        function copySmsQuoteText(orderId, name, total, paymentUrl) {
-            const text = generateSmsQuoteText(orderId, name, total, paymentUrl);
-            navigator.clipboard.writeText(text).then(() => {
-                alert('📋 SMS Quote copied to clipboard! You can paste it into iMessage, Google Voice, or any messaging app.');
-            }).catch(() => {
-                prompt('Copy SMS quote text:', text);
-            });
-        }
-
-        function sendSmsQuoteFromModal() {
-            sendSmsQuote(currentQrCustomerPhone, currentQrOrderId, currentQrCustomerName, currentQrFinalTotal, currentQrPaymentUrl);
-        }
-
-        function sendWhatsAppQuoteFromModal() {
-            sendWhatsAppQuote(currentQrCustomerPhone, currentQrOrderId, currentQrCustomerName, currentQrFinalTotal, currentQrPaymentUrl);
-        }
-
-        async function showQrModal(orderId, total, phone = '', name = '') {
+        async function showQrModal(orderId, total) {
             currentQrOrderId = orderId;
-            currentQrCustomerPhone = phone || '';
-            currentQrCustomerName = name || '';
             const orderIdEl   = document.getElementById('qrModalOrderId');
             const baseTotalEl = document.getElementById('qrModalBaseTotal');
             const taxEl       = document.getElementById('qrModalTax');
@@ -1599,11 +1528,10 @@ if ($format === 'json') {
             document.getElementById('createFinalTotalDisplay').innerText = '$' + finalTotal.toFixed(2);
         }
 
-        async function saveNewManualQuote(notifyMode = 'email') {
+        async function saveNewManualQuote(sendEmail) {
             const name  = document.getElementById('createName').value.trim();
             const email = document.getElementById('createEmail').value.trim();
             const phone = document.getElementById('createPhone').value.trim();
-            const sendEmail = (notifyMode === 'email');
 
             if (!name) {
                 alert('Please enter customer name.');
@@ -1639,7 +1567,7 @@ if ($format === 'json') {
             if (msgDiv) {
                 msgDiv.style.display = 'block';
                 msgDiv.style.color = '#cbd5e1';
-                msgDiv.innerText = sendEmail ? 'Creating quote and sending customer email...' : 'Creating quote order...';
+                msgDiv.innerText = sendEmail ? 'Creating quote and sending customer email...' : 'Creating quote order quietly...';
             }
 
             const payload = {
@@ -1668,18 +1596,10 @@ if ($format === 'json') {
                 const data = await res.json();
 
                 if (data.success) {
-                    const finalTotalStr = parseFloat(data.final_total || 0).toFixed(2);
                     if (msgDiv) {
                         msgDiv.style.color = '#10b981';
                         msgDiv.innerText = sendEmail ? ('✅ Order ' + data.order_id + ' created & quote emailed to ' + data.customer_email + '!') : ('✅ Order ' + data.order_id + ' created successfully!');
                     }
-
-                    if (notifyMode === 'sms') {
-                        sendSmsQuote(phone, data.order_id, name, finalTotalStr);
-                    } else if (notifyMode === 'whatsapp') {
-                        sendWhatsAppQuote(phone, data.order_id, name, finalTotalStr);
-                    }
-
                     setTimeout(() => {
                         closeCreateQuoteModal();
                         window.location.reload();
@@ -1816,11 +1736,9 @@ if ($format === 'json') {
             <p style="font-size: 0.76rem; color: var(--text-muted, #94a3b8); margin-bottom: 1rem;">Scan QR code with phone camera or click Pay Now below.</p>
 
             <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
-                <a id="qrModalPayBtn" href="https://square.link/u/xV2eBBtG?src=embed" target="_blank" style="display: inline-block; font-size: 14px; line-height: 40px; height: 40px; color: #ffffff !important; background-color: #006aff; padding: 0 16px; border-radius: 6px; text-decoration: none; font-weight: bold;">Pay now</a>
-                <button onclick="sendSmsQuoteFromModal()" style="font-size: 14px; padding: 0 14px; height: 40px; background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid rgba(16,185,129,0.4); border-radius: 6px; cursor: pointer; font-weight: bold;">📱 Text SMS</button>
-                <button onclick="sendWhatsAppQuoteFromModal()" style="font-size: 14px; padding: 0 14px; height: 40px; background: rgba(37,211,102,0.2); color: #25d366; border: 1px solid rgba(37,211,102,0.4); border-radius: 6px; cursor: pointer; font-weight: bold;">💬 WhatsApp</button>
-                <button onclick="copyPaymentLink()" style="font-size: 14px; padding: 0 14px; height: 40px; background: transparent; color: var(--text-primary, #fff); border: 1px solid var(--border-color, #444); border-radius: 6px; cursor: pointer; font-weight: 600;">📋 Copy Link</button>
-                <button onclick="sendPaymentLinkFromModal()" id="qrModalSendBtn" style="font-size: 14px; padding: 0 14px; height: 40px; background: var(--primary, #d4af37); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">✉️ Send Email</button>
+                <a id="qrModalPayBtn" href="https://square.link/u/xV2eBBtG?src=embed" target="_blank" style="display: inline-block; font-size: 15px; line-height: 40px; height: 40px; color: #ffffff !important; background-color: #006aff; padding: 0 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">Pay now</a>
+                <button onclick="copyPaymentLink()" style="font-size: 14px; padding: 0 16px; height: 40px; background: transparent; color: var(--text-primary, #fff); border: 1px solid var(--border-color, #444); border-radius: 6px; cursor: pointer; font-weight: 600;">📋 Copy Link</button>
+                <button onclick="sendPaymentLinkFromModal()" id="qrModalSendBtn" style="font-size: 14px; padding: 0 16px; height: 40px; background: var(--primary, #d4af37); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">✉️ Send Email</button>
             </div>
             <div id="qrModalMsg" style="font-size: 0.8rem; margin-top: 0.8rem; display: none;"></div>
         </div>
@@ -1969,11 +1887,9 @@ if ($format === 'json') {
             </div>
 
             <!-- Action Buttons -->
-            <div style="display: flex; gap: 0.5rem; justify-content: flex-end; flex-wrap: wrap;">
-                <button onclick="saveNewManualQuote('none')" style="font-size: 0.82rem; padding: 0.6rem 0.9rem; background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); font-weight: bold; border-radius: 8px; cursor: pointer;">💾 Save Order quietly</button>
-                <button onclick="saveNewManualQuote('sms')" style="font-size: 0.82rem; padding: 0.6rem 0.9rem; background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.5); color: #10b981; font-weight: bold; border-radius: 8px; cursor: pointer;">📱 Save &amp; Text SMS Quote</button>
-                <button onclick="saveNewManualQuote('whatsapp')" style="font-size: 0.82rem; padding: 0.6rem 0.9rem; background: rgba(37,211,102,0.2); border: 1px solid rgba(37,211,102,0.5); color: #25d366; font-weight: bold; border-radius: 8px; cursor: pointer;">💬 Save &amp; WhatsApp Quote</button>
-                <button onclick="saveNewManualQuote('email')" style="font-size: 0.82rem; padding: 0.6rem 0.9rem; background: linear-gradient(135deg, #006aff, #38bdf8); color: #fff; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,106,255,0.3);">✉️ Create Order &amp; Send Quote Email</button>
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end; flex-wrap: wrap;">
+                <button onclick="saveNewManualQuote(false)" style="font-size: 0.85rem; padding: 0.65rem 1.2rem; background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); font-weight: bold; border-radius: 8px; cursor: pointer;">💾 Save Order quietly</button>
+                <button onclick="saveNewManualQuote(true)" style="font-size: 0.85rem; padding: 0.65rem 1.2rem; background: linear-gradient(135deg, #006aff, #38bdf8); color: #fff; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,106,255,0.3);">✉️ Create Order &amp; Send Quote Email</button>
             </div>
             <div id="createMsg" style="margin-top: 0.8rem; font-size: 0.85rem; text-align: center; display: none;"></div>
         </div>
