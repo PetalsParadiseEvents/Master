@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ AI DIY Decor Visualizer Studio | Petals Paradise Events</title>
+    <meta name="description" content="Describe your event decor prompt, upload your inspiration pictures, and instantly visualize how your custom stage decor will appear! Powered by Petals Paradise Events AI Decor Stylist.">
+    <link rel="icon" type="image/png" href="./wp-content/uploads/2025/07/image-150x150.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- html2canvas for stage mockup image generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --diy-bg: #0b0f19;
+            --diy-panel: #161f30;
+            --diy-card: #212d45;
+            --diy-gold: #d4af37;
+            --diy-blue: #006aff;
+            --diy-green: #10b981;
+            --diy-purple: #8b5cf6;
+            --diy-text: #f8fafc;
+            --diy-muted: #94a3b8;
+            --diy-border: rgba(255, 255, 255, 0.12);
+        }
+
+        body.diy-page-body {
+            background-color: var(--diy-bg);
+            color: var(--diy-text);
+            font-family: 'Outfit', 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Top Header Navigation */
+        .diy-header {
+            background: rgba(11, 15, 25, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--diy-border);
+            padding: 0.9rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .diy-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #fff;
+        }
+        .diy-brand img {
+            height: 38px;
+            border-radius: 6px;
+        }
+        .diy-brand span {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--diy-gold);
+        }
+
+        .diy-badge-header {
+            background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(139,92,246,0.3));
+            border: 1px solid var(--diy-gold);
+            color: var(--diy-gold);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .diy-header-nav {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .diy-nav-btn {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            padding: 7px 16px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--diy-border);
+            transition: all 0.2s ease;
+        }
+        .diy-nav-btn:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: #fff;
+        }
+
+        /* Hero Banner */
+        .diy-hero {
+            text-align: center;
+            padding: 3rem 1.5rem 2rem 1.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .diy-eyebrow {
+            display: inline-block;
+            background: rgba(139,92,246,0.15);
+            border: 1px solid rgba(139,92,246,0.4);
+            color: #a78bfa;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 5px 16px;
+            border-radius: 30px;
+            margin-bottom: 1rem;
+            letter-spacing: 0.5px;
+        }
+        .diy-hero h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(2rem, 4.5vw, 3.2rem);
+            color: var(--diy-gold);
+            margin: 0 0 1rem 0;
+            line-height: 1.25;
+        }
+        .diy-hero p {
+            font-size: 1.1rem;
+            color: var(--diy-muted);
+            margin: 0 auto 1.8rem auto;
+            max-width: 720px;
+            line-height: 1.6;
+        }
+
+        /* Main Studio Container */
+        .diy-main-grid {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem 1.5rem;
+            display: grid;
+            grid-template-columns: 440px 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 1024px) {
+            .diy-main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Left Column: Input Controls Box */
+        .diy-input-card {
+            background: var(--diy-panel);
+            border: 1px solid var(--diy-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card-label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--diy-gold);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Preset Pill Buttons */
+        .presets-wrapper {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+        .preset-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--diy-border);
+            color: var(--diy-text);
+            padding: 5px 11px;
+            border-radius: 20px;
+            font-size: 0.76rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .preset-btn:hover {
+            background: var(--diy-blue);
+            border-color: var(--diy-blue);
+            color: #fff;
+        }
+
+        .diy-textarea {
+            width: 100%;
+            height: 110px;
+            background: var(--diy-bg);
+            border: 1px solid var(--diy-border);
+            border-radius: 10px;
+            padding: 12px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        .diy-textarea:focus {
+            outline: none;
+            border-color: var(--diy-gold);
+            box-shadow: 0 0 0 2px rgba(212,175,55,0.2);
+        }
+
+        /* Picture Dropzone Box */
+        .dropzone-box {
+            border: 2px dashed var(--diy-gold);
+            background: rgba(212,175,55,0.04);
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .dropzone-box:hover {
+            background: rgba(212,175,55,0.1);
+        }
+        .dropzone-icon {
+            font-size: 2rem;
+            margin-bottom: 6px;
+        }
+        .dropzone-text {
+            font-size: 0.82rem;
+            color: var(--diy-muted);
+            margin: 0;
+        }
+        .dropzone-text strong {
+            color: #fff;
+        }
+
+        /* Image Thumbnails Strip */
+        .image-preview-strip {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .img-thumb-wrapper {
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--diy-border);
+        }
+        .img-thumb-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .img-thumb-remove {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(0,0,0,0.8);
+            color: #ef4444;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-generate-diy {
+            background: linear-gradient(135deg, #d4af37, #b89628);
+            color: #000;
+            font-weight: 800;
+            font-size: 1rem;
+            padding: 13px 20px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(212,175,55,0.35);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .btn-generate-diy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(212,175,55,0.5);
+        }
+
+        /* Right Column: Visualization & AI Suggestions */
+        .diy-visual-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Visual Stage Workspace */
+        .stage-box {
+            background: var(--diy-panel);
+            border: 1px solid var(--diy-border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stage-box-header {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--diy-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stage-viewport {
+            width: 100%;
+            height: 480px;
+            background-size: cover;
+            background-position: center;
+            background-image: url('https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=80');
+            position: relative;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .stage-item-obj {
+            position: absolute;
+            cursor: move;
+            display: inline-block;
+            transition: outline 0.15s ease;
+        }
+        .stage-item-obj.active {
+            outline: 2px dashed var(--diy-gold);
+            outline-offset: 4px;
+        }
+        .stage-item-obj img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+            display: block;
+        }
+
+        /* Object Toolbar */
+        .obj-popup-tools {
+            position: absolute;
+            top: -42px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(11, 15, 25, 0.95);
+            border: 1px solid var(--diy-gold);
+            border-radius: 6px;
+            padding: 3px 6px;
+            display: none;
+            gap: 4px;
+            z-index: 999;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        }
+        .stage-item-obj.active .obj-popup-tools {
+            display: flex;
+        }
+        .tool-btn {
+            background: rgba(255,255,255,0.12);
+            border: none;
+            color: #fff;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .tool-btn:hover {
+            background: var(--diy-gold);
+            color: #000;
+        }
+        .tool-btn.del:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        /* AI Stylist Analysis & Suggestions Card */
+        .ai-recommendations-card {
+            background: linear-gradient(135deg, rgba(22, 31, 48, 0.9), rgba(33, 45, 69, 0.9));
+            border: 1.5px solid var(--diy-purple);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+        .ai-card-title {
+            color: #a78bfa;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .ai-analysis-text {
+            font-size: 0.9rem;
+            color: #e2e8f0;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            background: rgba(255,255,255,0.04);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--diy-purple);
+        }
+
+        .suggestions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+        .suggestion-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--diy-border);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #f1f5f9;
+            line-height: 1.4;
+        }
+
+        /* Inventory Match Checklist */
+        .matched-inventory-box {
+            background: var(--diy-panel);
+            border: 1px solid var(--diy-border);
+            border-radius: 16px;
+            padding: 1.2rem;
+        }
+        .inventory-list-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .inventory-match-item {
+            background: var(--diy-card);
+            border: 1px solid var(--diy-border);
+            border-radius: 8px;
+            padding: 8px 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .inventory-match-item img {
+            width: 44px;
+            height: 44px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        .inv-details {
+            flex: 1;
+            font-size: 0.78rem;
+        }
+        .inv-title {
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+        .inv-price {
+            color: var(--diy-gold);
+            font-weight: 700;
+        }
+
+        /* Quote Action Bar */
+        .diy-action-bar {
+            background: var(--diy-panel);
+            border: 1px solid var(--diy-gold);
+            border-radius: 16px;
+            padding: 1.2rem 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .action-pricing {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--diy-gold);
+        }
+        .action-pricing span {
+            font-size: 0.8rem;
+            color: var(--diy-muted);
+            font-weight: normal;
+        }
+
+        /* Modal Popup */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(6px);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-card {
+            background: var(--diy-panel);
+            border: 2px solid var(--diy-gold);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 580px;
+            max-height: 92vh;
+            overflow-y: auto;
+            padding: 1.8rem;
+            color: #fff;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+        }
+        .modal-close {
+            position: absolute;
+            top: 14px; right: 16px;
+            background: none; border: none;
+            color: var(--diy-muted);
+            font-size: 1.5rem; cursor: pointer;
+        }
+
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.8rem; color: var(--diy-muted); font-weight: 600; margin-bottom: 4px; }
+        .form-control {
+            width: 100%; padding: 9px 12px;
+            background: var(--diy-bg);
+            border: 1px solid var(--diy-border);
+            border-radius: 6px; color: #fff; font-size: 0.88rem; box-sizing: border-box;
+        }
+        .form-control:focus { outline: none; border-color: var(--diy-gold); }
+    </style>
+</head>
+<body class="diy-page-body">
+
+    <!-- Top Studio Header -->
+    <header class="diy-header">
+        <a href="index.html" class="diy-brand">
+            <img src="./wp-content/uploads/2025/07/image-150x150.png" alt="Petals Paradise Events Logo">
+            <span>Petals Paradise Events</span>
+            <span class="diy-badge-header">✨ AI DIY Studio</span>
+        </a>
+
+        <div class="diy-header-nav">
+            <a href="index.html#rentals" class="diy-nav-btn">📦 Catalog</a>
+            <a href="index.html#contact" class="diy-nav-btn">📞 Contact Us</a>
+            <a href="index.html" class="diy-nav-btn">🏠 Home</a>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="diy-hero">
+        <div class="diy-eyebrow">✨ AI Decor Stylist &amp; Visual Stage Builder</div>
+        <h1>Visualize Your Dream Decor Instant</h1>
+        <p>Enter your decor requirements, upload inspiration pictures from your phone or desktop, and let our AI Stylist generate your custom visual stage setup with expert design suggestions!</p>
+    </section>
+
+    <!-- Main Studio Grid -->
+    <div class="diy-main-grid">
+
+        <!-- Left Column: Input Prompt & Image Upload -->
+        <div class="diy-input-card">
+            <div class="card-label">
+                <span>📝 Describe Your Event Vision</span>
+                <span style="font-size: 0.74rem; color: var(--diy-muted); font-weight: normal;">Step 1 of 3</span>
+            </div>
+
+            <!-- Quick Inspiration Presets -->
+            <div>
+                <div style="font-size: 0.76rem; color: var(--diy-muted); margin-bottom: 6px; font-weight: 600;">Quick Presets:</div>
+                <div class="presets-wrapper">
+                    <button class="preset-btn" onclick="applyPreset('Haldi')">🌺 Haldi / Mehandi Traditional</button>
+                    <button class="preset-btn" onclick="applyPreset('Graduation')">🎓 Graduation Class of 2026</button>
+                    <button class="preset-btn" onclick="applyPreset('BabyShower')">👶 Baby Shower / Seemantham</button>
+                    <button class="preset-btn" onclick="applyPreset('Birthday')">🎂 Birthday Neon Setup</button>
+                    <button class="preset-btn" onclick="applyPreset('Wedding')">💍 Wedding Reception</button>
+                </div>
+            </div>
+
+            <textarea id="diyPrompt" class="diy-textarea" placeholder="e.g. Traditional yellow Haldi theme with Urli tub, marigold garlands, backdrop stand, loveseat chair, and warm lighting for 40 guests in Ashburn VA..."></textarea>
+
+            <div class="card-label">
+                <span>📸 Upload Reference Pictures (Optional)</span>
+                <span style="font-size: 0.74rem; color: var(--diy-muted); font-weight: normal;">From Phone or PC</span>
+            </div>
+
+            <!-- File Upload Dropzone -->
+            <input type="file" id="diyFileInput" accept="image/*" multiple style="display: none;" onchange="handleImageUpload(event)">
+            <div class="dropzone-box" onclick="document.getElementById('diyFileInput').click()">
+                <div class="dropzone-icon">🖼️</div>
+                <p class="dropzone-text"><strong>Click or Drag &amp; Drop Reference Photos Here</strong><br>Upload Pinterest inspo, venue photos, or decor ideas</p>
+            </div>
+
+            <div class="image-preview-strip" id="imagePreviewStrip"></div>
+
+            <button id="btnGenerateDIY" class="btn-generate-diy" onclick="processDIYVisualization()">
+                ✨ Generate Visual Decor &amp; AI Analysis
+            </button>
+        </div>
+
+        <!-- Right Column: Interactive Stage & AI Analysis Dashboard -->
+        <div class="diy-visual-container">
+
+            <!-- Visual Stage Workspace -->
+            <div class="stage-box">
+                <div class="stage-box-header">
+                    <div style="font-weight: 700; color: var(--diy-gold); font-size: 0.92rem; display: flex; align-items: center; gap: 6px;">
+                        <span>🎨 Interactive Stage Decor Preview</span>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem;">
+                        <label style="color: var(--diy-muted);">Stage Background:</label>
+                        <select id="stageBgSelect" class="form-control" style="padding: 3px 8px; width: auto; font-size: 0.78rem;" onchange="changeStageBg(this.value)">
+                            <option value="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=80">🏛️ Grand Ballroom Stage</option>
+                            <option value="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=80">🌸 Floral Arch Stage</option>
+                            <option value="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=80">🌿 Outdoor Garden Lawn</option>
+                            <option value="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80">✨ Luxury Draped Stage</option>
+                            <option value="solid">🎨 Solid Dark Slate Studio</option>
+                        </select>
+
+                        <input type="file" id="venuePhotoInput" accept="image/*" style="display: none;" onchange="handleVenuePhotoUpload(event)">
+                        <button onclick="document.getElementById('venuePhotoInput').click()" class="diy-nav-btn" style="padding: 3px 8px; font-size: 0.76rem;">📸 Upload Venue Photo</button>
+                    </div>
+                </div>
+
+                <div class="stage-viewport" id="diyStageViewport" onclick="deselectObjects(event)">
+                    <!-- Dynamically placed stage items render here -->
+                </div>
+            </div>
+
+            <!-- AI Stylist Analysis & Recommendations Card -->
+            <div class="ai-recommendations-card">
+                <div class="ai-card-title">
+                    <span>✨ AI Decor Stylist Recommendations &amp; Modifications</span>
+                </div>
+                <div class="ai-analysis-text" id="aiAnalysisText">
+                    Enter your event prompt or upload reference pictures above and click "Generate" to receive personalized AI decor stylist recommendations!
+                </div>
+
+                <div style="font-weight: 700; color: #fff; font-size: 0.88rem; margin-bottom: 6px;">Recommended Decor Modifications:</div>
+                <div class="suggestions-list" id="aiSuggestionsList">
+                    <div class="suggestion-item">💡 <strong>Color Harmony:</strong> Pair golden brass accents with vibrant marigold or warm pastels for photo depth.</div>
+                    <div class="suggestion-item">🌸 <strong>Stage Focal Point:</strong> Position the backdrop central behind seating with warm backlighting.</div>
+                </div>
+            </div>
+
+            <!-- Inventory Match Checklist -->
+            <div class="matched-inventory-box">
+                <div style="font-weight: 700; color: var(--diy-gold); font-size: 0.95rem;">
+                    📦 Matched Rental Inventory Items
+                </div>
+                <div class="inventory-list-grid" id="matchedInventoryGrid">
+                    <!-- Matched inventory items rendered here -->
+                </div>
+            </div>
+
+            <!-- Action & Quote Request Bar -->
+            <div class="diy-action-bar">
+                <div class="action-pricing">
+                    Estimated Subtotal: <span id="diyTotalPrice">$0.00</span>
+                </div>
+                <button onclick="exportLayoutPNG()" class="diy-nav-btn" style="padding: 10px 16px;">📸 Download PNG Mockup</button>
+                <button onclick="openDIYQuoteModal()" class="btn-generate-diy" style="margin-top: 0; padding: 10px 22px; font-size: 0.92rem;">
+                    📩 Send Inquiry for this Inspo Setup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quote Request Modal -->
+    <div class="modal-overlay" id="diyQuoteModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeDIYQuoteModal()">&times;</button>
+            <h3 style="margin-top:0; color: var(--diy-gold); font-family: 'Playfair Display', serif; font-size: 1.35rem;">
+                🌸 Send AI Inspo Setup Inquiry
+            </h3>
+            <p style="font-size: 0.8rem; color: var(--diy-muted); margin-bottom: 1rem;">
+                Send your custom AI visual stage layout and uploaded inspiration photos directly to our event team!
+            </p>
+
+            <img id="modalMockupPreviewImg" src="" alt="Mockup Preview" style="width: 100%; max-height: 180px; object-fit: contain; border-radius: 8px; border: 1px solid var(--diy-border); background: #000; margin-bottom: 12px;">
+
+            <form id="diyQuoteForm" onsubmit="submitDIYQuoteForm(event)">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label>Your Full Name *</label>
+                        <input type="text" id="diyCustomerName" class="form-control" required placeholder="e.g. Priya Sharma">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <input type="email" id="diyCustomerEmail" class="form-control" required placeholder="customer@example.com">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label>Phone Number *</label>
+                        <input type="tel" id="diyCustomerPhone" class="form-control" required placeholder="(703) 555-0199">
+                    </div>
+                    <div class="form-group">
+                        <label>Event Date *</label>
+                        <input type="date" id="diyEventDate" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Venue Location / Address</label>
+                    <input type="text" id="diyVenueLocation" class="form-control" placeholder="e.g. Ashburn VA / Hotel Ballroom / Backyard">
+                </div>
+
+                <div class="form-group">
+                    <label>Additional Notes</label>
+                    <textarea id="diyCustomNotes" class="form-control" rows="3" placeholder="Theme preferences, guest seating numbers, setup times..."></textarea>
+                </div>
+
+                <div id="diyModalMsg" style="font-size: 0.85rem; margin-bottom: 10px; display: none;"></div>
+
+                <div style="text-align: right;">
+                    <button type="button" onclick="closeDIYQuoteModal()" class="diy-nav-btn" style="margin-right: 8px;">Cancel</button>
+                    <button type="submit" id="btnSubmitDIYModal" class="btn-generate-diy" style="margin-top:0; padding: 9px 18px; font-size: 0.88rem;">🚀 Submit Quote Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripting Engine -->
+    <script src="app.js"></script>
+    <script>
+        // State
+        let uploadedImagesBase64 = [];
+        let placedStageObjects = [];
+        let activeObjId = null;
+        let matchedItemsData = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auto generate initial default visual setup
+            processDIYVisualization();
+        });
+
+        // Quick Preset Prompts
+        function applyPreset(type) {
+            const promptEl = document.getElementById('diyPrompt');
+            if (type === 'Haldi') {
+                promptEl.value = 'Vibrant traditional Haldi and Mehandi ceremony setup with yellow Haldi Urli tub, marigold flower backdrops, umbrella props, and loveseat chair for 40 guests in Ashburn VA.';
+            } else if (type === 'Graduation') {
+                promptEl.value = 'Class of 2026 graduation party setup with 4FT Marquee Numbers, Congrats Grad neon sign, photo backdrop stand, adult folding chairs, and cocktail tables.';
+            } else if (type === 'BabyShower') {
+                promptEl.value = 'Dreamy Seemantham / Baby Shower setup featuring moon swing photo prop, pastel backdrop stand, 5-piece pedestal display, and loveseat seating.';
+            } else if (type === 'Birthday') {
+                promptEl.value = 'Festive birthday party setup with Happy Birthday neon sign, marquee numbers, party backdrop, adult chairs, and food warming chafers.';
+            } else if (type === 'Wedding') {
+                promptEl.value = 'Luxury wedding reception stage with pipe and drape backdrop stand, metal crystal centerpieces, hand-carved accent chair, easel, and canopy tent.';
+            }
+            processDIYVisualization();
+        }
+
+        // Handle Image Uploads from device
+        function handleImageUpload(e) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    uploadedImagesBase64.push(evt.target.result);
+                    renderImagePreviews();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderImagePreviews() {
+            const container = document.getElementById('imagePreviewStrip');
+            container.innerHTML = uploadedImagesBase64.map((b64, idx) => `
+                <div class="img-thumb-wrapper">
+                    <img src="${b64}" alt="Reference ${idx+1}">
+                    <button class="img-thumb-remove" onclick="removeUploadedImg(${idx})">&times;</button>
+                </div>
+            `).join('');
+        }
+
+        function removeUploadedImg(idx) {
+            uploadedImagesBase64.splice(idx, 1);
+            renderImagePreviews();
+        }
+
+        // Call Backend API to Analyze Prompt & Pictures
+        async function processDIYVisualization() {
+            const btn = document.getElementById('btnGenerateDIY');
+            const promptVal = document.getElementById('diyPrompt').value.trim();
+
+            btn.disabled = true;
+            btn.innerHTML = '⌛ Analyzing Prompt &amp; Generating Visualization...';
+
+            try {
+                const payload = {
+                    prompt: promptVal,
+                    images: uploadedImagesBase64
+                };
+
+                const res = await fetch('./api/ai_diy_decor.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    renderAIAnalysis(data.analysis, data.suggestions);
+                    renderMatchedInventory(data.matchedItemIds);
+                    renderStageFromData(data.matchedItemIds, data.layout);
+                } else {
+                    throw new Error(data.message || 'Error processing AI visualization');
+                }
+            } catch (err) {
+                console.warn('AI API Notice:', err);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '✨ Generate Visual Decor &amp; AI Analysis';
+            }
+        }
+
+        // Render AI Suggestions Card
+        function renderAIAnalysis(analysisText, suggestionsArr) {
+            const analysisEl = document.getElementById('aiAnalysisText');
+            const listEl = document.getElementById('aiSuggestionsList');
+
+            if (analysisEl) analysisEl.innerText = analysisText || 'Custom styled decor visualization based on your preferences.';
+            
+            if (listEl && suggestionsArr && suggestionsArr.length > 0) {
+                listEl.innerHTML = suggestionsArr.map(s => `
+                    <div class="suggestion-item">${s}</div>
+                `).join('');
+            }
+        }
+
+        // Render Matched Rental Inventory Grid
+        function renderMatchedInventory(itemIds) {
+            const grid = document.getElementById('matchedInventoryGrid');
+            matchedItemsData = [];
+
+            if (!itemIds || itemIds.length === 0) itemIds = [11, 10, 8, 20];
+
+            let html = itemIds.map(id => {
+                const item = rentalItems.find(i => i.id === id);
+                if (!item) return '';
+                matchedItemsData.push(item);
+
+                return `
+                    <div class="inventory-match-item">
+                        <img src="${item.img}" alt="${item.title}" onerror="this.src='./wp-content/uploads/2025/07/image-150x150.png'">
+                        <div class="inv-details">
+                            <div class="inv-title">${item.title}</div>
+                            <div class="inv-price">${typeof item.price === 'number' ? '$' + item.price : item.price}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            grid.innerHTML = html;
+            updateDIYTotal();
+        }
+
+        // Render 2D Canvas Stage Items
+        function renderStageFromData(itemIds, layoutArr) {
+            placedStageObjects = [];
+            const viewport = document.getElementById('diyStageViewport');
+            viewport.querySelectorAll('.stage-item-obj').forEach(el => el.remove());
+
+            if (!itemIds || itemIds.length === 0) itemIds = [11, 10, 8, 20];
+
+            itemIds.forEach((id, idx) => {
+                const item = rentalItems.find(i => i.id === id);
+                if (!item) return;
+
+                const pos = (layoutArr && layoutArr[idx]) ? layoutArr[idx] : { x: 140 + (idx * 130) % 550, y: 160 + (idx * 30) % 180, scale: 1 };
+
+                const obj = {
+                    objId: 'stg_' + Date.now() + '_' + idx,
+                    id: item.id,
+                    title: item.title,
+                    price: typeof item.price === 'number' ? item.price : 0,
+                    img: item.img,
+                    x: pos.x,
+                    y: pos.y,
+                    width: 170,
+                    height: 170,
+                    scale: pos.scale || 1,
+                    rotation: 0,
+                    flipped: false,
+                    zIndex: idx + 1
+                };
+
+                placedStageObjects.push(obj);
+            });
+
+            drawStageObjects();
+        }
+
+        function drawStageObjects() {
+            const viewport = document.getElementById('diyStageViewport');
+            viewport.querySelectorAll('.stage-item-obj').forEach(el => el.remove());
+
+            placedStageObjects.sort((a,b) => a.zIndex - b.zIndex).forEach(obj => {
+                const el = document.createElement('div');
+                el.className = 'stage-item-obj' + (obj.objId === activeObjId ? ' active' : '');
+                el.id = obj.objId;
+                el.style.left = obj.x + 'px';
+                el.style.top = obj.y + 'px';
+                el.style.width = (obj.width * obj.scale) + 'px';
+                el.style.height = (obj.height * obj.scale) + 'px';
+                el.style.transform = `rotate(${obj.rotation}deg) scaleX(${obj.flipped ? -1 : 1})`;
+                el.style.zIndex = obj.zIndex;
+
+                el.innerHTML = `
+                    <div class="obj-popup-tools" onclick="event.stopPropagation()">
+                        <button class="tool-btn" onclick="scaleStageObj('${obj.objId}', 1.1)">🔍+</button>
+                        <button class="tool-btn" onclick="scaleStageObj('${obj.objId}', 0.9)">🔍-</button>
+                        <button class="tool-btn" onclick="rotateStageObj('${obj.objId}', 15)">🔄</button>
+                        <button class="tool-btn" onclick="flipStageObj('${obj.objId}')">↔️</button>
+                        <button class="tool-btn del" onclick="deleteStageObj('${obj.objId}')">🗑️</button>
+                    </div>
+                    <img src="${obj.img}" alt="${obj.title}">
+                `;
+
+                // Drag Events
+                el.addEventListener('mousedown', (e) => startStageDrag(e, obj.objId));
+                el.addEventListener('touchstart', (e) => startStageDrag(e, obj.objId), {passive: false});
+
+                viewport.appendChild(el);
+            });
+        }
+
+        // Dragging Logic
+        let isStageDragging = false, dragStartX = 0, dragStartY = 0;
+
+        function startStageDrag(e, objId) {
+            e.stopPropagation();
+            activeObjId = objId;
+            isStageDragging = true;
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+            const obj = placedStageObjects.find(o => o.objId === objId);
+            if (!obj) return;
+
+            dragStartX = clientX - obj.x;
+            dragStartY = clientY - obj.y;
+
+            document.querySelectorAll('.stage-item-obj').forEach(el => el.classList.toggle('active', el.id === objId));
+
+            document.addEventListener('mousemove', onStageDrag);
+            document.addEventListener('mouseup', stopStageDrag);
+            document.addEventListener('touchmove', onStageDrag, {passive: false});
+            document.addEventListener('touchend', stopStageDrag);
+        }
+
+        function onStageDrag(e) {
+            if (!isStageDragging || !activeObjId) return;
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+            const obj = placedStageObjects.find(o => o.objId === activeObjId);
+            if (obj) {
+                obj.x = clientX - dragStartX;
+                obj.y = clientY - dragStartY;
+                const el = document.getElementById(obj.objId);
+                if (el) {
+                    el.style.left = obj.x + 'px';
+                    el.style.top = obj.y + 'px';
+                }
+            }
+        }
+
+        function stopStageDrag() {
+            isStageDragging = false;
+            document.removeEventListener('mousemove', onStageDrag);
+            document.removeEventListener('mouseup', stopStageDrag);
+            document.removeEventListener('touchmove', onStageDrag);
+            document.removeEventListener('touchend', stopStageDrag);
+        }
+
+        function deselectObjects(e) {
+            if (e.target.id === 'diyStageViewport') {
+                activeObjId = null;
+                document.querySelectorAll('.stage-item-obj').forEach(el => el.classList.remove('active'));
+            }
+        }
+
+        function scaleStageObj(objId, factor) {
+            const obj = placedStageObjects.find(o => o.objId === objId);
+            if (obj) {
+                obj.scale = Math.max(0.4, Math.min(2.5, obj.scale * factor));
+                drawStageObjects();
+            }
+        }
+
+        function rotateStageObj(objId, deg) {
+            const obj = placedStageObjects.find(o => o.objId === objId);
+            if (obj) {
+                obj.rotation = (obj.rotation + deg) % 360;
+                drawStageObjects();
+            }
+        }
+
+        function flipStageObj(objId) {
+            const obj = placedStageObjects.find(o => o.objId === objId);
+            if (obj) {
+                obj.flipped = !obj.flipped;
+                drawStageObjects();
+            }
+        }
+
+        function deleteStageObj(objId) {
+            placedStageObjects = placedStageObjects.filter(o => o.objId !== objId);
+            if (activeObjId === objId) activeObjId = null;
+            drawStageObjects();
+            updateDIYTotal();
+        }
+
+        function changeStageBg(val) {
+            const viewport = document.getElementById('diyStageViewport');
+            if (val === 'solid') {
+                viewport.style.backgroundImage = 'none';
+                viewport.style.backgroundColor = '#161f30';
+            } else {
+                viewport.style.backgroundColor = 'transparent';
+                viewport.style.backgroundImage = `url('${val}')`;
+            }
+        }
+
+        function handleVenuePhotoUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const viewport = document.getElementById('diyStageViewport');
+                viewport.style.backgroundImage = `url('${evt.target.result}')`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateDIYTotal() {
+            const totalPriceEl = document.getElementById('diyTotalPrice');
+            const total = placedStageObjects.reduce((acc, o) => acc + o.price, 0);
+            if (totalPriceEl) totalPriceEl.innerText = '$' + total.toFixed(2);
+        }
+
+        // Export Stage PNG Image
+        async function exportLayoutPNG() {
+            const viewport = document.getElementById('diyStageViewport');
+            activeObjId = null;
+            drawStageObjects();
+
+            try {
+                const canvas = await html2canvas(viewport, { useCORS: true, scale: 2 });
+                const link = document.createElement('a');
+                link.download = 'Petals-Paradise-DIY-Decor-Inspo.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (err) {
+                alert('Could not download mockup: ' + err.message);
+            }
+        }
+
+        // Quote Request Modal
+        async function openDIYQuoteModal() {
+            const modal = document.getElementById('diyQuoteModal');
+            const mockupImg = document.getElementById('modalMockupPreviewImg');
+            const viewport = document.getElementById('diyStageViewport');
+
+            activeObjId = null;
+            drawStageObjects();
+
+            try {
+                const canvas = await html2canvas(viewport, { useCORS: true, scale: 1.5 });
+                mockupImg.src = canvas.toDataURL('image/png');
+            } catch (err) {
+                mockupImg.style.display = 'none';
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function closeDIYQuoteModal() {
+            document.getElementById('diyQuoteModal').style.display = 'none';
+        }
+
+        // Submit Form
+        async function submitDIYQuoteForm(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitDIYModal');
+            const msg = document.getElementById('diyModalMsg');
+            btn.disabled = true;
+            btn.innerText = '⌛ Submitting Quote Request...';
+
+            const name = document.getElementById('diyCustomerName').value.trim();
+            const email = document.getElementById('diyCustomerEmail').value.trim();
+            const phone = document.getElementById('diyCustomerPhone').value.trim();
+            const date = document.getElementById('diyEventDate').value;
+            const location = document.getElementById('diyVenueLocation').value.trim();
+            const notes = document.getElementById('diyCustomNotes').value.trim();
+            const promptVal = document.getElementById('diyPrompt').value.trim();
+
+            const placedItemsList = placedStageObjects.map(o => o.title + (o.price ? ' ($' + o.price + ')' : '')).join(', ');
+            const totalNum = placedStageObjects.reduce((acc, o) => acc + o.price, 0);
+
+            const payload = {
+                name: name,
+                email: email,
+                phone: phone,
+                event_date: date,
+                location: location,
+                event_type: 'AI DIY Decor Studio Inquiry',
+                service_tier: 'AI Generated Stage Decor Setup',
+                budget: '$' + totalNum.toFixed(2),
+                notes: `[AI DIY DECOR SETUP INQUIRY]\nUser Prompt: ${promptVal}\nPlaced Items: ${placedItemsList}\nEst Subtotal: $${totalNum.toFixed(2)}\n\nUser Notes: ${notes}`,
+                source: 'AI DIY Decor Studio'
+            };
+
+            try {
+                const res = await fetch('./api/save_lead.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    msg.style.display = 'block';
+                    msg.style.color = '#10b981';
+                    msg.innerHTML = '🎉 <strong>Inquiry Submitted Successfully!</strong> Our decor team will review your visual layout and reply shortly.';
+                    setTimeout(() => {
+                        closeDIYQuoteModal();
+                        document.getElementById('diyQuoteForm').reset();
+                        msg.style.display = 'none';
+                    }, 3500);
+                } else {
+                    throw new Error(data.message || 'Error submitting request');
+                }
+            } catch (err) {
+                msg.style.display = 'block';
+                msg.style.color = '#ef4444';
+                msg.innerText = '❌ Error submitting inquiry: ' + err.message;
+            } finally {
+                btn.disabled = false;
+                btn.innerText = '🚀 Submit Quote Request';
+            }
+        }
+    </script>
+</body>
+</html>
