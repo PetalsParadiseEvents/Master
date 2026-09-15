@@ -554,7 +554,6 @@ function renderNavbar() {
         <a href="#" class="logo-text">Petals Paradise Events</a>
         <div class="nav-links">
             <a href="#" class="nav-link">Home</a>
-            <a href="diy.html" class="nav-link" style="color: #d4af37; font-weight: 700;">✨ AI DIY Studio</a>
             <a href="#rentals" class="nav-link">Rentals</a>
             <a href="#services" class="nav-link">Services</a>
             <a href="#gallery" class="nav-link">Gallery</a>
@@ -577,7 +576,6 @@ function renderNavbar() {
                 <i data-feather="x"></i>
             </button>
             <a href="#" class="nav-link">Home</a>
-            <a href="diy.html" class="nav-link" style="color: #d4af37; font-weight: 700;">✨ AI DIY Studio (Visualizer)</a>
             
             <!-- Rentals Section with Expandable Inventory Categories -->
             <div class="menu-item-with-submenu">
