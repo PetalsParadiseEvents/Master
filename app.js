@@ -485,7 +485,8 @@ const rentalItems = [
     { id: 21, title: 'Good Vibes Only Neon Sign', price: 10, img: './wp-content/uploads/2025/07/image-5.png', desc: 'Trendy \"Good Vibes Only\" neon sign for a modern event feel.' },
     { id: 22, title: 'Congrats Grad Neon Sign', price: 10, img: './wp-content/uploads/2025/07/81i8bvay0GL._AC_SX679_.jpg', desc: 'Celebratory Congrats Grad neon sign - perfect for Class of 2026 parties!' },
     { id: 23, title: 'Mehandi Umbrella Set', price: 3, img: './wp-content/uploads/2025/05/Umbrella.jpg', desc: 'Colorful traditional umbrellas for Mehandi or festive ceremonies ($3 each).' },
-    { id: 24, title: 'Easel for Rent', price: 10, img: './wp-content/uploads/2025/09/gold-litton-lane-boards-easels-27391-64_600.jpg', desc: 'Elegant gold easel for displaying welcome signs or photos.' }
+    { id: 24, title: 'Easel for Rent', price: 10, img: './wp-content/uploads/2025/09/gold-litton-lane-boards-easels-27391-64_600.jpg', desc: 'Elegant gold easel for displaying welcome signs or photos.' },
+    { id: 26, title: 'Haldi / Maiyan Backdrop & Staircase Decor', price: 'Varies', img: './wp-content/uploads/2026/10/haldi-backdrop-decor.jpg', gallery: ['./wp-content/uploads/2026/10/haldi-backdrop-decor.jpg', './wp-content/uploads/2026/10/haldi-staircase-decor.jpg'], desc: 'Stunning Haldi & Maiyan decor package featuring a floral backdrop with marigold hangings, greenery, lanterns & golden accents — plus a matching staircase floral drape setup. Fully customizable to your theme and colors.', customizable: true }
 ];
 
 // Dynamically categorize rental items for advanced sidebar & filter bar
@@ -1207,6 +1208,10 @@ function renderServices() {
 
 function renderGallery() {
     const gallery = {
+        "Haldi Decor": [
+            "./wp-content/uploads/2026/10/haldi-backdrop-decor.jpg",
+            "./wp-content/uploads/2026/10/haldi-staircase-decor.jpg"
+        ],
         "Birthday Parties": [
             "./wp-content/uploads/2026/08/1st_birthday_pic.jpg",
             "./wp-content/uploads/2025/12/IMG_0670-2-scaled.jpg",
@@ -2106,9 +2111,14 @@ function renderItemCard(item) {
         priceStyle = 'color: var(--primary-color); font-weight: 700;';
     }
 
+    const customBadge = item.customizable
+        ? `<span style="position:absolute;top:10px;left:10px;background:linear-gradient(135deg,#d4af37,#f5c842);color:#1a1a1a;font-size:0.7rem;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:0.5px;box-shadow:0 2px 8px rgba(212,175,55,0.45);z-index:2;">✦ Customization Available</span>`
+        : '';
+
     return `
         <div class="card">
-            <div class="card-img-wrapper">
+            <div class="card-img-wrapper" style="position:relative;">
+                ${customBadge}
                 <img loading="lazy" src="${item.img}" alt="${item.title}" onerror="this.onerror=null;this.src='https://via.placeholder.com/300?text=Image+Not+Found'"/>
             </div>
             <div class="card-body">
