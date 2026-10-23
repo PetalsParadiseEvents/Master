@@ -1327,7 +1327,44 @@ function renderVideos() {
                 <h2 class="section-title">Videos Gallery</h2>
                 <p class="section-subtitle">Experience the magic of our event transformations through these highlights.</p>
             </div>
-            
+
+            <div style="margin-bottom: 3rem;">
+                <h3 style="color: var(--primary-color); border-left: 4px solid var(--primary-color); padding-left: 1rem; margin-bottom: 1.5rem;">&#10024; Featured &#8212; Haldi / Maiyan Decor</h3>
+                <div style="display: flex; justify-content: center; align-items: flex-start; gap: 2rem; flex-wrap: wrap;">
+                    <div style="background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(245,200,66,0.06)); border: 1px solid rgba(212,175,55,0.3); border-radius: 20px; padding: 1.5rem; max-width: 420px; width: 100%; box-shadow: 0 8px 32px rgba(212,175,55,0.15);">
+                        <div style="border-radius: 14px; overflow: hidden; background: #000;">
+                            <iframe
+                                src="https://www.instagram.com/reel/De0KWBwK_vx/embed/"
+                                width="100%"
+                                height="560"
+                                frameborder="0"
+                                scrolling="no"
+                                allowtransparency="true"
+                                allowfullscreen="true"
+                                style="display: block; border-radius: 14px;"
+                                loading="lazy"
+                            ></iframe>
+                        </div>
+                        <div style="padding: 1rem 0.5rem 0;">
+                            <h4 style="color: var(--primary-color); font-size: 1rem; margin-bottom: 0.3rem;">&#127800; Haldi / Maiyan Decor Setup</h4>
+                            <p style="color: var(--text-secondary); font-size: 0.85rem; font-style: italic; margin-bottom: 0.8rem;">#petalsparadiseevents #haldidecor #maiyan</p>
+                            <a href="https://www.instagram.com/petalsparadiseevents/reel/De0KWBwK_vx/" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.4rem 1.2rem;">
+                                <i data-feather="instagram" style="width: 14px; margin-right: 6px; vertical-align: middle;"></i>View on Instagram
+                            </a>
+                        </div>
+                    </div>
+                    <div style="max-width: 380px; width: 100%; display: flex; flex-direction: column; gap: 1rem; justify-content: center;">
+                        <div style="background: var(--surface-color); border-radius: 16px; padding: 1.5rem; border: 1px solid var(--border-color);">
+                            <p style="font-size: 1.05rem; color: var(--text-primary); line-height: 1.7; font-style: italic;">"From stunning floral backdrops to staircase drapes &#8212; we bring your Haldi &amp; Maiyan vision to life with elegance and tradition."</p>
+                            <p style="color: var(--primary-color); font-weight: 600; margin-top: 0.8rem;">&#8212; Petals Paradise Events</p>
+                        </div>
+                        <a href="#catalog" onclick="navigate('#catalog')" class="btn btn-primary" style="text-align: center;">
+                            View Haldi Decor Rentals &#8594;
+                        </a>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;">
                 ${videos.map(v => `
                     <div class="card" style="padding: 0.5rem; background: var(--surface-color); overflow: hidden; border-radius: 16px;">
