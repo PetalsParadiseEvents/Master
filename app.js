@@ -1363,8 +1363,8 @@ function renderVideos() {
                             <p style="font-size: 1.05rem; color: var(--text-primary); line-height: 1.7; font-style: italic;">"From stunning floral backdrops to staircase drapes &#8212; we bring your Haldi &amp; Maiyan vision to life with elegance and tradition."</p>
                             <p style="color: var(--primary-color); font-weight: 600; margin-top: 0.8rem;">&#8212; Petals Paradise Events</p>
                         </div>
-                        <a href="#catalog" onclick="navigate('#catalog')" class="btn btn-primary" style="text-align: center;">
-                            View Haldi Decor Rentals &#8594;
+                        <a href="#rentals" onclick="navigate('#rentals')" class="btn btn-primary" style="text-align: center;">
+                            Browse Haldi Decor Rentals &#8594;
                         </a>
                     </div>
                 </div>
