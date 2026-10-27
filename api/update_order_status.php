@@ -114,7 +114,7 @@ if ($notifyCustomer && !empty($customerEmail)) {
         'Out for Delivery' => "Your rental decor for Order {$orderId} is OUT FOR DELIVERY! Our logistics team is en route to your specified address.",
         'Delivered' => "Your rental decor for Order {$orderId} has been DELIVERED to your event address! Enjoy your celebration.",
         'Returned' => "We have received your RETURNED rental items for Order {$orderId}. Thank you for renting with Petals Paradise Events!",
-        'Completed' => "Thank you for choosing Petals Paradise Events! Your rental order {$orderId} is now officially COMPLETED. \xF0\x9F\x8E\x89 We are so honored to have been part of your special celebration! We hope our decor helped make your event truly unforgettable.",
+        'Completed' => "Thank you for choosing Petals Paradise Events! Your order {$orderId} is now officially COMPLETED. We are so honored to have been part of your special celebration! We hope everything came together beautifully and that your event was everything you dreamed of.",
         'Cancelled' => "Your rental request for Order {$orderId} has been CANCELLED as requested.",
         'Pending' => "Your rental request for Order {$orderId} is currently PENDING review."
     ];
