@@ -530,16 +530,21 @@ function renderBanner() {
         <div class="promo-banner">
             <div class="ticker-wrap">
                 <div class="ticker">
-                    <span class="ticker-item">☀️ SUMMER CELEBRATION SPECIAL ☀️</span>
-                    <span class="ticker-item">✨ CELEBRATE EVERY MOMENT THIS SUMMER! ✨</span>
+                    <span class="ticker-item">🎃 HAPPY HALLOWEEN FROM PETALS PARADISE EVENTS! 🎃</span>
+                    <span class="ticker-item">🕷️ SPOOKY SEASON DECOR NOW AVAILABLE — BOOK YOUR EVENT TODAY! 🕷️</span>
                     <span class="ticker-item">🌸 WEDDINGS • BIRTHDAYS • BABY SHOWERS • CORPORATE EVENTS 🌸</span>
-                    <span class="ticker-item">📞 QUESTIONS? CALL US AT +1 848-448-6993</span>
-                    <span class="ticker-item">🚚 WE OFFER DELIVERY & PICKUP OPTIONS! 🚚</span>
+                    <span class="ticker-item">👻 FALL & HALLOWEEN PARTIES — LET US MAKE IT MAGICAL! 👻</span>
+                    <span class="ticker-item">📞 CALL OR TEXT US: +1 848-448-6993</span>
+                    <span class="ticker-item">🍂 FALL CELEBRATIONS • HALDI • MEHANDI • HOLIDAY PARTIES 🍂</span>
+                    <span class="ticker-item">🚚 DELIVERY & PICKUP OPTIONS AVAILABLE! 🚚</span>
                     <!-- Duplicate for seamless loop -->
-                    <span class="ticker-item">☀️ SUMMER CELEBRATION SPECIAL ☀️</span>
-                    <span class="ticker-item">✨ CELEBRATE EVERY MOMENT THIS SUMMER! ✨</span>
+                    <span class="ticker-item">🎃 HAPPY HALLOWEEN FROM PETALS PARADISE EVENTS! 🎃</span>
+                    <span class="ticker-item">🕷️ SPOOKY SEASON DECOR NOW AVAILABLE — BOOK YOUR EVENT TODAY! 🕷️</span>
                     <span class="ticker-item">🌸 WEDDINGS • BIRTHDAYS • BABY SHOWERS • CORPORATE EVENTS 🌸</span>
-                    <span class="ticker-item">📞 QUESTIONS? CALL US AT +1 848-448-6993</span>
+                    <span class="ticker-item">👻 FALL & HALLOWEEN PARTIES — LET US MAKE IT MAGICAL! 👻</span>
+                    <span class="ticker-item">📞 CALL OR TEXT US: +1 848-448-6993</span>
+                    <span class="ticker-item">🍂 FALL CELEBRATIONS • HALDI • MEHANDI • HOLIDAY PARTIES 🍂</span>
+                    <span class="ticker-item">🚚 DELIVERY & PICKUP OPTIONS AVAILABLE! 🚚</span>
                 </div>
             </div>
         </div>

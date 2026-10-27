@@ -114,7 +114,7 @@ if ($notifyCustomer && !empty($customerEmail)) {
         'Out for Delivery' => "Your rental decor for Order {$orderId} is OUT FOR DELIVERY! Our logistics team is en route to your specified address.",
         'Delivered' => "Your rental decor for Order {$orderId} has been DELIVERED to your event address! Enjoy your celebration.",
         'Returned' => "We have received your RETURNED rental items for Order {$orderId}. Thank you for renting with Petals Paradise Events!",
-        'Completed' => "Thank you for choosing Petals Paradise Events! Your rental order {$orderId} is now officially COMPLETED. We hope we helped make your celebration truly unforgettable! Please remember Petals Paradise Events for all your future milestone celebrations, birthdays, weddings, and party decor needs.",
+        'Completed' => "Thank you for choosing Petals Paradise Events! Your rental order {$orderId} is now officially COMPLETED. \xF0\x9F\x8E\x89 We are so honored to have been part of your special celebration! We hope our decor helped make your event truly unforgettable.",
         'Cancelled' => "Your rental request for Order {$orderId} has been CANCELLED as requested.",
         'Pending' => "Your rental request for Order {$orderId} is currently PENDING review."
     ];
@@ -150,10 +150,6 @@ if ($notifyCustomer && !empty($customerEmail)) {
             <p>Hi <strong>" . htmlspecialchars($customerName) . "</strong>,</p>
             <p>" . htmlspecialchars($statusMsgText) . "</p>
             
-            <div style='text-align: center; margin: 25px 0;'>
-                <a href='{$trackUrl}' class='track-btn' target='_blank'>📦 Track Your Order Live</a>
-            </div>
-
             <div class='box'>
                 <h3 style='margin-top:0; color:#2d3748; font-size:16px;'>📋 Order Details Summary</h3>
                 <p style='margin: 5px 0;'><strong>Order Confirmation ID:</strong> <span style='font-family: monospace; font-weight: bold; color: #d4af37;'>" . htmlspecialchars($orderId) . "</span></p>
@@ -162,17 +158,14 @@ if ($notifyCustomer && !empty($customerEmail)) {
                 (!empty($eventDate) ? "<p style='margin: 5px 0;'><strong>Event Date:</strong> " . htmlspecialchars($eventDate) . "</p>" : "") .
                 (floatval($orderRecord['discount'] ?? 0) > 0 ? "<p style='margin: 5px 0; color: #38a169;'><strong>Discount Applied:</strong> -\$" . number_format((float)$orderRecord['discount'], 2) . "</p>" : "") . "
                 <p style='margin: 5px 0;'><strong>Total Estimate:</strong> \$" . htmlspecialchars($totalAmount) . "</p>
-            </div>
-
-            <div class='box'>
-                <h3 style='margin-top:0; color:#2d3748; font-size:16px;'>🛍️ Requested Items</h3>
-                <ul style='padding-left: 20px; margin-bottom: 0;'>" . 
-                (!empty($itemsHtml) ? $itemsHtml : "<li>No item details listed.</li>") . "
-                </ul>
-            </div>
-
-            <p style='font-size: 14px; color: #4a5568;'>Direct tracking link:<br>
-            <a href='{$trackUrl}' style='color: #d4af37; text-decoration: underline; word-break: break-all;'>{$trackUrl}</a></p>
+            </div>" .
+            ($newStatus === 'Completed' ? "
+            <div style='background: linear-gradient(135deg, #fff9e6, #fff3cc); border: 2px solid #d4af37; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;'>
+                <p style='font-size: 26px; margin: 0 0 6px;'>&#11088;&#11088;&#11088;&#11088;&#11088;</p>
+                <h3 style='margin: 0 0 10px; color: #1a202c; font-size: 17px;'>Loved your experience? We'd love a review!</h3>
+                <p style='font-size: 14px; color: #4a5568; margin: 0 0 18px;'>Your kind words help other families discover Petals Paradise Events and mean the world to our small business. It only takes 30 seconds!</p>
+                <a href='https://g.page/r/CXcHwjVlRTQIEBM/review' target='_blank' style='display: inline-block; background: #d4af37; color: #ffffff; padding: 14px 36px; border-radius: 30px; font-weight: bold; font-size: 15px; text-decoration: none;'>&#11088; Write a Google Review</a>
+            </div>" : "") . "
 
             <div class='footer'>
                 <p><strong>Petals Paradise Events</strong><br>
