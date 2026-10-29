@@ -19,10 +19,13 @@ $notificationEmails = [
 ];
 $apiKey      = '';
 
-// Owner SMS Gateway (T-Mobile email-to-SMS — free, no external API needed)
+// Owner SMS Gateways (T-Mobile email-to-SMS — free, no external API needed)
 // Format: {10-digit-phone}@tmomail.net
-// To change carrier: AT&T=@txt.att.net | Verizon=@vtext.com | T-Mobile=@tmomail.net
-$ownerSmsGateway = '8484486993@tmomail.net';
+// Carrier suffixes: AT&T=@txt.att.net | Verizon=@vtext.com | T-Mobile=@tmomail.net
+$ownerSmsGateways = [
+    '8484486993@tmomail.net',  // Mounika
+    '6692248611@tmomail.net',  // Second number
+];
 
 // Database Defaults (Hostinger phpMyAdmin)
 $dbHost      = 'localhost';
@@ -104,22 +107,28 @@ if (!defined('ADMIN_PASS'))          define('ADMIN_PASS', $adminPass);
 if (!defined('ADMIN_SECRET'))        define('ADMIN_SECRET', $adminSecret);
 if (!defined('NOTIFICATION_EMAILS')) define('NOTIFICATION_EMAILS', json_encode($notificationEmails));
 if (!defined('GEMINI_API_KEY'))      define('GEMINI_API_KEY', $apiKey);
-if (!defined('OWNER_SMS_GATEWAY'))   define('OWNER_SMS_GATEWAY', $ownerSmsGateway ?? '');
+if (!defined('OWNER_SMS_GATEWAYS'))  define('OWNER_SMS_GATEWAYS', json_encode($ownerSmsGateways ?? []));
 
 /**
- * Send a short SMS alert to the owner via email-to-SMS gateway (free, no API key).
+ * Send a short SMS alert to all owner phones via email-to-SMS gateway (free, no API key).
  * Keeps the message under 160 chars for a single SMS segment.
  *
  * @param string $message  Short plain-text message (max ~155 chars recommended)
- * @return bool            True if mail() accepted the message
+ * @return bool            True if at least one message was accepted
  */
 function smsOwner(string $message): bool {
-    $gateway = OWNER_SMS_GATEWAY;
-    if (empty($gateway)) return false;
+    $gateways = json_decode(OWNER_SMS_GATEWAYS, true) ?: [];
+    if (empty($gateways)) return false;
     $headers = "From: Petals Paradise <contact@petalsparadiseevents.com>\r\n"
              . "X-Mailer: PHP/" . phpversion();
-    // Subject is intentionally blank — carriers display it as part of the message body
-    return (bool)@mail($gateway, '', $message, $headers);
+    $sent = false;
+    foreach ($gateways as $gateway) {
+        if (!empty($gateway)) {
+            // Subject is intentionally blank — carriers display it as part of the body
+            $sent = (bool)@mail($gateway, '', $message, $headers) || $sent;
+        }
+    }
+    return $sent;
 }
 
 if (!defined('DB_HOST'))  define('DB_HOST', $dbHost);
