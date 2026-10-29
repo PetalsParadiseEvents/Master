@@ -27,6 +27,12 @@ $ownerSmsGateways = [
     '6692248611@tmomail.net',  // Second number
 ];
 
+// ntfy.sh Push Notification Topic (free, instant push to phone app)
+// Install ntfy app -> subscribe to this topic -> get instant order alerts
+// Topic acts as a secret password — keep it private
+// Download: https://ntfy.sh (iOS & Android, free)
+$ntfyTopic = 'petalsparadise-orders-x7k2m9p';  // Change to any secret string you like
+
 // Database Defaults (Hostinger phpMyAdmin)
 $dbHost      = 'localhost';
 $dbName      = 'u704222898_ParadiseDB';
@@ -108,26 +114,52 @@ if (!defined('ADMIN_SECRET'))        define('ADMIN_SECRET', $adminSecret);
 if (!defined('NOTIFICATION_EMAILS')) define('NOTIFICATION_EMAILS', json_encode($notificationEmails));
 if (!defined('GEMINI_API_KEY'))      define('GEMINI_API_KEY', $apiKey);
 if (!defined('OWNER_SMS_GATEWAYS'))  define('OWNER_SMS_GATEWAYS', json_encode($ownerSmsGateways ?? []));
+if (!defined('NTFY_TOPIC'))          define('NTFY_TOPIC', $ntfyTopic ?? '');
 
 /**
- * Send a short SMS alert to all owner phones via email-to-SMS gateway (free, no API key).
- * Keeps the message under 160 chars for a single SMS segment.
+ * Notify the owner of a new order via:
+ *   1. ntfy.sh push notification (primary — instant, reliable, free)
+ *   2. email-to-SMS gateway      (fallback — may be blocked by some carriers)
  *
- * @param string $message  Short plain-text message (max ~155 chars recommended)
- * @return bool            True if at least one message was accepted
+ * @param string $message  Short plain-text alert (keep under 155 chars for SMS)
+ * @return bool            True if at least one method succeeded
  */
 function smsOwner(string $message): bool {
-    $gateways = json_decode(OWNER_SMS_GATEWAYS, true) ?: [];
-    if (empty($gateways)) return false;
-    $headers = "From: Petals Paradise <contact@petalsparadiseevents.com>\r\n"
-             . "X-Mailer: PHP/" . phpversion();
     $sent = false;
+
+    // ── Method 1: ntfy.sh push notification (preferred) ──────────────────
+    $topic = NTFY_TOPIC;
+    if (!empty($topic) && function_exists('curl_init')) {
+        $ch = curl_init("https://ntfy.sh/{$topic}");
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 8,
+            CURLOPT_POSTFIELDS     => $message,
+            CURLOPT_HTTPHEADER     => [
+                'Title: 🌸 PPE New Order!',
+                'Priority: high',
+                'Tags: shopping,bell',
+            ],
+        ]);
+        $resp     = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if ($httpCode === 200) {
+            $sent = true;
+        }
+    }
+
+    // ── Method 2: email-to-SMS gateway (fallback) ─────────────────────────
+    $gateways = json_decode(OWNER_SMS_GATEWAYS, true) ?: [];
+    $headers  = "From: Petals Paradise <contact@petalsparadiseevents.com>\r\n"
+              . "X-Mailer: PHP/" . phpversion();
     foreach ($gateways as $gateway) {
         if (!empty($gateway)) {
-            // Subject is intentionally blank — carriers display it as part of the body
             $sent = (bool)@mail($gateway, '', $message, $headers) || $sent;
         }
     }
+
     return $sent;
 }
 
