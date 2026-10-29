@@ -400,6 +400,10 @@ try {
                 @mail($nEmail, "[Admin Copy] " . $subject, $message, $headers);
             }
         }
+
+        // Send SMS alert to owner (manual order created via admin portal)
+        $smsTotalFmt = number_format((float)($total ?? 0), 2);
+        smsOwner("PPE MANUAL ORDER! ID:{$orderId} | {$name} | {$phone} | {$fulfillment} | Event:{$eventDate} | Total:\${$smsTotalFmt}");
     }
 
     if (ob_get_length()) ob_clean();

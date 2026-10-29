@@ -19,6 +19,11 @@ $notificationEmails = [
 ];
 $apiKey      = '';
 
+// Owner SMS Gateway (T-Mobile email-to-SMS — free, no external API needed)
+// Format: {10-digit-phone}@tmomail.net
+// To change carrier: AT&T=@txt.att.net | Verizon=@vtext.com | T-Mobile=@tmomail.net
+$ownerSmsGateway = '8484486993@tmomail.net';
+
 // Database Defaults (Hostinger phpMyAdmin)
 $dbHost      = 'localhost';
 $dbName      = 'u704222898_ParadiseDB';
@@ -99,6 +104,23 @@ if (!defined('ADMIN_PASS'))          define('ADMIN_PASS', $adminPass);
 if (!defined('ADMIN_SECRET'))        define('ADMIN_SECRET', $adminSecret);
 if (!defined('NOTIFICATION_EMAILS')) define('NOTIFICATION_EMAILS', json_encode($notificationEmails));
 if (!defined('GEMINI_API_KEY'))      define('GEMINI_API_KEY', $apiKey);
+if (!defined('OWNER_SMS_GATEWAY'))   define('OWNER_SMS_GATEWAY', $ownerSmsGateway ?? '');
+
+/**
+ * Send a short SMS alert to the owner via email-to-SMS gateway (free, no API key).
+ * Keeps the message under 160 chars for a single SMS segment.
+ *
+ * @param string $message  Short plain-text message (max ~155 chars recommended)
+ * @return bool            True if mail() accepted the message
+ */
+function smsOwner(string $message): bool {
+    $gateway = OWNER_SMS_GATEWAY;
+    if (empty($gateway)) return false;
+    $headers = "From: Petals Paradise <contact@petalsparadiseevents.com>\r\n"
+             . "X-Mailer: PHP/" . phpversion();
+    // Subject is intentionally blank — carriers display it as part of the message body
+    return (bool)@mail($gateway, '', $message, $headers);
+}
 
 if (!defined('DB_HOST'))  define('DB_HOST', $dbHost);
 if (!defined('DB_NAME'))  define('DB_NAME', $dbName);

@@ -213,6 +213,10 @@ foreach ($notificationEmails as $recipientEmail) {
     }
 }
 
+// Send SMS alert to owner's phone (T-Mobile gateway, free)
+$smsTotal = number_format((float)$total, 2);
+smsOwner("PPE NEW ORDER! ID:{$orderId} | {$name} | {$phone} | {$fulfillment} | Event:{$eventDate} | Total:\${$smsTotal}");
+
 // 6. Send Confirmation Email to the Customer
 $custSubject = "🌸 Rental Request Received: {$orderId} - Petals Paradise Events";
 $custMessage = "Hi {$name},\n\n"
