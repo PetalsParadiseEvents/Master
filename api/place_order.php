@@ -213,7 +213,7 @@ foreach ($notificationEmails as $recipientEmail) {
     }
 }
 
-// Send SMS alert to owner's phone (T-Mobile gateway, free)
+// Send push notification alert to owner's phone (ntfy app)
 $smsTotal = number_format((float)$total, 2);
 smsOwner("PPE NEW ORDER! ID:{$orderId} | {$name} | {$phone} | {$fulfillment} | Event:{$eventDate} | Total:\${$smsTotal}");
 

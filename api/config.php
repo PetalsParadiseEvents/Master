@@ -19,14 +19,6 @@ $notificationEmails = [
 ];
 $apiKey      = '';
 
-// Owner SMS Gateways (T-Mobile email-to-SMS — free, no external API needed)
-// Format: {10-digit-phone}@tmomail.net
-// Carrier suffixes: AT&T=@txt.att.net | Verizon=@vtext.com | T-Mobile=@tmomail.net
-$ownerSmsGateways = [
-    '8484486993@tmomail.net',  // Mounika
-    '6692248611@tmomail.net',  // Second number
-];
-
 // ntfy.sh Push Notification Topic (free, instant push to phone app)
 // Install ntfy app -> subscribe to this topic -> get instant order alerts
 // Topic acts as a secret password — keep it private
@@ -113,16 +105,14 @@ if (!defined('ADMIN_PASS'))          define('ADMIN_PASS', $adminPass);
 if (!defined('ADMIN_SECRET'))        define('ADMIN_SECRET', $adminSecret);
 if (!defined('NOTIFICATION_EMAILS')) define('NOTIFICATION_EMAILS', json_encode($notificationEmails));
 if (!defined('GEMINI_API_KEY'))      define('GEMINI_API_KEY', $apiKey);
-if (!defined('OWNER_SMS_GATEWAYS'))  define('OWNER_SMS_GATEWAYS', json_encode($ownerSmsGateways ?? []));
 if (!defined('NTFY_TOPIC'))          define('NTFY_TOPIC', $ntfyTopic ?? '');
 
 /**
- * Notify the owner of a new order via:
- *   1. ntfy.sh push notification (primary — instant, reliable, free)
- *   2. email-to-SMS gateway      (fallback — may be blocked by some carriers)
+ * Notify the owner of a new order via ntfy.sh push notification (free, instant).
+ * (T-Mobile's email-to-SMS gateway was discontinued, so it is no longer used.)
  *
- * @param string $message  Short plain-text alert (keep under 155 chars for SMS)
- * @return bool            True if at least one method succeeded
+ * @param string $message  Short plain-text alert
+ * @return bool            True if the push was accepted
  */
 function smsOwner(string $message): bool {
     $sent = false;
@@ -147,16 +137,6 @@ function smsOwner(string $message): bool {
         curl_close($ch);
         if ($httpCode === 200) {
             $sent = true;
-        }
-    }
-
-    // ── Method 2: email-to-SMS gateway (fallback) ─────────────────────────
-    $gateways = json_decode(OWNER_SMS_GATEWAYS, true) ?: [];
-    $headers  = "From: Petals Paradise <contact@petalsparadiseevents.com>\r\n"
-              . "X-Mailer: PHP/" . phpversion();
-    foreach ($gateways as $gateway) {
-        if (!empty($gateway)) {
-            $sent = (bool)@mail($gateway, '', $message, $headers) || $sent;
         }
     }
 
