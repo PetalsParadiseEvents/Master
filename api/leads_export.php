@@ -173,11 +173,14 @@ if (!$dbConnected) {
 // Split orders into Active and Completed arrays
 $activeOrders = [];
 $completedOrders = [];
+$cancelledOrders = [];
 
 foreach ($orders as $ord) {
     $st = $ord['status'] ?? 'Pending';
     if ($st === 'Completed') {
         $completedOrders[] = $ord;
+    } elseif (strcasecmp($st, 'Cancelled') === 0 || strcasecmp($st, 'Canceled') === 0) {
+        $cancelledOrders[] = $ord;
     } else {
         $activeOrders[] = $ord;
     }
@@ -195,6 +198,7 @@ $sortByEventDate = function($a, $b) {
 
 usort($activeOrders, $sortByEventDate);
 usort($completedOrders, $sortByEventDate);
+usort($cancelledOrders, $sortByEventDate);
 
 // Helper Function: Get Week Range Details (Monday to Sunday)
 function getWeekRangeDetails($dateStr) {
@@ -443,6 +447,7 @@ if ($format === 'json') {
             <button class="tab-btn active" onclick="switchTab('leads')">📋 Leads / Inquiries (<?php echo count($leads); ?>)</button>
             <button class="tab-btn" onclick="switchTab('orders')">📦 Active Orders (<?php echo count($activeOrders); ?>)</button>
             <button class="tab-btn" onclick="switchTab('completed')">✅ Completed Orders (<?php echo count($completedOrders); ?>)</button>
+            <button class="tab-btn" onclick="switchTab('cancelled')">❌ Cancelled Orders (<?php echo count($cancelledOrders); ?>)</button>
         </div>
 
         <!-- ──────────────── 1. LEADS TAB ──────────────── -->
@@ -620,6 +625,17 @@ if ($format === 'json') {
             </div>
 
             <?php renderOrdersTable($completedOrders, 'completedTable'); ?>
+        </div>
+
+        <!-- ──────────────── 4. CANCELLED ORDERS TAB ──────────────── -->
+        <div id="cancelled-tab" class="tab-content">
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-value" style="color: #ef4444;"><?php echo count($cancelledOrders); ?></div>
+                    <div class="stat-label">Cancelled Orders</div>
+                </div>
+            </div>
+            <?php renderOrdersTable($cancelledOrders, 'cancelledTable'); ?>
         </div>
 
     </div>
