@@ -705,6 +705,14 @@ function renderFooter() {
                 <a href="./locations/loudoun-county-va.html">Loudoun County, VA</a>
             </div>
             <div class="footer-col">
+                <h3>Rental Categories</h3>
+                <a href="./rentals/chair-table-rentals.html">Chair &amp; Table Rentals</a>
+                <a href="./rentals/tent-rentals.html">Tent Rentals</a>
+                <a href="./rentals/backdrop-rentals.html">Backdrops &amp; Photo Props</a>
+                <a href="./rentals/marquee-letters-neon-signs.html">Marquee Letters &amp; Neon</a>
+                <a href="./rentals/haldi-mehandi-indian-decor-rentals.html">Haldi &amp; Mehandi Decor</a>
+            </div>
+            <div class="footer-col">
                 <h3>Contact Us</h3>
                 <p style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;"><i data-feather="phone" style="width: 20px; height: 20px; flex-shrink: 0; color: var(--primary-color);"></i> <a href="tel:+18484486993" class="phone-link" style="color: inherit; text-decoration: none; line-height: 1;">+1 848-448-6993</a></p>
                 <p style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;"><i data-feather="mail" style="width: 20px; height: 20px; flex-shrink: 0; color: var(--primary-color);"></i> <a href="mailto:contact@petalsparadiseevents.com" style="color: inherit; text-decoration: none; word-break: break-word; line-height: 1;">contact@petalsparadiseevents.com</a></p>
