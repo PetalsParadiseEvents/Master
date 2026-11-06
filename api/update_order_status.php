@@ -6,6 +6,7 @@ session_start();
  */
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/loyalty.php';
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: https://petalsparadiseevents.com');
@@ -86,6 +87,21 @@ if (file_exists($ordersFile)) {
     }
 }
 
+// 3b. Loyalty points: credit on Returned (pickup) / Completed (delivery); refund redeemed points on Cancelled
+$pointsResult = null;
+$pointsRefunded = 0;
+if ($dbUpdated && $orderRecord) {
+    try {
+        if (orderEarnsAtStatus($orderRecord['fulfillment_method'] ?? '', $newStatus)) {
+            $pointsResult = creditOrderPoints($orderId);
+        } elseif ($newStatus === 'Cancelled') {
+            $pointsRefunded = refundRedeemedPoints($orderId);
+        }
+    } catch (Exception $e) {
+        // Never block a status update because of loyalty errors
+    }
+}
+
 // 4. Send Custom Status Email Notification to Customer
 $emailSent = false;
 $customerEmail = $orderRecord['email'] ?? '';
@@ -148,7 +164,24 @@ if ($notifyCustomer && !empty($customerEmail)) {
             </div>
             
             <p>Hi <strong>" . htmlspecialchars($customerName) . "</strong>,</p>
-            <p>" . htmlspecialchars($statusMsgText) . "</p>
+            <p>" . htmlspecialchars($statusMsgText) . "</p>" .
+            ($pointsResult ? "
+            <div style='background:#fff9e6; border:1px solid #d4af37; border-radius:10px; padding:14px 18px; margin:16px 0;'>
+                <strong>&#127881; You earned " . number_format($pointsResult['earned']) . " loyalty points!</strong><br>
+                New balance: <strong>" . number_format($pointsResult['balance']) . " points</strong>" .
+                ($pointsResult['balance'] >= MIN_REDEEM_POINTS ? " &mdash; worth <strong>\$" . number_format(pointsToDollars((int)(floor($pointsResult['balance'] / REDEEM_STEP_POINTS) * REDEEM_STEP_POINTS)), 2) . " off</strong> your next order!" : " &mdash; just " . number_format(MIN_REDEEM_POINTS - $pointsResult['balance']) . " more to unlock \$5 off.") . "
+                <br><a href='https://petalsparadiseevents.com/#profile' style='color:#b8941f;'>View my rewards</a>
+            </div>" : "") .
+            ($pointsRefunded > 0 ? "
+            <div style='background:#f0fff4; border:1px solid #38a169; border-radius:10px; padding:14px 18px; margin:16px 0;'>
+                &#8617; The <strong>" . number_format($pointsRefunded) . " points</strong> you used on this order have been returned to your account.
+            </div>" : "") .
+            (!$pointsResult && orderEarnsAtStatus($fulfillment, $newStatus) && empty($orderRecord['customer_id']) ? "
+            <div style='background:#fff9e6; border:1px dashed #d4af37; border-radius:10px; padding:14px 18px; margin:16px 0;'>
+                &#127800; <strong>Earn rewards next time!</strong> Create a free account with this email at
+                <a href='https://petalsparadiseevents.com/#signup' style='color:#b8941f;'>petalsparadiseevents.com</a>
+                and earn 10 points for every \$1. Past orders from the last 12 months count too!
+            </div>" : "") . "
             
             <div class='box'>
                 <h3 style='margin-top:0; color:#2d3748; font-size:16px;'>📋 Order Details Summary</h3>

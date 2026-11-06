@@ -5,6 +5,7 @@
  */
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/loyalty.php';
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: https://petalsparadiseevents.com');
@@ -69,6 +70,34 @@ if (empty($name) || empty($email) || empty($phone) || empty($items)) {
     exit;
 }
 
+// Loyalty: link signed-in customer and validate points redemption (server-side)
+$customer        = currentCustomer();
+$customerId      = $customer ? (int)$customer['id'] : null;
+$pointsRequested = isset($inputData['points_to_redeem']) ? (int)$inputData['points_to_redeem'] : 0;
+$pointsRedeemed  = 0;
+$pointsDollars   = 0.00;
+if ($pointsRequested > 0) {
+    if (!$customer) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Please sign in to redeem loyalty points.']);
+        exit;
+    }
+    // Use the item list (not only the client-sent subtotal) as the basis for the 50% cap
+    $itemsSum = 0.0;
+    foreach ($items as $it) { $itemsSum += (float)($it['price'] ?? 0) * (int)($it['quantity'] ?? 1); }
+    $capBase = $itemsSum > 0 ? min($itemsSum, $subtotal > 0 ? $subtotal : $itemsSum) : $subtotal;
+    try {
+        [$pointsRedeemed, $pointsDollars] = validateRedemption($pointsRequested, (int)$customer['points_balance'], $capBase);
+    } catch (InvalidArgumentException $e) {
+        http_response_code(400);
+        echo json_encode(['error' => $e->getMessage()]);
+        exit;
+    }
+    $discount  = round($discount + $pointsDollars, 2);
+    $total     = max(0, round($total - $pointsDollars, 2));
+    $promoCode = trim($promoCode . ($promoCode !== '' ? ' + ' : '') . "{$pointsRedeemed} pts");
+}
+
 // Generate a professional human-readable Order Confirmation ID
 $orderId = 'PPE-' . date('Ymd') . '-' . str_pad(mt_rand(100, 999), 3, '0', STR_PAD_LEFT);
 
@@ -127,6 +156,16 @@ if ($pdo) {
             ':total'              => $total
         ]);
         $dbSaved = true;
+
+        // Loyalty: attach customer + deduct redeemed points
+        if ($customerId) {
+            ensureLoyaltyTables($pdo);
+            $pdo->prepare("UPDATE `orders` SET `customer_id` = ?, `points_redeemed` = ? WHERE `id` = ?")
+                ->execute([$customerId, $pointsRedeemed, $orderId]);
+            if ($pointsRedeemed > 0) {
+                addPoints($pdo, $customerId, -$pointsRedeemed, 'redeem', $orderId, "Redeemed on order {$orderId} (-\$" . number_format($pointsDollars, 2) . ")");
+            }
+        }
     } catch (Exception $e) {
         // Fallback to JSON file continues if DB fails
     }
@@ -159,6 +198,8 @@ $orderRecord = [
     'discount'           => $discount,
     'promo_code'         => $promoCode,
     'total'              => $total,
+    'customer_id'        => $customerId,
+    'points_redeemed'    => $pointsRedeemed,
     'status'             => 'Pending'
 ];
 array_unshift($existingOrders, $orderRecord);
@@ -249,5 +290,9 @@ $custHeaders = "From: Petals Paradise Events <contact@petalsparadiseevents.com>\
 echo json_encode([
     'success' => true,
     'order_id' => $orderId,
+    'points_redeemed' => $pointsRedeemed,
+    'points_discount' => $pointsDollars,
+    'total' => $total,
+    'points_to_earn' => $customerId ? pointsForTotal($total) : 0,
     'message' => 'Order placed successfully.'
 ]);

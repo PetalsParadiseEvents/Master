@@ -566,6 +566,7 @@ function renderNavbar() {
             <a href="#videos" class="nav-link">Videos</a>
             <a href="#contact" class="nav-link">Contact Us</a>
             <a href="#track" class="nav-link">Track Order</a>
+            <a href="#signin" class="nav-link nav-account-link" data-account-link>👤 Sign In</a>
             <a href="#contact" class="nav-link nav-plan-btn">✨ Plan My Event</a>
         </div>
         <a href="#cart" class="cart-icon-container" aria-label="View cart with ${cart.reduce((sum, item) => sum + item.quantity, 0)} items">
@@ -609,6 +610,8 @@ function renderNavbar() {
             <a href="#videos" class="nav-link">Videos</a>
             <a href="#contact" class="nav-link">Contact Us</a>
             <a href="#track" class="nav-link">Track Order</a>
+            <a href="#rewards" class="nav-link">🌸 Rewards</a>
+            <a href="#signin" class="nav-link" data-account-link>👤 Sign In</a>
             <a href="#contact" class="nav-link mobile-plan-btn" style="color: var(--primary-color); font-weight: 700; margin-top: 0.5rem; display: inline-block;">✨ Plan My Event</a>
         </div>
     `;
@@ -1733,6 +1736,7 @@ function renderCart() {
                         <span style="font-size: 1rem; color: var(--text-secondary);">Total Estimate:</span>
                         <span style="font-size: 1.25rem; font-weight: 700; color: var(--primary-color); text-align: right;">$${subtotal - discount}${fulfillmentMethod === 'Delivery' ? ' + Delivery (TBD)' : ''}</span>
                     </div>
+                    <div id="loyalty-earn-preview"></div>
                     <button type="button" id="cart-checkout-btn" class="btn btn-primary" style="width: 100%; text-align: center; margin-top: 1.5rem; display: block; padding: 1.2rem;" onclick="goToCheckout(event)">
                         Proceed to Checkout
                     </button>
@@ -1801,6 +1805,7 @@ function renderCheckout() {
             discount: getDiscount(),
             total: getCartTotal() - getDiscount(),
             promo_code: appliedPromo || '',
+            points_to_redeem: window.ppeSelectedRedeem || 0,
             items: cart.map(item => ({
                 id: item.id,
                 title: item.title,
@@ -1831,6 +1836,9 @@ function renderCheckout() {
                 cart = [];
                 appliedPromo = null;
                 saveCart();
+                
+                window.ppeSelectedRedeem = 0;
+                if (window.ppeAccount && typeof window.ppeAccount.refresh === 'function') window.ppeAccount.refresh();
                 
                 window.location.hash = '#confirmation';
             } else {
@@ -2087,10 +2095,13 @@ function renderCheckout() {
                         </div>
                     </form>
 
+                    <div id="loyalty-redeem-box"></div>
+
                     <div id="summary-total-val" class="summary-total" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
                         <span style="font-size: 1rem; color: var(--text-secondary);">Total Estimate:</span>
-                        <span style="font-size: 1.25rem; font-weight: 700; color: var(--primary-color); text-align: right;">$${subtotal - discount}${fulfillmentMethod === 'Delivery' ? ' + Delivery (TBD)' : ''}</span>
+                        <span id="checkout-total-amount" style="font-size: 1.25rem; font-weight: 700; color: var(--primary-color); text-align: right;">$${subtotal - discount}${fulfillmentMethod === 'Delivery' ? ' + Delivery (TBD)' : ''}</span>
                     </div>
+                    <div id="loyalty-earn-preview"></div>
                     <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 1rem;">
                         <i data-feather="info" style="width:16px; margin-right:4px; vertical-align:middle;"></i>
                         Call us: <a href="tel:+18484486993" class="phone-link" style="text-decoration: underline;">+1 848-448-6993</a>
@@ -2611,7 +2622,7 @@ function router(preserveScroll = false) {
     let pageTitle = 'Petals Paradise Events | Event Decor & Party Rentals DMV';
     let metaDesc = 'Transform your celebrations into unforgettable moments with Petals Paradise Events. Premium party rentals, elegant backdrops, and custom decor in the DMV area.';
 
-    switch (hash) {
+    switch (hash.split('?')[0]) {
         case '#': 
             content = renderHome(); 
             break;
@@ -2678,6 +2689,21 @@ function router(preserveScroll = false) {
             pageTitle = 'Track My Order | Petals Paradise Events';
             metaDesc = 'Check live status updates for your rental order with Petals Paradise Events.';
             break;
+        case '#signin':
+        case '#signup':
+        case '#profile':
+        case '#reset':
+        case '#forgot':
+        case '#rewards':
+            if (typeof window.renderAccountPage === 'function') {
+                const page = window.renderAccountPage(hash.split('?')[0].slice(1));
+                content = page.html;
+                pageTitle = page.title;
+                metaDesc = page.desc || metaDesc;
+            } else {
+                content = renderHome();
+            }
+            break;
         default: 
             content = renderHome();
     }
@@ -2690,6 +2716,9 @@ function router(preserveScroll = false) {
 
     main.innerHTML = content;
     feather.replace(); // Re-initialize icons
+    if (typeof window.ppeAfterRender === 'function') {
+        try { window.ppeAfterRender(hash.split('?')[0]); } catch (e) { console.error(e); }
+    }
 
     // Reset Sticky Mobile Actions
     const stickyContainer = document.getElementById('sticky-action-container');
@@ -2712,6 +2741,14 @@ function router(preserveScroll = false) {
 }
 
 // Initialization
+// Read-only cart API for account.js (loyalty points)
+window.ppeCart = {
+    subtotal: () => getCartTotal(),
+    discount: () => getDiscount(),
+    fulfillment: () => fulfillmentMethod,
+    rerender: () => router(true),
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     renderBanner();
     renderNavbar();

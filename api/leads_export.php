@@ -17,6 +17,7 @@ header('X-Content-Type-Options: nosniff');
 header('X-Robots-Tag: noindex, nofollow, noarchive');
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/loyalty.php';
 
 // ═══════════════════════════════════════════════════════════
 // 1. AUTHENTICATION (Session, Cookie, or URL Key Bypass)
@@ -448,6 +449,20 @@ if ($format === 'json') {
             <button class="tab-btn" onclick="switchTab('orders')">📦 Active Orders (<?php echo count($activeOrders); ?>)</button>
             <button class="tab-btn" onclick="switchTab('completed')">✅ Completed Orders (<?php echo count($completedOrders); ?>)</button>
             <button class="tab-btn" onclick="switchTab('cancelled')">❌ Cancelled Orders (<?php echo count($cancelledOrders); ?>)</button>
+<?php
+            // Loyalty customers list
+            $loyaltyCustomers = [];
+            $loyaltyPdo = loyaltyDb();
+            if ($loyaltyPdo) {
+                try {
+                    $loyaltyCustomers = $loyaltyPdo->query("SELECT c.`id`, c.`name`, c.`email`, c.`phone`, c.`points_balance`, c.`created_at`,
+                        (SELECT COUNT(*) FROM `orders` o WHERE o.`customer_id` = c.`id`) AS order_count,
+                        (SELECT COALESCE(SUM(l.`points`),0) FROM `points_ledger` l WHERE l.`customer_id` = c.`id` AND l.`type` = 'earn') AS lifetime_earned
+                        FROM `customers` c ORDER BY c.`created_at` DESC")->fetchAll();
+                } catch (Exception $e) { $loyaltyCustomers = []; }
+            }
+?>
+            <button class="tab-btn" onclick="switchTab('customers')">🌸 Customers / Rewards (<?php echo count($loyaltyCustomers); ?>)</button>
         </div>
 
         <!-- ──────────────── 1. LEADS TAB ──────────────── -->
@@ -638,7 +653,81 @@ if ($format === 'json') {
             <?php renderOrdersTable($cancelledOrders, 'cancelledTable'); ?>
         </div>
 
+        <!-- ──────────────── 5. CUSTOMERS / REWARDS TAB ──────────────── -->
+        <div id="customers-tab" class="tab-content">
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-value" style="color: #d4af37;"><?php echo count($loyaltyCustomers); ?></div>
+                    <div class="stat-label">Registered Customers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: #d4af37;"><?php echo number_format(array_sum(array_column($loyaltyCustomers, 'points_balance'))); ?></div>
+                    <div class="stat-label">Outstanding Points (≈ $<?php echo number_format(array_sum(array_column($loyaltyCustomers, 'points_balance')) / 100, 2); ?>)</div>
+                </div>
+            </div>
+            <div class="toolbar">
+                <input type="text" id="customerSearch" class="search-input" placeholder="🔍 Search customers by name, email, phone..." onkeyup="filterCustomers()">
+            </div>
+            <div style="overflow-x:auto;">
+            <table id="customersTable" style="width:100%; border-collapse:collapse;">
+                <thead>
+                    <tr>
+                        <th style="text-align:left; padding:10px;">Customer</th>
+                        <th style="text-align:left; padding:10px;">Phone</th>
+                        <th style="text-align:right; padding:10px;">Orders</th>
+                        <th style="text-align:right; padding:10px;">Lifetime Earned</th>
+                        <th style="text-align:right; padding:10px;">Balance</th>
+                        <th style="text-align:left; padding:10px;">Joined</th>
+                        <th style="text-align:left; padding:10px;">Adjust Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php if (empty($loyaltyCustomers)): ?>
+                    <tr><td colspan="7" style="padding:20px; text-align:center; color:#94a3b8;">No customer accounts yet.</td></tr>
+                <?php else: foreach ($loyaltyCustomers as $lc): ?>
+                    <tr style="border-top:1px solid rgba(255,255,255,0.08);">
+                        <td style="padding:10px;"><strong><?php echo htmlspecialchars($lc['name']); ?></strong><br><span style="font-size:0.8rem; color:#94a3b8;"><?php echo htmlspecialchars($lc['email']); ?></span></td>
+                        <td style="padding:10px;"><?php echo htmlspecialchars($lc['phone']); ?></td>
+                        <td style="padding:10px; text-align:right;"><?php echo (int)$lc['order_count']; ?></td>
+                        <td style="padding:10px; text-align:right;"><?php echo number_format((int)$lc['lifetime_earned']); ?></td>
+                        <td style="padding:10px; text-align:right; color:#d4af37; font-weight:700;" id="bal-<?php echo (int)$lc['id']; ?>"><?php echo number_format((int)$lc['points_balance']); ?></td>
+                        <td style="padding:10px; font-size:0.85rem;"><?php echo htmlspecialchars(formatDateToEST($lc['created_at'], 'M d, Y')); ?></td>
+                        <td style="padding:10px; white-space:nowrap;">
+                            <input type="number" id="adj-<?php echo (int)$lc['id']; ?>" placeholder="+/- pts" style="width:90px; padding:6px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:transparent; color:inherit;">
+                            <button onclick="adjustPoints(<?php echo (int)$lc['id']; ?>)" style="padding:6px 12px; border-radius:6px; border:none; background:#d4af37; color:#0d0f12; font-weight:700; cursor:pointer;">Apply</button>
+                        </td>
+                    </tr>
+                <?php endforeach; endif; ?>
+                </tbody>
+            </table>
+            </div>
+        </div>
+
     </div>
+
+    <script>
+        function filterCustomers() {
+            const q = document.getElementById('customerSearch').value.toLowerCase();
+            document.querySelectorAll('#customersTable tbody tr').forEach(tr => {
+                tr.style.display = tr.innerText.toLowerCase().includes(q) ? '' : 'none';
+            });
+        }
+        async function adjustPoints(id) {
+            const input = document.getElementById('adj-' + id);
+            const pts = parseInt(input.value, 10);
+            if (!pts) { alert('Enter a positive or negative number of points.'); return; }
+            const note = prompt('Reason for this adjustment (shown to the customer):', pts > 0 ? 'Bonus points' : 'Points correction');
+            if (note === null) return;
+            try {
+                const res = await fetch('admin_points.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ customer_id: id, points: pts, note }) });
+                const json = await res.json();
+                if (json.success) {
+                    document.getElementById('bal-' + id).textContent = json.balance.toLocaleString();
+                    input.value = '';
+                } else { alert(json.error || 'Could not adjust points.'); }
+            } catch (e) { alert('Network error.'); }
+        }
+    </script>
 
     <?php
     function renderOrdersTable($ordersList, $tableId) {
