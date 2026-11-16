@@ -1,4 +1,26 @@
+# Petals Paradise Events — crawler rules
+# Search engines and AI / answer-engine crawlers are welcome (GEO / AI search visibility).
+# Bots that match a named group ignore the * group, so each group repeats the private paths.
+
 User-agent: *
 Allow: /
+Disallow: /admin.html
+Disallow: /wp-admin/
+Disallow: /api/
+Disallow: /tools/
+
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: PerplexityBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /admin.html
+Disallow: /wp-admin/
+Disallow: /api/
+Disallow: /tools/
 
 Sitemap: https://petalsparadiseevents.com/sitemap.xml

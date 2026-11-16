@@ -293,6 +293,6 @@ echo json_encode([
     'points_redeemed' => $pointsRedeemed,
     'points_discount' => $pointsDollars,
     'total' => $total,
-    'points_to_earn' => $customerId ? pointsForTotal($total) : 0,
+    'points_to_earn' => $customerId ? pointsForTotal(pointsEligibleAmount(['subtotal' => $subtotal, 'discount' => $discount, 'points_redeemed' => $pointsRedeemed, 'total' => $total])) : 0,
     'message' => 'Order placed successfully.'
 ]);

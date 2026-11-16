@@ -3,7 +3,7 @@
  * Customer Accounts API — sign up, sign in, sign out, profile, password reset
  * Petals Paradise Events
  *
- * POST JSON { action: "signup"|"login"|"logout"|"forgot"|"reset", ... }
+ * POST JSON { action: "signup"|"login"|"logout"|"forgot"|"reset"|"update_profile", ... }
  * GET  ?action=me
  */
 
@@ -31,7 +31,7 @@ $input  = json_decode(file_get_contents('php://input'), true) ?: [];
 $action = $_GET['action'] ?? ($input['action'] ?? '');
 
 function profilePayload(PDO $pdo, int $cid): array {
-    $st = $pdo->prepare("SELECT `id`,`name`,`email`,`phone`,`points_balance`,`created_at` FROM `customers` WHERE `id` = ?");
+    $st = $pdo->prepare("SELECT * FROM `customers` WHERE `id` = ?");
     $st->execute([$cid]);
     $c = $st->fetch();
     if (!$c) return [];
@@ -50,6 +50,19 @@ function profilePayload(PDO $pdo, int $cid): array {
             'email' => $c['email'],
             'phone' => $c['phone'],
             'member_since' => $c['created_at'],
+        ],
+        'profile' => [
+            'address_line1'    => $c['address_line1'] ?? '',
+            'address_line2'    => $c['address_line2'] ?? '',
+            'city'             => $c['city'] ?? '',
+            'state'            => $c['state'] ?? '',
+            'zip'              => $c['zip'] ?? '',
+            'contact_method'   => $c['contact_method'] ?? 'email',
+            'marketing_opt_in' => (bool)($c['marketing_opt_in'] ?? 0),
+            'sms_opt_in'       => (bool)($c['sms_opt_in'] ?? 0),
+            'event_types'      => array_values(array_filter(explode(',', $c['event_types'] ?? ''))),
+            'guest_count'      => $c['guest_count'] ?? '',
+            'notes'            => $c['notes'] ?? '',
         ],
         'points' => [
             'balance'        => $balance,
@@ -114,6 +127,31 @@ switch ($action) {
     case 'logout': {
         unset($_SESSION['customer_id']);
         out(['success' => true]);
+    }
+
+    case 'update_profile': {
+        if (empty($_SESSION['customer_id'])) out(['error' => 'Please sign in again.'], 401);
+        $cid   = (int)$_SESSION['customer_id'];
+        $clean = fn($k, $max) => mb_substr(trim(strip_tags((string)($input[$k] ?? ''))), 0, $max);
+        $name  = $clean('name', 255);
+        $phone = $clean('phone', 64);
+        $zip   = $clean('zip', 16);
+        $state = strtoupper($clean('state', 32));
+        if ($name === '') out(['error' => 'Please enter your name.'], 400);
+        $digits = preg_replace('/\D/', '', $phone);
+        if ($phone !== '' && !(strlen($digits) === 10 || (strlen($digits) === 11 && $digits[0] === '1'))) out(['error' => 'Please enter a valid 10-digit US phone number.'], 400);
+        if ($zip !== '' && !preg_match('/^\d{5}(-\d{4})?$/', $zip)) out(['error' => 'Please enter a valid ZIP code.'], 400);
+        $method = in_array($input['contact_method'] ?? '', ['email', 'phone', 'text'], true) ? $input['contact_method'] : 'email';
+        $allowedTypes = ['wedding', 'birthday', 'baby_shower', 'graduation', 'haldi_mehndi', 'corporate', 'holiday', 'other'];
+        $types = array_values(array_intersect((array)($input['event_types'] ?? []), $allowedTypes));
+        $guests = in_array($input['guest_count'] ?? '', ['', '1-25', '26-50', '51-100', '101-200', '200+'], true) ? $input['guest_count'] : '';
+
+        $pdo->prepare("UPDATE `customers` SET `name`=?,`phone`=?,`address_line1`=?,`address_line2`=?,`city`=?,`state`=?,`zip`=?,
+                       `contact_method`=?,`marketing_opt_in`=?,`sms_opt_in`=?,`event_types`=?,`guest_count`=?,`notes`=? WHERE `id`=?")
+            ->execute([$name, $phone, $clean('address_line1', 255), $clean('address_line2', 255), $clean('city', 120), $state, $zip,
+                       $method, !empty($input['marketing_opt_in']) ? 1 : 0, !empty($input['sms_opt_in']) ? 1 : 0,
+                       implode(',', $types), $guests, $clean('notes', 500), $cid]);
+        out(['success' => true, 'logged_in' => true] + profilePayload($pdo, $cid));
     }
 
     case 'me': {

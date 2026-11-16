@@ -4,7 +4,9 @@
  * Petals Paradise Events
  *
  * Program rules (change here only):
- *   - Earn 5 points per $1 of final order total
+ *   - Earn 5 points per $1 of the RENTAL subtotal (after promo codes only).
+ *     Delivery fee and setup fee never earn points, and reward points redeemed
+ *     on the order do NOT reduce the points earned ($100 order + $5 reward = 500 pts).
  *   - 100 points = $1 off  (500 points = $5)
  *   - Minimum 500 points to redeem, in steps of 500
  *   - Points can cover at most 50% of the order subtotal
@@ -75,6 +77,25 @@ function ensureLoyaltyTables(PDO $pdo): void {
         if (!in_array('customer_id', $cols))     $pdo->exec("ALTER TABLE `orders` ADD COLUMN `customer_id` INT DEFAULT NULL");
         if (!in_array('points_redeemed', $cols)) $pdo->exec("ALTER TABLE `orders` ADD COLUMN `points_redeemed` INT DEFAULT 0");
         if (!in_array('points_earned', $cols))   $pdo->exec("ALTER TABLE `orders` ADD COLUMN `points_earned` INT DEFAULT 0");
+
+        // Profile / preference center columns
+        $ccols = array_map('strtolower', array_column($pdo->query("SHOW COLUMNS FROM `customers`")->fetchAll(), 'Field'));
+        $profileCols = [
+            'address_line1'    => "VARCHAR(255) DEFAULT ''",
+            'address_line2'    => "VARCHAR(255) DEFAULT ''",
+            'city'             => "VARCHAR(120) DEFAULT ''",
+            'state'            => "VARCHAR(32) DEFAULT ''",
+            'zip'              => "VARCHAR(16) DEFAULT ''",
+            'contact_method'   => "VARCHAR(16) DEFAULT 'email'",
+            'marketing_opt_in' => "TINYINT(1) DEFAULT 0",
+            'sms_opt_in'       => "TINYINT(1) DEFAULT 0",
+            'event_types'      => "VARCHAR(255) DEFAULT ''",
+            'guest_count'      => "VARCHAR(32) DEFAULT ''",
+            'notes'            => "VARCHAR(500) DEFAULT ''",
+        ];
+        foreach ($profileCols as $col => $def) {
+            if (!in_array($col, $ccols)) $pdo->exec("ALTER TABLE `customers` ADD COLUMN `{$col}` {$def}");
+        }
     } catch (Exception $e) {
         // Silently continue — loyalty features degrade gracefully
     }
@@ -120,6 +141,21 @@ function pointsForTotal(float $total): int {
     return max(0, (int)floor($total * POINTS_PER_DOLLAR));
 }
 
+/**
+ * Amount of an order that earns points: rental subtotal minus promo-code discount.
+ * Excludes delivery/setup fees and ignores any reward-points discount.
+ */
+function pointsEligibleAmount(array $order): float {
+    $subtotal      = (float)($order['subtotal'] ?? 0);
+    $discount      = (float)($order['discount'] ?? 0);
+    $pointsDollars = pointsToDollars((int)($order['points_redeemed'] ?? 0));
+    $promoDiscount = max(0, $discount - $pointsDollars);
+    if ($subtotal > 0) return max(0, round($subtotal - $promoDiscount, 2));
+    // Legacy fallback: derive from total by removing fees and adding back reward discount
+    $total = (float)($order['total'] ?? 0) - (float)($order['delivery_fee'] ?? 0) - (float)($order['setup_fee'] ?? 0) + $pointsDollars;
+    return max(0, round($total, 2));
+}
+
 function pointsToDollars(int $points): float {
     return round($points / POINTS_PER_DOLLAR_OFF, 2);
 }
@@ -151,7 +187,7 @@ function orderEarnsAtStatus(string $fulfillment, string $status): bool {
 function creditOrderPoints(string $orderId): ?array {
     $pdo = loyaltyDb();
     if (!$pdo) return null;
-    $st = $pdo->prepare("SELECT `id`,`email`,`total`,`customer_id`,`status` FROM `orders` WHERE `id` = ?");
+    $st = $pdo->prepare("SELECT `id`,`email`,`subtotal`,`discount`,`delivery_fee`,`setup_fee`,`total`,`points_redeemed`,`customer_id`,`status` FROM `orders` WHERE `id` = ?");
     $st->execute([$orderId]);
     $order = $st->fetch();
     if (!$order) return null;
@@ -165,7 +201,7 @@ function creditOrderPoints(string $orderId): ?array {
     }
     if (!$customerId) return null;
 
-    $earned = pointsForTotal((float)$order['total']);
+    $earned = pointsForTotal(pointsEligibleAmount($order));
     if ($earned <= 0) return null;
     if (!addPoints($pdo, $customerId, $earned, 'earn', $orderId, "Earned on order {$orderId}")) return null;
     $pdo->prepare("UPDATE `orders` SET `points_earned` = ? WHERE `id` = ?")->execute([$earned, $orderId]);

@@ -2713,6 +2713,18 @@ function router(preserveScroll = false) {
     if (metaDescriptionTag) {
         metaDescriptionTag.setAttribute('content', metaDesc);
     }
+    // Keep social / AI preview tags in sync with the active route
+    const setMeta = (sel, val) => { const el = document.querySelector(sel); if (el) el.setAttribute('content', val); };
+    setMeta('meta[property="og:title"]', pageTitle);
+    setMeta('meta[name="twitter:title"]', pageTitle);
+    setMeta('meta[property="og:description"]', metaDesc);
+    setMeta('meta[name="twitter:description"]', metaDesc);
+    // Private / transactional routes should never be indexed
+    const routeKey = hash.split('?')[0];
+    const privateRoutes = ['#cart', '#checkout', '#confirmation', '#signin', '#signup', '#profile', '#reset', '#forgot', '#track', '#track-order'];
+    setMeta('meta[name="robots"]', privateRoutes.includes(routeKey)
+        ? 'noindex, nofollow'
+        : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
 
     main.innerHTML = content;
     feather.replace(); // Re-initialize icons

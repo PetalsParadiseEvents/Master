@@ -80,7 +80,7 @@
         </div>`;
 
     const faq = [
-        ['How do I earn points?', 'You earn 5 points for every $1 of your final order total (after discounts). Points are added to your account when a pickup order is marked Returned or a delivery order is marked Completed.'],
+        ['How do I earn points?', 'You earn 5 points for every $1 spent on rentals and decor (after any promo code). Delivery and setup fees do not earn points, and using reward points never reduces the points you earn — a $100 order with $5 in rewards still earns 500 points. Points are added when a pickup order is marked Returned or a delivery order is marked Completed.'],
         ['How do I redeem points?', 'Once you have at least 500 points, sign in and choose how many points to use in the checkout summary. Every 500 points = $5 off, and points can cover up to 50% of your order.'],
         ['Do my past orders count?', 'Yes! When you create an account with the same email you used for past orders, completed orders from the last 12 months are credited automatically.'],
         ['Do points expire?', 'No, your points do not expire.'],
@@ -210,6 +210,115 @@
         return ({ Completed: 'ok', Returned: 'ok', Delivered: 'ok', Cancelled: 'bad', Pending: 'wait' })[s] || 'info';
     }
 
+    const EVENT_TYPES = [
+        ['wedding', '💍 Wedding'], ['birthday', '🎂 Birthday'], ['baby_shower', '🍼 Baby Shower'],
+        ['graduation', '🎓 Graduation'], ['haldi_mehndi', '🌼 Haldi / Mehndi'], ['corporate', '🏢 Corporate'],
+        ['holiday', '🎄 Holiday Party'], ['other', '✨ Other'],
+    ];
+    const GUESTS = ['', '1-25', '26-50', '51-100', '101-200', '200+'];
+    const STATES = ['VA', 'DC', 'MD', 'WV', 'PA', 'DE', 'NC'];
+
+    function preferenceCenter(d) {
+        const c = d.customer || {};
+        const p = d.profile || {};
+        const types = p.event_types || [];
+        const radio = (v, label) => `<label class="pref-chip"><input type="radio" name="contact_method" value="${v}" ${ (p.contact_method || 'email') === v ? 'checked' : ''}><span>${label}</span></label>`;
+        return `
+            <section class="pref-center" id="preferences" aria-labelledby="pref-title">
+                <div class="pref-head">
+                    <h2 class="acct-panel-title" id="pref-title">⚙️ Profile &amp; Preferences</h2>
+                    <p class="acct-subtitle">Save your details once and checkout gets filled in for you.</p>
+                </div>
+                <form id="pref-form" class="pref-form" onsubmit="ppeSaveProfile(event)" novalidate>
+                    <fieldset class="pref-card">
+                        <legend>👤 Personal Info</legend>
+                        <div class="pref-grid">
+                            <div class="form-group"><label class="form-label" for="pref-name">Full name *</label>
+                                <input id="pref-name" name="name" class="form-control" autocomplete="name" required value="${esc(c.name)}"></div>
+                            <div class="form-group"><label class="form-label" for="pref-phone">Phone</label>
+                                <input id="pref-phone" name="phone" type="tel" class="form-control" autocomplete="tel" placeholder="(571) 555-0123" value="${esc(c.phone)}"></div>
+                            <div class="form-group pref-span"><label class="form-label" for="pref-email">Email</label>
+                                <input id="pref-email" class="form-control" value="${esc(c.email)}" disabled>
+                                <small class="pref-hint">Email is your sign-in and can't be changed here.</small></div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="pref-card">
+                        <legend>📍 Saved Address</legend>
+                        <div class="pref-grid">
+                            <div class="form-group pref-span"><label class="form-label" for="pref-addr1">Street address</label>
+                                <input id="pref-addr1" name="address_line1" class="form-control" autocomplete="address-line1" value="${esc(p.address_line1)}"></div>
+                            <div class="form-group pref-span"><label class="form-label" for="pref-addr2">Apt, suite (optional)</label>
+                                <input id="pref-addr2" name="address_line2" class="form-control" autocomplete="address-line2" value="${esc(p.address_line2)}"></div>
+                            <div class="form-group"><label class="form-label" for="pref-city">City</label>
+                                <input id="pref-city" name="city" class="form-control" autocomplete="address-level2" value="${esc(p.city)}"></div>
+                            <div class="pref-grid pref-grid-2">
+                                <div class="form-group"><label class="form-label" for="pref-state">State</label>
+                                    <select id="pref-state" name="state" class="form-control" autocomplete="address-level1">
+                                        <option value="">—</option>${STATES.map(s => `<option ${p.state === s ? 'selected' : ''}>${s}</option>`).join('')}
+                                    </select></div>
+                                <div class="form-group"><label class="form-label" for="pref-zip">ZIP</label>
+                                    <input id="pref-zip" name="zip" class="form-control" inputmode="numeric" autocomplete="postal-code" maxlength="10" value="${esc(p.zip)}"></div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="pref-card">
+                        <legend>💬 Communication</legend>
+                        <div class="form-label">Preferred contact method</div>
+                        <div class="pref-chips">${radio('email', '✉️ Email')}${radio('phone', '📞 Call')}${radio('text', '💬 Text')}</div>
+                        <label class="pref-toggle"><input type="checkbox" name="marketing_opt_in" ${p.marketing_opt_in ? 'checked' : ''}><span class="pref-switch"></span> Email me seasonal offers &amp; new decor</label>
+                        <label class="pref-toggle"><input type="checkbox" name="sms_opt_in" ${p.sms_opt_in ? 'checked' : ''}><span class="pref-switch"></span> Text me order updates</label>
+                    </fieldset>
+
+                    <fieldset class="pref-card">
+                        <legend>🎉 Event Preferences</legend>
+                        <div class="form-label">Events I usually plan</div>
+                        <div class="pref-chips">${EVENT_TYPES.map(([v, l]) => `<label class="pref-chip"><input type="checkbox" name="event_types" value="${v}" ${types.includes(v) ? 'checked' : ''}><span>${l}</span></label>`).join('')}</div>
+                        <div class="pref-grid">
+                            <div class="form-group"><label class="form-label" for="pref-guests">Typical guest count</label>
+                                <select id="pref-guests" name="guest_count" class="form-control">${GUESTS.map(g => `<option value="${g}" ${p.guest_count === g ? 'selected' : ''}>${g || 'Select'}</option>`).join('')}</select></div>
+                            <div class="form-group pref-span"><label class="form-label" for="pref-notes">Notes for our team (colors, themes, access info)</label>
+                                <textarea id="pref-notes" name="notes" class="form-control" rows="3" maxlength="500">${esc(p.notes)}</textarea></div>
+                        </div>
+                    </fieldset>
+
+                    <div class="pref-actions">
+                        <div id="pref-msg" class="acct-msg" role="status" aria-live="polite"></div>
+                        <button type="submit" id="pref-save-btn" class="btn btn-primary">Save Preferences</button>
+                    </div>
+                </form>
+            </section>`;
+    }
+
+    window.ppeSaveProfile = async function (e) {
+        e.preventDefault();
+        const form = e.target;
+        const msg = document.getElementById('pref-msg');
+        const say = (t, ok) => { msg.textContent = t; msg.className = 'acct-msg ' + (ok ? 'ok' : 'err'); };
+        const fd = new FormData(form);
+        const body = Object.fromEntries(fd);
+        body.event_types = fd.getAll('event_types');
+        body.marketing_opt_in = fd.has('marketing_opt_in');
+        body.sms_opt_in = fd.has('sms_opt_in');
+        if (!body.name.trim()) return say('Please enter your name.');
+        const digits = (body.phone || '').replace(/\D/g, '');
+        if (body.phone && !(digits.length === 10 || (digits.length === 11 && digits[0] === '1'))) return say('Please enter a valid 10-digit US phone number.');
+        if (body.zip && !/^\d{5}(-\d{4})?$/.test(body.zip.trim())) return say('Please enter a valid ZIP code.');
+        const btn = document.getElementById('pref-save-btn');
+        btn.disabled = true; btn.textContent = 'Saving…';
+        try {
+            const json = await api('update_profile', body);
+            if (json.error) return say(json.error);
+            state.data = json; updateNav();
+            say('✓ Preferences saved', true);
+        } catch (err) {
+            say('Network error. Please try again.');
+        } finally {
+            btn.disabled = false; btn.textContent = 'Save Preferences';
+        }
+    };
+
     function pageProfile() {
         if (!state.loaded) {
             return { title: 'My Account | Petals Paradise Events', html: `<div class="container acct-page"><div class="acct-loading">Loading your account…</div></div>` };
@@ -272,6 +381,8 @@
                                 : `<p class="acct-empty">Points appear here once an order is Returned (pickup) or Completed (delivery).</p>`}
                         </section>
                     </div>
+
+                    ${preferenceCenter(d)}
 
                     <h2 class="section-title acct-section-title">How Petals Rewards works</h2>
                     ${howItWorks()}
@@ -359,8 +470,9 @@
     function renderEarnPreview() {
         const el = document.getElementById('loyalty-earn-preview');
         if (!el) return;
-        const redeemDollars = (window.ppeSelectedRedeem || 0) / RULES.perDollarOff;
-        const pts = Math.floor(Math.max(0, orderBase() - redeemDollars) * RULES.perDollar);
+        // Points earn on rentals after promo codes only — delivery/setup fees are
+        // excluded and redeemed reward points never reduce the points earned.
+        const pts = Math.floor(orderBase() * RULES.perDollar);
         el.innerHTML = state.loggedIn
             ? `<div class="acct-earn-note">⭐ You'll earn about <strong>${fmt(pts)} points</strong> on this order.</div>`
             : `<div class="acct-earn-note">⭐ Earn <strong>${fmt(pts)} points</strong> on this order — <a href="javascript:void(0)" onclick="ppeGoSignin()" class="acct-link">sign in</a> or <a href="#signup" class="acct-link">join free</a>.</div>`;
@@ -418,6 +530,12 @@
         set('checkout-name', c.name);
         set('checkout-email', c.email);
         set('checkout-phone', c.phone);
+        const p = state.data.profile || {};
+        const addr = [p.address_line1, p.address_line2, p.city, [p.state, p.zip].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+        const da = document.querySelector('input[name="delivery_address"]');
+        if (da && !da.value && addr) da.value = addr;
+        const loc = document.querySelector('input[name="location"]');
+        if (loc && !loc.value && p.city) loc.value = `${p.city}${p.state ? ', ' + p.state : ''}`;
     }
 
     function injectBanner() {
