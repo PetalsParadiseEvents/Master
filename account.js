@@ -7,7 +7,7 @@
 (function () {
     'use strict';
 
-    const RULES = { perDollar: 10, perDollarOff: 100, minRedeem: 500, step: 500, maxPct: 0.5 };
+    const RULES = { perDollar: 5, perDollarOff: 100, minRedeem: 500, step: 500, maxPct: 0.5 };
     const API = '/api/auth.php';
 
     const state = { loaded: false, loggedIn: false, data: null };
@@ -67,7 +67,7 @@
     const rewardsBanner = () => `
         <div class="acct-rewards-banner" role="note">
             <span class="acct-rewards-icon">🌸</span>
-            <span><strong>Petals Rewards:</strong> Earn <strong>10 points for every $1</strong> you spend.
+            <span><strong>Petals Rewards:</strong> Earn <strong>5 points for every $1</strong> you spend.
             Redeem <strong>500 points for $5 off</strong> your next order!</span>
             <a href="${state.loggedIn ? '#profile' : '#signup'}" class="acct-rewards-cta">${state.loggedIn ? `You have ${fmt(balance())} pts →` : 'Join free →'}</a>
         </div>`;
@@ -75,12 +75,12 @@
     const howItWorks = () => `
         <div class="acct-steps">
             <div class="acct-step"><div class="acct-step-num">1</div><h4>Create a free account</h4><p>Sign up with the email you use for orders. Completed orders from the last 12 months are added automatically.</p></div>
-            <div class="acct-step"><div class="acct-step-num">2</div><h4>Earn 10 pts per $1</h4><p>Points are added once your order is <strong>Returned</strong> (pickup) or <strong>Completed</strong> (delivery).</p></div>
+            <div class="acct-step"><div class="acct-step-num">2</div><h4>Earn 5 pts per $1</h4><p>Points are added once your order is <strong>Returned</strong> (pickup) or <strong>Completed</strong> (delivery).</p></div>
             <div class="acct-step"><div class="acct-step-num">3</div><h4>Redeem 500 pts = $5</h4><p>Use points at checkout in steps of 500 (up to 50% of your order). Points never expire.</p></div>
         </div>`;
 
     const faq = [
-        ['How do I earn points?', 'You earn 10 points for every $1 of your final order total (after discounts). Points are added to your account when a pickup order is marked Returned or a delivery order is marked Completed.'],
+        ['How do I earn points?', 'You earn 5 points for every $1 of your final order total (after discounts). Points are added to your account when a pickup order is marked Returned or a delivery order is marked Completed.'],
         ['How do I redeem points?', 'Once you have at least 500 points, sign in and choose how many points to use in the checkout summary. Every 500 points = $5 off, and points can cover up to 50% of your order.'],
         ['Do my past orders count?', 'Yes! When you create an account with the same email you used for past orders, completed orders from the last 12 months are credited automatically.'],
         ['Do points expire?', 'No, your points do not expire.'],
@@ -105,7 +105,7 @@
                 <aside class="acct-auth-side">
                     <h3>Why join?</h3>
                     <ul>
-                        <li>⭐ 10 points for every $1 spent</li>
+                        <li>⭐ 5 points for every $1 spent</li>
                         <li>🎁 500 points = $5 off</li>
                         <li>📦 Track all your orders in one place</li>
                         <li>🕒 Past 12 months of orders count</li>
@@ -137,8 +137,8 @@
         if (state.loggedIn) return pageProfile();
         return {
             title: 'Create Account | Petals Paradise Events',
-            desc: 'Join Petals Rewards: earn 10 points for every $1 and get $5 off for every 500 points.',
-            html: authShell('Create your account', 'Earn 10 points for every $1 — 500 points = $5 off.', `
+            desc: 'Join Petals Rewards: earn 5 points for every $1 and get $5 off for every 500 points.',
+            html: authShell('Create your account', 'Earn 5 points for every $1 — 500 points = $5 off.', `
                 <form id="acct-signup-form" class="acct-form" onsubmit="ppeAccountSubmit(event, 'signup')" novalidate>
                     <div class="form-group"><label class="form-label" for="su-name">Full Name</label>
                         <input id="su-name" name="name" type="text" class="form-control" autocomplete="name" required></div>
@@ -186,13 +186,13 @@
     function pageRewards() {
         return {
             title: 'Petals Rewards Loyalty Program | Petals Paradise Events',
-            desc: 'Earn 10 points for every $1 on party rentals and decor. Redeem 500 points for $5 off your next order.',
+            desc: 'Earn 5 points for every $1 on party rentals and decor. Redeem 500 points for $5 off your next order.',
             html: `
                 <div class="container acct-page">
                     <div class="acct-hero">
                         <div class="acct-auth-badge">🌸 Petals Rewards</div>
                         <h1 class="acct-title acct-hero-title">Celebrate more. <span class="acct-gold">Save more.</span></h1>
-                        <p class="acct-subtitle">Earn <strong>10 points for every $1</strong> you spend with us. Every <strong>500 points = $5 off</strong> your next order.</p>
+                        <p class="acct-subtitle">Earn <strong>5 points for every $1</strong> you spend with us. Every <strong>500 points = $5 off</strong> your next order.</p>
                         <div class="acct-hero-btns">
                             ${state.loggedIn
                                 ? `<a href="#profile" id="rewards-view-btn" class="btn btn-primary">View My Points (${fmt(balance())})</a>`

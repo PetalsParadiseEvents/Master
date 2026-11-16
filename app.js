@@ -530,20 +530,20 @@ function renderBanner() {
         <div class="promo-banner">
             <div class="ticker-wrap">
                 <div class="ticker">
-                    <span class="ticker-item">🎃 HAPPY HALLOWEEN FROM PETALS PARADISE EVENTS! 🎃</span>
-                    <span class="ticker-item">🕷️ SPOOKY SEASON DECOR NOW AVAILABLE — BOOK YOUR EVENT TODAY! 🕷️</span>
-                    <span class="ticker-item">🌸 WEDDINGS • BIRTHDAYS • BABY SHOWERS • CORPORATE EVENTS 🌸</span>
-                    <span class="ticker-item">👻 FALL & HALLOWEEN PARTIES — LET US MAKE IT MAGICAL! 👻</span>
+                    <span class="ticker-item">🦃 HAPPY THANKSGIVING FROM PETALS PARADISE EVENTS! 🦃</span>
+                    <span class="ticker-item">🎄 CHRISTMAS & HOLIDAY PARTY DECOR NOW BOOKING — RESERVE YOUR DATE! 🎄</span>
+                    <span class="ticker-item">🍂 FRIENDSGIVING • THANKSGIVING DINNERS • TABLES, CHAIRS & BUFFET WARMERS 🍂</span>
+                    <span class="ticker-item">✨ OFFICE HOLIDAY PARTIES • NEW YEAR'S EVE • BALLOON & BACKDROP DECOR ✨</span>
+                    <span class="ticker-item">🌸 PETALS REWARDS: EARN 5 POINTS FOR EVERY $1 — 500 POINTS = $5 OFF! 🌸</span>
                     <span class="ticker-item">📞 CALL OR TEXT US: +1 848-448-6993</span>
-                    <span class="ticker-item">🍂 FALL CELEBRATIONS • HALDI • MEHANDI • HOLIDAY PARTIES 🍂</span>
                     <span class="ticker-item">🚚 DELIVERY & PICKUP OPTIONS AVAILABLE! 🚚</span>
                     <!-- Duplicate for seamless loop -->
-                    <span class="ticker-item">🎃 HAPPY HALLOWEEN FROM PETALS PARADISE EVENTS! 🎃</span>
-                    <span class="ticker-item">🕷️ SPOOKY SEASON DECOR NOW AVAILABLE — BOOK YOUR EVENT TODAY! 🕷️</span>
-                    <span class="ticker-item">🌸 WEDDINGS • BIRTHDAYS • BABY SHOWERS • CORPORATE EVENTS 🌸</span>
-                    <span class="ticker-item">👻 FALL & HALLOWEEN PARTIES — LET US MAKE IT MAGICAL! 👻</span>
+                    <span class="ticker-item">🦃 HAPPY THANKSGIVING FROM PETALS PARADISE EVENTS! 🦃</span>
+                    <span class="ticker-item">🎄 CHRISTMAS & HOLIDAY PARTY DECOR NOW BOOKING — RESERVE YOUR DATE! 🎄</span>
+                    <span class="ticker-item">🍂 FRIENDSGIVING • THANKSGIVING DINNERS • TABLES, CHAIRS & BUFFET WARMERS 🍂</span>
+                    <span class="ticker-item">✨ OFFICE HOLIDAY PARTIES • NEW YEAR'S EVE • BALLOON & BACKDROP DECOR ✨</span>
+                    <span class="ticker-item">🌸 PETALS REWARDS: EARN 5 POINTS FOR EVERY $1 — 500 POINTS = $5 OFF! 🌸</span>
                     <span class="ticker-item">📞 CALL OR TEXT US: +1 848-448-6993</span>
-                    <span class="ticker-item">🍂 FALL CELEBRATIONS • HALDI • MEHANDI • HOLIDAY PARTIES 🍂</span>
                     <span class="ticker-item">🚚 DELIVERY & PICKUP OPTIONS AVAILABLE! 🚚</span>
                 </div>
             </div>

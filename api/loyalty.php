@@ -4,7 +4,7 @@
  * Petals Paradise Events
  *
  * Program rules (change here only):
- *   - Earn 10 points per $1 of final order total
+ *   - Earn 5 points per $1 of final order total
  *   - 100 points = $1 off  (500 points = $5)
  *   - Minimum 500 points to redeem, in steps of 500
  *   - Points can cover at most 50% of the order subtotal
@@ -14,7 +14,7 @@
 
 require_once __DIR__ . '/config.php';
 
-if (!defined('POINTS_PER_DOLLAR'))      define('POINTS_PER_DOLLAR', 10);
+if (!defined('POINTS_PER_DOLLAR'))      define('POINTS_PER_DOLLAR', 5);
 if (!defined('POINTS_PER_DOLLAR_OFF'))  define('POINTS_PER_DOLLAR_OFF', 100);
 if (!defined('MIN_REDEEM_POINTS'))      define('MIN_REDEEM_POINTS', 500);
 if (!defined('REDEEM_STEP_POINTS'))     define('REDEEM_STEP_POINTS', 500);

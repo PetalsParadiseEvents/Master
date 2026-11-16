@@ -180,7 +180,7 @@ if ($notifyCustomer && !empty($customerEmail)) {
             <div style='background:#fff9e6; border:1px dashed #d4af37; border-radius:10px; padding:14px 18px; margin:16px 0;'>
                 &#127800; <strong>Earn rewards next time!</strong> Create a free account with this email at
                 <a href='https://petalsparadiseevents.com/#signup' style='color:#b8941f;'>petalsparadiseevents.com</a>
-                and earn 10 points for every \$1. Past orders from the last 12 months count too!
+                and earn 5 points for every \$1. Past orders from the last 12 months count too!
             </div>" : "") . "
             
             <div class='box'>
