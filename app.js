@@ -1920,7 +1920,7 @@ function renderCheckout() {
             };
 
             input.addEventListener('input', (e) => {
-                if (!e.isTrusted) return;
+                if (!e.isTrusted || window.googleMapsAuthFailed) return;
                 clearTimeout(timer);
                 const q = input.value.trim();
                 if (q.length < 3) { items = []; return close(); }
@@ -1934,7 +1934,14 @@ function renderCheckout() {
                         if (my !== reqId) return;
                         items = suggestions.map(s => s.placePrediction).filter(Boolean).slice(0, 5);
                         active = -1; render();
-                    } catch (err) { console.warn('Address suggestions unavailable:', err); items = []; close(); }
+                    } catch (err) {
+                        items = []; close();
+                        if (/permission|403|denied|not authorized|PERMISSION/i.test(String(err && (err.message || err)))) {
+                            window.googleMapsAuthFailed = true;
+                            console.warn('Address suggestions disabled: enable "Places API (New)" for this API key. Manual entry active.');
+                            manual();
+                        }
+                    }
                 }, 250);
             });
             input.addEventListener('keydown', (e) => {
