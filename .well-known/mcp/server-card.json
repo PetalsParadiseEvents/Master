@@ -1,0 +1,24 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/mcp-server-card/v1.json",
+  "version": "1.0",
+  "protocolVersion": "2025-06-18",
+  "serverInfo": {
+    "name": "petals-paradise-events",
+    "title": "Petals Paradise Events",
+    "version": "1.0.0"
+  },
+  "description": "Read-only public info for Petals Paradise Events, a party rental and event decor company in Ashburn, VA.",
+  "documentationUrl": "https://petalsparadiseevents.com/llms.txt",
+  "transport": {
+    "type": "streamable-http",
+    "endpoint": "https://petalsparadiseevents.com/api/mcp.php"
+  },
+  "capabilities": {
+    "tools": { "listChanged": false }
+  },
+  "authentication": { "required": false },
+  "tools": [
+    { "name": "get_business_info", "description": "Contact details, hours, service area and booking links." },
+    { "name": "get_catalog_summary", "description": "Markdown summary of services, rentals and pricing." }
+  ]
+}

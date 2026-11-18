@@ -8,6 +8,8 @@ Disallow: /admin.html
 Disallow: /wp-admin/
 Disallow: /api/
 Disallow: /tools/
+Allow: /api/mcp.php
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 
 User-agent: GPTBot
 User-agent: OAI-SearchBot
@@ -22,5 +24,7 @@ Disallow: /admin.html
 Disallow: /wp-admin/
 Disallow: /api/
 Disallow: /tools/
+Allow: /api/mcp.php
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 
 Sitemap: https://petalsparadiseevents.com/sitemap.xml

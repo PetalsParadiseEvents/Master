@@ -725,6 +725,10 @@ function renderFooter() {
         <div class="footer-bottom" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1.5rem;">
             <p style="margin: 0;">&copy; ${new Date().getFullYear()} Petals Paradise Events. All Rights Reserved.</p>
             <div style="display: flex; gap: 1rem; font-size: 0.85rem;">
+                <a href="/about/" style="color: var(--text-secondary); text-decoration: none;">About</a>
+                <span style="color: var(--border-color);">|</span>
+                <a href="/contact/" style="color: var(--text-secondary); text-decoration: none;">Contact</a>
+                <span style="color: var(--border-color);">|</span>
                 <a href="#privacy" style="color: var(--text-secondary); text-decoration: none; transition: var(--transition);" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='var(--text-secondary)'">Privacy Policy</a>
                 <span style="color: var(--border-color);">|</span>
                 <a href="#terms" style="color: var(--text-secondary); text-decoration: none; transition: var(--transition);" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='var(--text-secondary)'">Terms of Service</a>

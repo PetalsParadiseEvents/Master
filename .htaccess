@@ -112,3 +112,24 @@ Options -Indexes
     RewriteCond %{QUERY_STRING} (\.{2}[\/\\]) [NC]
     RewriteRule ^ - [F,L]
 </IfModule>
+
+# ─────────────────────────────────────────
+# Agent-readiness: Markdown negotiation + RFC 8288 Link headers
+# ─────────────────────────────────────────
+AddType text/markdown .md
+AddType application/json .json
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Serve Markdown homepage when an agent asks for it
+    RewriteCond %{HTTP_ACCEPT} text/markdown [NC]
+    RewriteRule ^(index\.html)?$ /index.md [L,E=MDNEG:1]
+</IfModule>
+<IfModule mod_headers.c>
+    <FilesMatch "^(index\.html|index\.md)$">
+        Header always set Link "</index.md>; rel=\"alternate\"; type=\"text/markdown\", </llms.txt>; rel=\"describedby\"; type=\"text/plain\", </sitemap.xml>; rel=\"sitemap\", </.well-known/mcp/server-card.json>; rel=\"mcp-server-card\"; type=\"application/json\""
+        Header append Vary Accept
+    </FilesMatch>
+    <Files "server-card.json">
+        Header set Access-Control-Allow-Origin "*"
+    </Files>
+</IfModule>
