@@ -1,7 +1,11 @@
 /* WebMCP: expose site tools to in-browser AI agents (navigator.modelContext). */
 (function () {
+  let done = false;
+  function register() {
+  if (done) return;
   const mc = navigator.modelContext;
   if (!mc || typeof mc.registerTool !== 'function') return;
+  done = true;
 
   const info = {
     name: 'Petals Paradise Events',
@@ -73,4 +77,11 @@
       return text('Form pre-filled. Ask the user to review and press submit.');
     }
   });
+  }
+
+  register();
+  document.addEventListener('DOMContentLoaded', register);
+  window.addEventListener('load', register);
+  let tries = 0;
+  const t = setInterval(() => { register(); if (done || ++tries > 20) clearInterval(t); }, 250);
 })();
