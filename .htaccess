@@ -52,7 +52,12 @@
     ExpiresByType text/javascript "access plus 1 year"
 
     # HTML Documents (Revalidate or 1 Hour)
-    ExpiresByType text/html "access plus 1 hour"
+    ExpiresByType text/html "access plus 5 minutes"
+    ExpiresByType text/plain "access plus 5 minutes"
+    ExpiresByType text/markdown "access plus 5 minutes"
+    ExpiresByType application/xml "access plus 5 minutes"
+    ExpiresByType text/xml "access plus 5 minutes"
+    ExpiresByType application/json "access plus 5 minutes"
 </IfModule>
 
 <IfModule mod_headers.c>
@@ -61,9 +66,10 @@
         Header set Cache-Control "public, max-age=31536000, immutable"
     </FilesMatch>
 
-    # HTML Cache-Control
-    <FilesMatch "\.(html|htm)$">
-        Header set Cache-Control "public, max-age=3600, must-revalidate"
+    # HTML & agent/crawler documents: short cache so CDN never serves stale copies
+    <FilesMatch "\.(html|htm|txt|md|xml|json)$">
+        Header set Cache-Control "public, max-age=300, must-revalidate"
+        Header unset Expires
     </FilesMatch>
 
     # Security Headers
