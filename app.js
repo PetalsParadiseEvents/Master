@@ -1909,9 +1909,10 @@ function renderCheckout() {
                 items.forEach((p, i) => {
                     const li = document.createElement('li');
                     li.setAttribute('role', 'option');
-                    li.innerHTML = `<strong></strong><span></span>`;
-                    li.firstChild.textContent = p.mainText ? p.mainText.toString() : p.text.toString();
-                    li.lastChild.textContent = p.secondaryText ? p.secondaryText.toString() : '';
+                    li.innerHTML = `<div><strong></strong><span></span></div>`;
+                    const [st, sp] = li.firstChild.children;
+                    st.textContent = p.mainText ? p.mainText.toString() : p.text.toString();
+                    sp.textContent = p.secondaryText ? p.secondaryText.toString() : '';
                     li.addEventListener('mousedown', (e) => { e.preventDefault(); choose(i); });
                     box.appendChild(li);
                 });
