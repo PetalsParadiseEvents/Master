@@ -419,7 +419,7 @@
         </main>
 
         <!-- Footer -->
-        <footer id="footer" role="contentinfo"><nav aria-label="Company"><a href="/about/">About Us</a> | <a href="/contact/">Contact</a> | <a href="/terms/">Terms of Service</a> | <a href="/#privacy">Privacy Policy</a></nav><form id="agent-quote-form" action="mailto:contact@petalsparadiseevents.com" method="post" enctype="text/plain" toolname="request_event_quote" tooldescription="Send Petals Paradise Events a party rental or event decor quote request with name, email, event date and details."><label>Name <input name="name" required toolparamdescription="Customer full name"></label> <label>Email <input type="email" name="email" required toolparamdescription="Customer email"></label> <label>Event date <input type="date" name="event_date" toolparamdescription="Event date YYYY-MM-DD"></label> <label>Details <input name="message" toolparamdescription="Event type, guest count and items needed"></label> <button type="submit">Request quote</button></form></footer>
+        <footer id="footer" role="contentinfo"><nav aria-label="Company"><a href="/about/">About Us</a> | <a href="/contact/">Contact</a> | <a href="/terms/">Terms of Service</a> | <a href="/#privacy">Privacy Policy</a></nav><form id="agent-quote-form" action="/contact/" method="get" toolname="request_event_quote" tooldescription="Send Petals Paradise Events a party rental or event decor quote request with name, email, event date and details."><label>Name <input name="name" required toolparamdescription="Customer full name"></label> <label>Email <input type="email" name="email" required toolparamdescription="Customer email"></label> <label>Event date <input type="date" name="event_date" toolparamdescription="Event date YYYY-MM-DD"></label> <label>Details <input name="message" toolparamdescription="Event type, guest count and items needed"></label> <button type="submit">Request quote</button></form></footer>
 
         <!-- Image Modal -->
         <div id="image-modal" class="image-modal" role="dialog" aria-modal="true" aria-label="Image viewer" aria-hidden="true">
@@ -519,6 +519,11 @@
             return originalAlert.apply(window, arguments);
         };
 
+        // Stable callback: app.js may define initAutocomplete after Maps loads
+        window.__mapsReady = function() {
+            if (typeof window.initAutocomplete === 'function') window.initAutocomplete();
+        };
+
         window.loadGoogleMaps = function() {
             if (window.mapsLoaded) {
                 if (typeof window.initAutocomplete === 'function') window.initAutocomplete();
@@ -526,7 +531,7 @@
             }
             window.mapsLoaded = true;
             var s = document.createElement('script');
-            s.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAMRF6oAHu-iA_50hpuFXPwLKaPRIcos3A&libraries=places&callback=initAutocomplete';
+            s.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAMRF6oAHu-iA_50hpuFXPwLKaPRIcos3A&libraries=places&loading=async&callback=__mapsReady';
             s.async = true; s.defer = true;
             document.head.appendChild(s);
         };
