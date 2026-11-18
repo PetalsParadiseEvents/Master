@@ -1937,9 +1937,15 @@ function renderCheckout() {
                     } catch (err) {
                         items = []; close();
                         if (/permission|403|denied|not authorized|PERMISSION/i.test(String(err && (err.message || err)))) {
-                            window.googleMapsAuthFailed = true;
-                            console.warn('Address suggestions disabled: enable "Places API (New)" for this API key. Manual entry active.');
-                            manual();
+                            window.googleMapsAuthFailed = true; // stop calling the New API
+                            box.remove();
+                            if (google.maps.places && google.maps.places.Autocomplete) {
+                                console.info('Places API (New) not enabled for this key; using legacy Autocomplete.');
+                                new google.maps.places.Autocomplete(input, { types: ['address'], componentRestrictions: { country: 'us' } });
+                                input.focus();
+                            } else {
+                                manual();
+                            }
                         }
                     }
                 }, 250);
