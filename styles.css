@@ -2923,3 +2923,14 @@ main > .acct-banner-wrap + div > .container:first-child { padding-top: 1.25rem; 
   .pref-grid-2 { grid-template-columns: 1fr 1fr; }
   .pref-actions .btn { width: 100%; }
 }
+
+/* Address autocomplete (Places API New) */
+.addr-suggest { position:absolute; left:0; right:0; top:100%; z-index:1000; margin:.35rem 0 0; padding:.35rem; list-style:none;
+  background:rgba(255,255,255,.97); backdrop-filter:blur(10px); border:1px solid var(--border-color, #eadff0);
+  border-radius:14px; box-shadow:0 14px 36px rgba(90,40,120,.16); animation:addrIn .14s ease-out; }
+.addr-suggest[hidden] { display:none; }
+.addr-suggest li { display:flex; flex-direction:column; gap:.1rem; padding:.6rem .8rem; border-radius:10px; cursor:pointer; transition:background .15s; }
+.addr-suggest li strong { font-weight:600; color:var(--text-primary, #2a2233); font-size:.95rem; }
+.addr-suggest li span { font-size:.8rem; color:var(--text-secondary, #6b5f75); }
+.addr-suggest li:hover, .addr-suggest li[aria-selected="true"] { background:linear-gradient(90deg, rgba(176,69,122,.10), rgba(123,75,196,.10)); }
+@keyframes addrIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }

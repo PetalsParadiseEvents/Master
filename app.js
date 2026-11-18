@@ -1863,40 +1863,91 @@ function renderCheckout() {
         });
     };
 
-    window.initAutocomplete = () => {
-        try {
-            const input = document.querySelector('input[name="delivery_address"]');
-            if (!input) return;
+    window.initAutocomplete = async () => {
+        const input = document.querySelector('input[name="delivery_address"]');
+        if (!input) return;
+        const manual = () => {
+            input.style.backgroundImage = 'none';
+            if (window.googleMapsAuthFailed) input.placeholder = "Enter full address manually";
+            input.disabled = false; input.readOnly = false;
+            input.removeAttribute('disabled'); input.removeAttribute('readonly');
+            const box = document.getElementById('addr-suggest');
+            if (box) box.hidden = true;
+        };
+        if (window.googleMapsAuthFailed || !(window.google && google.maps && google.maps.importLibrary)) return manual();
+        if (input.hasAttribute('data-autocomplete-init')) return;
+        input.setAttribute('data-autocomplete-init', 'true');
 
-            if (window.google && window.google.maps && window.google.maps.places && !window.googleMapsAuthFailed) {
-                if (!input.hasAttribute('data-autocomplete-init')) {
-                    const autocomplete = new google.maps.places.Autocomplete(input, {
-                        types: ['address'],
-                        componentRestrictions: { country: 'us' }
-                    });
-                    input.setAttribute('data-autocomplete-init', 'true');
-                    
-                    // Prevent 'Enter' from submitting form when selecting an autocomplete option
-                    input.addEventListener('keydown', function(e) {
-                        if (e.key === 'Enter') {
-                            e.preventDefault();
-                        }
-                    });
-                }
-            } else {
-                // If maps auth failed or script is missing, enforce manual address input
-                input.style.backgroundImage = 'none';
-                if (window.googleMapsAuthFailed) {
-                    input.placeholder = "Enter full address manually";
-                }
-                input.disabled = false;
-                input.readOnly = false;
-                input.removeAttribute('disabled');
-                input.removeAttribute('readonly');
-                input.classList.remove('pac-target-input');
-            }
+        try {
+            const { AutocompleteSuggestion, AutocompleteSessionToken } = await google.maps.importLibrary('places');
+            input.setAttribute('autocomplete', 'off');
+            input.setAttribute('role', 'combobox');
+            input.setAttribute('aria-autocomplete', 'list');
+            input.setAttribute('aria-controls', 'addr-suggest');
+
+            const wrap = input.parentElement;
+            if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+            const box = document.createElement('ul');
+            box.id = 'addr-suggest'; box.className = 'addr-suggest'; box.setAttribute('role', 'listbox'); box.hidden = true;
+            input.insertAdjacentElement('afterend', box);
+
+            let token = new AutocompleteSessionToken();
+            let items = [], active = -1, timer = null, reqId = 0;
+
+            const close = () => { box.hidden = true; active = -1; input.setAttribute('aria-expanded', 'false'); };
+            const choose = (i) => {
+                const p = items[i]; if (!p) return;
+                input.value = p.text.toString();
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+                token = new AutocompleteSessionToken();
+                close();
+            };
+            const highlight = () => [...box.children].forEach((li, i) => li.setAttribute('aria-selected', i === active ? 'true' : 'false'));
+            const render = () => {
+                box.innerHTML = '';
+                items.forEach((p, i) => {
+                    const li = document.createElement('li');
+                    li.setAttribute('role', 'option');
+                    li.innerHTML = `<strong></strong><span></span>`;
+                    li.firstChild.textContent = p.mainText ? p.mainText.toString() : p.text.toString();
+                    li.lastChild.textContent = p.secondaryText ? p.secondaryText.toString() : '';
+                    li.addEventListener('mousedown', (e) => { e.preventDefault(); choose(i); });
+                    box.appendChild(li);
+                });
+                box.hidden = !items.length;
+                input.setAttribute('aria-expanded', items.length ? 'true' : 'false');
+            };
+
+            input.addEventListener('input', (e) => {
+                if (!e.isTrusted) return;
+                clearTimeout(timer);
+                const q = input.value.trim();
+                if (q.length < 3) { items = []; return close(); }
+                timer = setTimeout(async () => {
+                    const my = ++reqId;
+                    try {
+                        const { suggestions } = await AutocompleteSuggestion.fetchAutocompleteSuggestions({
+                            input: q, sessionToken: token, includedRegionCodes: ['us'],
+                            locationBias: { lat: 39.0438, lng: -77.4874 } // Ashburn, VA
+                        });
+                        if (my !== reqId) return;
+                        items = suggestions.map(s => s.placePrediction).filter(Boolean).slice(0, 5);
+                        active = -1; render();
+                    } catch (err) { console.warn('Address suggestions unavailable:', err); items = []; close(); }
+                }, 250);
+            });
+            input.addEventListener('keydown', (e) => {
+                if (box.hidden) { if (e.key === 'Enter' && document.activeElement === input && items.length) e.preventDefault(); return; }
+                if (e.key === 'ArrowDown') { e.preventDefault(); active = (active + 1) % items.length; highlight(); }
+                else if (e.key === 'ArrowUp') { e.preventDefault(); active = (active - 1 + items.length) % items.length; highlight(); }
+                else if (e.key === 'Enter') { e.preventDefault(); choose(active < 0 ? 0 : active); }
+                else if (e.key === 'Escape') close();
+            });
+            input.addEventListener('blur', () => setTimeout(close, 120));
         } catch (error) {
-            console.error("Google Maps Autocomplete failed to initialize:", error);
+            console.error("Address autocomplete failed to initialize:", error);
+            manual();
         }
     };
 
