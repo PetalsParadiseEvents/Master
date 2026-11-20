@@ -1341,6 +1341,10 @@ function renderGallery() {
             "./wp-content/uploads/2025/07/image-2-scaled.png"
         ],
         "Traditional & Seemantham": [
+            "./wp-content/uploads/2026/11/traditional-lotus-floral-backdrop.webp",
+            "./wp-content/uploads/2026/11/traditional-mehendi-station-backdrop.webp",
+            "./wp-content/uploads/2026/11/traditional-floral-archway-railing.webp",
+            "./wp-content/uploads/2026/11/traditional-welcome-easel-decor.webp",
             "./wp-content/uploads/2026/11/cradle-with-backdrop.webp",
             "./wp-content/uploads/2025/07/Seemantham-4.jpg",
             "./wp-content/uploads/2025/05/Haldi-backdrop-3-2-scaled.jpg",
@@ -1350,6 +1354,7 @@ function renderGallery() {
             "./wp-content/uploads/2025/07/IMG_9925-1-scaled.jpg"
         ],
         "Event Highlights": [
+            "./wp-content/uploads/2026/11/staircase-floral-drape-decor.webp",
             "./wp-content/uploads/2026/05/IMG_1314.jpeg",
             "./wp-content/uploads/2025/09/IMG_0048-scaled.jpg",
             "./wp-content/uploads/2025/09/IMG_0079-scaled.jpg",
