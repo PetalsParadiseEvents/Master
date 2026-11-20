@@ -134,16 +134,24 @@ function buildPage(page) {
     itemListElement: items.map((it, idx) => ({
       '@type': 'ListItem',
       position: idx + 1,
-      item: {
-        '@type': 'Product',
-        name: it.title,
-        description: it.desc,
-        image: absImg(it.img),
-        brand: { '@type': 'Brand', name: 'Petals Paradise Events' },
-        ...(typeof it.price === 'number' && {
-          offers: { '@type': 'Offer', price: it.price, priceCurrency: 'USD', availability: 'https://schema.org/InStock', url },
-        }),
-      },
+      item: typeof it.price === 'number'
+        ? {
+            '@type': 'Product',
+            name: it.title,
+            description: it.desc,
+            image: absImg(it.img),
+            brand: { '@type': 'Brand', name: 'Petals Paradise Events' },
+            offers: { '@type': 'Offer', price: it.price, priceCurrency: 'USD', availability: 'https://schema.org/InStock', url },
+          }
+        : {
+            '@type': 'Service',
+            name: it.title,
+            description: it.desc,
+            image: absImg(it.img),
+            provider: { '@type': 'LocalBusiness', name: 'Petals Paradise Events', url: `${SITE}/` },
+            areaServed: 'Northern Virginia',
+            url,
+          },
     })),
   };
   const faqSchema = {
@@ -156,8 +164,7 @@ function buildPage(page) {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
-      { '@type': 'ListItem', position: 2, name: 'Rentals', item: `${SITE}/#rentals` },
-      { '@type': 'ListItem', position: 3, name: page.navLabel, item: url },
+      { '@type': 'ListItem', position: 2, name: page.navLabel, item: url },
     ],
   };
 
