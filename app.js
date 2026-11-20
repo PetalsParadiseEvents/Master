@@ -300,6 +300,9 @@ function addToCart(item) {
 }
 
 function getItemPrice(item) {
+    if (item.isCustom || typeof item.price !== 'number') {
+        return 0;
+    }
     if (item.id === 4 && item.quantity >= 30) {
         return 1.5;
     }
@@ -307,6 +310,9 @@ function getItemPrice(item) {
 }
 
 function getItemTotal(item) {
+    if (item.isCustom || typeof item.price !== 'number') {
+        return 0;
+    }
     return getItemPrice(item) * item.quantity * rentalDays;
 }
 
@@ -486,7 +492,8 @@ const rentalItems = [
     { id: 22, title: 'Congrats Grad Neon Sign', price: 10, img: './wp-content/uploads/2025/07/81i8bvay0GL._AC_SX679_.jpg', desc: 'Celebratory Congrats Grad neon sign - perfect for Class of 2026 parties!' },
     { id: 23, title: 'Mehandi Umbrella Set', price: 3, img: './wp-content/uploads/2025/05/Umbrella.jpg', desc: 'Colorful traditional umbrellas for Mehandi or festive ceremonies ($3 each).' },
     { id: 24, title: 'Easel for Rent', price: 10, img: './wp-content/uploads/2025/09/gold-litton-lane-boards-easels-27391-64_600.jpg', desc: 'Elegant gold easel for displaying welcome signs or photos.' },
-    { id: 26, title: 'Haldi / Maiyan Backdrop & Staircase Decor', price: 'Varies', img: './wp-content/uploads/2026/10/haldi-backdrop-decor.jpg', gallery: ['./wp-content/uploads/2026/10/haldi-backdrop-decor.jpg', './wp-content/uploads/2026/10/haldi-staircase-decor.jpg'], desc: 'Stunning Haldi & Maiyan decor package featuring a floral backdrop with marigold hangings, greenery, lanterns & golden accents — plus a matching staircase floral drape setup. Fully customizable to your theme and colors.', customizable: true }
+    { id: 26, title: 'Haldi / Maiyan Backdrop & Staircase Decor', price: 'Varies', img: './wp-content/uploads/2026/10/haldi-backdrop-decor.jpg', gallery: ['./wp-content/uploads/2026/10/haldi-backdrop-decor.jpg', './wp-content/uploads/2026/10/haldi-staircase-decor.jpg'], desc: 'Stunning Haldi & Maiyan decor package featuring a floral backdrop with marigold hangings, greenery, lanterns & golden accents — plus a matching staircase floral drape setup. Fully customizable to your theme and colors.', customizable: true },
+    { id: 27, title: 'Traditional Baby Cradle with Floral Backdrop', price: 30, img: './wp-content/uploads/2026/11/cradle-with-backdrop.webp', desc: 'Traditional wooden baby cradle (Uyyala / Palna) with lush banana-leaf & marigold floral backdrop — ideal for Naming Ceremony (Namakaran / Barasala), Cradle Ceremony, and Baby Showers.' }
 ];
 
 // Dynamically categorize rental items for advanced sidebar & filter bar
@@ -1067,6 +1074,37 @@ function renderRentals() {
         if (item) addToCart(item);
     };
 
+    window.handleAddCustomItem = (e) => {
+        e.preventDefault();
+        const nameEl = document.getElementById('custom-item-name');
+        const qtyEl = document.getElementById('custom-item-qty');
+        const notesEl = document.getElementById('custom-item-notes');
+        const name = nameEl ? nameEl.value.trim() : '';
+        const qty = Math.max(1, parseInt(qtyEl ? qtyEl.value : '1', 10) || 1);
+        const notes = notesEl ? notesEl.value.trim() : '';
+        if (!name) {
+            showToast('Please enter the item name you would like to request.');
+            return;
+        }
+        const customItem = {
+            id: Date.now(),
+            title: `Custom Request: ${name}`,
+            customName: name,
+            customNotes: notes,
+            price: 0,
+            isCustom: true,
+            img: './wp-content/uploads/2025/07/image-150x150.png',
+            quantity: qty
+        };
+        cart.push(customItem);
+        saveCart();
+        showToast(`Added custom request "${name}" to cart. Our team will review availability and confirm!`, true);
+        if (nameEl) nameEl.value = '';
+        if (qtyEl) qtyEl.value = '1';
+        if (notesEl) notesEl.value = '';
+        if (window.refreshRentalsUI) window.refreshRentalsUI();
+    };
+
     const categories = ['All', 'Chairs', 'Tables', 'Buffet Sets', 'Tents', 'Backdrops', 'Marquee Letters', 'Neon Signs', 'Traditional Decor'];
 
     // Calculate dynamic counts
@@ -1159,11 +1197,38 @@ function renderRentals() {
                 <div style="grid-column: 1/-1; text-align: center; padding: 2rem;">Loading collection...</div>
             </div>
 
-            <div class="empty-state mt-2">
-                <i data-feather="help-circle"></i>
-                <h3>Can't find what you're looking for?</h3>
-                <p style="color: var(--text-secondary); margin-top:1rem;">If there's a specific item you need for your event that isn't listed here, please let us know! We are constantly updating our inventory.</p>
-                <a href="#contact" class="btn btn-outline mt-2">Inquire About Missing Items</a>
+            <!-- Custom Item Request Card -->
+            <div class="empty-state mt-2" id="custom-item-request-card" style="text-align: left; max-width: 760px; margin-left: auto; margin-right: auto; border: 1px dashed rgba(212, 175, 55, 0.55); background: linear-gradient(145deg, rgba(212, 175, 55, 0.08), rgba(26, 29, 36, 0.85));">
+                <div style="text-align: center; margin-bottom: 1.25rem;">
+                    <span style="display: inline-block; padding: 4px 14px; border-radius: 999px; background: rgba(212, 175, 55, 0.16); border: 1px solid rgba(212, 175, 55, 0.4); color: var(--primary-color); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 0.6rem;">✨ Custom Item Request</span>
+                    <h3 style="margin-bottom: 0.4rem;">Need Something Not Listed Above?</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem;">Add any custom rental item you need directly to your cart. Our team will check inventory and get back to you.</p>
+                </div>
+
+                <div role="note" style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); color: #fde68a; padding: 0.85rem 1rem; border-radius: 10px; font-size: 0.88rem; line-height: 1.5; margin-bottom: 1.25rem;">
+                    <strong>⚠️ Please Note:</strong> Adding a custom item is a <strong>request only and is not guaranteed</strong>. Our team will check and review your request and let you know if the item is available along with pricing.
+                </div>
+
+                <form onsubmit="window.handleAddCustomItem(event)" style="display: grid; gap: 0.9rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 110px; gap: 0.85rem;">
+                        <div>
+                            <label for="custom-item-name" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.35rem;">Item Name *</label>
+                            <input type="text" id="custom-item-name" class="form-control" required maxlength="120" placeholder="e.g., Gold Charger Plates, Kids Chairs, Balloon Arch..." style="width: 100%;">
+                        </div>
+                        <div>
+                            <label for="custom-item-qty" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.35rem;">Qty *</label>
+                            <input type="number" id="custom-item-qty" class="form-control" min="1" max="500" value="1" required style="width: 100%;">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="custom-item-notes" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.35rem;">Details / Color / Size (Optional)</label>
+                        <input type="text" id="custom-item-notes" class="form-control" maxlength="250" placeholder="Color, size, theme, or any extra details for our team..." style="width: 100%;">
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: space-between; margin-top: 0.25rem;">
+                        <button type="submit" class="btn btn-primary">+ Add Custom Item to Cart</button>
+                        <a href="#contact" class="btn btn-outline" style="font-size: 0.82rem; padding: 0.65rem 1.2rem;">Or Message Our Team</a>
+                    </div>
+                </form>
             </div>
 
             <!-- Sticky Cart Button -->
@@ -1273,6 +1338,7 @@ function renderGallery() {
             "./wp-content/uploads/2025/07/image-2-scaled.png"
         ],
         "Traditional & Seemantham": [
+            "./wp-content/uploads/2026/11/cradle-with-backdrop.webp",
             "./wp-content/uploads/2025/07/Seemantham-4.jpg",
             "./wp-content/uploads/2025/05/Haldi-backdrop-3-2-scaled.jpg",
             "./wp-content/uploads/2025/05/Baby-backdrop-1-scaled.jpg",
@@ -1703,10 +1769,16 @@ function renderCart() {
                 <div>
                     ${cart.map(item => `
                         <div class="cart-item">
-                            <img loading="lazy" src="${item.img}" alt="${item.title}">
+                            <img loading="lazy" src="${escapeHtml(item.img)}" alt="${escapeHtml(item.title)}">
                             <div class="cart-item-info">
-                                <h4 class="cart-item-title">${item.title}</h4>
-                                <p style="color: var(--primary-color); font-weight:600;">$${getItemPrice(item)}</p>
+                                <h4 class="cart-item-title">${escapeHtml(item.title)}</h4>
+                                ${item.isCustom ? `
+                                    <span style="display: inline-block; margin: 4px 0; padding: 2px 8px; border-radius: 999px; background: rgba(245, 158, 11, 0.16); border: 1px solid rgba(245, 158, 11, 0.45); color: #fde68a; font-size: 0.72rem; font-weight: 700;">Custom Request • Not Guaranteed</span>
+                                    ${item.customNotes ? `<p style="font-size: 0.82rem; color: var(--text-secondary); margin: 4px 0;">Notes: ${escapeHtml(item.customNotes)}</p>` : ''}
+                                    <p style="color: #fde68a; font-size: 0.82rem; font-weight: 600;">Price &amp; availability confirmed after team review</p>
+                                ` : `
+                                    <p style="color: var(--primary-color); font-weight:600;">$${getItemPrice(item)}</p>
+                                `}
                             </div>
                             <div class="cart-item-actions">
                                 <div class="quantity-controls">
@@ -1720,6 +1792,11 @@ function renderCart() {
                             </div>
                         </div>
                     `).join('')}
+                    ${cart.some(i => i.isCustom) ? `
+                        <div role="note" style="margin-top: 1rem; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); color: #fde68a; padding: 0.85rem 1rem; border-radius: 10px; font-size: 0.86rem; line-height: 1.5;">
+                            <strong>⚠️ Custom Item Notice:</strong> Custom requested items are <strong>not guaranteed</strong>. Our team will check availability, review your request, and confirm pricing with you before finalizing your order.
+                        </div>
+                    ` : ''}
                 </div>
                 <div class="cart-summary">
                     <h3 style="margin-bottom: 1.5rem;">Order Summary</h3>
@@ -1817,6 +1894,12 @@ function renderCheckout() {
         const formData = new FormData(e.target);
         const details = Object.fromEntries(formData);
 
+        const customRequestsSummary = cart
+            .filter(i => i.isCustom)
+            .map(i => `[CUSTOM ITEM REQUEST - NOT GUARANTEED] ${i.customName || i.title} (Qty: ${i.quantity}${i.customNotes ? ', Notes: ' + i.customNotes : ''})`)
+            .join('\n');
+        const combinedSpecialRequests = [details.special_requests || '', customRequestsSummary].filter(Boolean).join('\n\n');
+
         const orderData = {
             name: details.name,
             email: details.email,
@@ -1825,7 +1908,7 @@ function renderCheckout() {
             location: details.location || '',
             fulfillment: details.fulfillment,
             delivery_address: details.delivery_address || '',
-            special_requests: details.special_requests || '',
+            special_requests: combinedSpecialRequests,
             pickup_date_manual: details.pickup_date_manual || '',
             pickup_time_manual: details.pickup_time_manual || '',
             dropoff_date_manual: details.dropoff_date_manual || '',
@@ -1841,9 +1924,10 @@ function renderCheckout() {
             points_to_redeem: window.ppeSelectedRedeem || 0,
             items: cart.map(item => ({
                 id: item.id,
-                title: item.title,
+                title: item.isCustom && item.customNotes ? `${item.title} (${item.customNotes}) [Subject to availability]` : (item.isCustom ? `${item.title} [Subject to availability]` : item.title),
                 quantity: item.quantity,
-                price: getItemPrice(item)
+                price: getItemPrice(item),
+                custom_request: !!item.isCustom
             }))
         };
 
