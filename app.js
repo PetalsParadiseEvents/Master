@@ -493,13 +493,16 @@ const rentalItems = [
     { id: 23, title: 'Mehandi Umbrella Set', price: 3, img: './wp-content/uploads/2025/05/Umbrella.jpg', desc: 'Colorful traditional umbrellas for Mehandi or festive ceremonies ($3 each).' },
     { id: 24, title: 'Easel for Rent', price: 10, img: './wp-content/uploads/2025/09/gold-litton-lane-boards-easels-27391-64_600.jpg', desc: 'Elegant gold easel for displaying welcome signs or photos.' },
     { id: 26, title: 'Haldi / Maiyan Backdrop & Staircase Decor', price: 'Varies', img: './wp-content/uploads/2026/10/haldi-backdrop-decor.jpg', gallery: ['./wp-content/uploads/2026/10/haldi-backdrop-decor.jpg', './wp-content/uploads/2026/10/haldi-staircase-decor.jpg'], desc: 'Stunning Haldi & Maiyan decor package featuring a floral backdrop with marigold hangings, greenery, lanterns & golden accents — plus a matching staircase floral drape setup. Fully customizable to your theme and colors.', customizable: true },
-    { id: 27, title: 'Traditional Baby Cradle with Floral Backdrop', price: 30, img: './wp-content/uploads/2026/11/cradle-with-backdrop.webp', desc: 'Traditional wooden baby cradle (Uyyala / Palna) with lush banana-leaf & marigold floral backdrop — ideal for Naming Ceremony (Namakaran / Barasala), Cradle Ceremony, and Baby Showers.' }
+    { id: 27, title: 'Traditional Baby Cradle with Floral Backdrop', price: 30, img: './wp-content/uploads/2026/11/cradle-with-backdrop.webp', desc: 'Traditional wooden baby cradle (Uyyala / Palna) with lush banana-leaf & marigold floral backdrop — ideal for Naming Ceremony (Namakaran / Barasala), Cradle Ceremony, and Baby Showers.' },
+    { id: 28, title: 'Lotus Stand, Gangalam & Kalasham Stands', price: 'Varies', img: './wp-content/uploads/2026/11/lotus-gangalam-kalasham-stands.webp', desc: 'Elegant gold Lotus stand, traditional Gangalam (Urli), and Kalasham (Kalusham) stands — versatile statement pieces suitable for weddings, poojas, Haldi, housewarmings, and any event decor. Price varies based on items selected.' }
 ];
 
 // Dynamically categorize rental items for advanced sidebar & filter bar
 rentalItems.forEach(item => {
     const title = item.title.toLowerCase();
-    if (title.includes('chair') || title.includes('loveseat')) {
+    if (title.includes('lotus') || title.includes('gangalam') || title.includes('kalasham') || title.includes('kalusham')) {
+        item.category = 'Traditional Decor';
+    } else if (title.includes('chair') || title.includes('loveseat')) {
         item.category = 'Chairs';
     } else if (title.includes('table')) {
         item.category = 'Tables';

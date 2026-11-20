@@ -309,7 +309,8 @@ ${footerBlock}
 // Categorize same way as app.js
 rentalItems.forEach(item => {
   const t = item.title.toLowerCase();
-  if (t.includes('chair') || t.includes('loveseat')) item.category = 'Chairs';
+  if (t.includes('lotus') || t.includes('gangalam') || t.includes('kalasham') || t.includes('kalusham')) item.category = 'Traditional Decor';
+  else if (t.includes('chair') || t.includes('loveseat')) item.category = 'Chairs';
   else if (t.includes('table')) item.category = 'Tables';
   else if (t.includes('tent')) item.category = 'Tents';
   else if (t.includes('warmer') || t.includes('buffet')) item.category = 'Buffet Sets';
