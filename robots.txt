@@ -11,8 +11,15 @@ Disallow: /tools/
 Allow: /api/mcp.php
 Content-Signal: search=yes, ai-input=yes, ai-train=no
 
-User-agent: GPTBot
 User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin.html
+Disallow: /wp-admin/
+Disallow: /api/
+Disallow: /tools/
+Allow: /api/mcp.php
+
+User-agent: GPTBot
 User-agent: ChatGPT-User
 User-agent: ClaudeBot
 User-agent: Claude-SearchBot
