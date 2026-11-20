@@ -34,25 +34,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     require_once __DIR__ . '/config.php';
 
-    // 1. Admin Authentication
-    $adminUser   = ADMIN_USER;
-    $adminPass   = ADMIN_PASS;
-    $adminSecret = ADMIN_SECRET;
-    $cookieHash  = md5($adminUser . $adminPass . $adminSecret);
+    // 1. Admin Authentication (Session or HttpOnly HMAC cookie only)
+    ppeRequireAdminApiAuth();
 
-    $rawInput        = file_get_contents('php://input');
-    $data            = json_decode($rawInput, true) ?: [];
-    $providedKey     = isset($data['key']) ? trim($data['key']) : (isset($_GET['key']) ? $_GET['key'] : (isset($_POST['key']) ? $_POST['key'] : ''));
-    $isBypassed      = (!empty($adminSecret) && $providedKey === $adminSecret);
-    $isCookieValid   = (isset($_COOKIE['ppe_auth']) && $_COOKIE['ppe_auth'] === $cookieHash);
-    $isAuthenticated = $isBypassed || (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) || $isCookieValid;
-
-    if (!$isAuthenticated) {
-        if (ob_get_length()) ob_clean();
-        http_response_code(401);
-        echo json_encode(['success' => false, 'error' => 'Unauthorized admin access.']);
-        exit;
-    }
+    $rawInput = file_get_contents('php://input');
+    $data     = json_decode($rawInput, true) ?: [];
 
     // 2. Parse & Validate Customer Details
     $name  = isset($data['name']) ? trim($data['name']) : '';

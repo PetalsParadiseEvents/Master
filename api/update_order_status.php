@@ -17,22 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
-// 1. Authenticate admin session or cookie
-$adminUser = ADMIN_USER;
-$adminPass = ADMIN_PASS;
-$adminSecret = ADMIN_SECRET;
-$cookieHash = md5($adminUser . $adminPass . $adminSecret);
-
-$providedKey = isset($_GET['key']) ? $_GET['key'] : '';
-$isBypassed = (!empty($adminSecret) && $providedKey === $adminSecret);
-$isCookieValid = (isset($_COOKIE['ppe_auth']) && $_COOKIE['ppe_auth'] === $cookieHash);
-$isAuthenticated = $isBypassed || (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) || $isCookieValid;
-
-if (!$isAuthenticated) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized admin access.']);
-    exit(0);
-}
+// 1. Authenticate admin session or HttpOnly HMAC cookie
+ppeRequireAdminApiAuth();
 
 // 2. Parse input JSON payload
 $rawInput = file_get_contents('php://input');

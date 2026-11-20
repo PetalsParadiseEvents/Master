@@ -20,39 +20,43 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/loyalty.php';
 
 // ═══════════════════════════════════════════════════════════
-// 1. AUTHENTICATION (Session, Cookie, or URL Key Bypass)
+// 1. AUTHENTICATION (Session or HttpOnly HMAC Cookie — no URL key bypass)
 // ═══════════════════════════════════════════════════════════
-$adminUser   = ADMIN_USER;
-$adminPass   = ADMIN_PASS;
-$adminSecret = ADMIN_SECRET;
-$cookieHash  = md5($adminUser . $adminPass . $adminSecret);
+$adminUser = ADMIN_USER;
+$adminPass = ADMIN_PASS;
+$providedKey = '';
 
 // Handle Logout
 if (isset($_GET['logout'])) {
     unset($_SESSION['admin_logged_in']);
-    setcookie('ppe_auth', '', time() - 3600, '/');
+    ppeClearAdminAuthCookie();
     header('Location: leads_export.php');
     exit;
 }
 
-// Handle Login Form Submission
+// Handle Login Form Submission (with brute-force rate limiting)
 $loginError = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset($_POST['password'])) {
-    if ($_POST['username'] === $adminUser && $_POST['password'] === $adminPass) {
+    $authPdo = function_exists('loyaltyDb') ? loyaltyDb() : null;
+    if ($authPdo && function_exists('tooManyAttempts') && tooManyAttempts($authPdo)) {
+        http_response_code(429);
+        $loginError = 'Too many failed login attempts. Please wait 15 minutes and try again.';
+    } elseif (hash_equals((string)$adminUser, (string)$_POST['username']) && hash_equals((string)$adminPass, (string)$_POST['password'])) {
+        session_regenerate_id(true);
         $_SESSION['admin_logged_in'] = true;
-        setcookie('ppe_auth', $cookieHash, time() + (86400 * 30), '/'); // 30 days
+        ppeSetAdminAuthCookie(86400 * 30); // 30 days, HttpOnly + Secure + SameSite=Lax
         header('Location: leads_export.php');
         exit;
     } else {
+        if ($authPdo && function_exists('recordFailedAttempt')) {
+            recordFailedAttempt($authPdo, (string)$_POST['username']);
+        }
         $loginError = 'Invalid admin username or password.';
     }
 }
 
 // Verify Authentication
-$providedKey = isset($_GET['key']) ? $_GET['key'] : '';
-$isBypassed = (!empty($adminSecret) && $providedKey === $adminSecret);
-$isCookieValid = (isset($_COOKIE['ppe_auth']) && $_COOKIE['ppe_auth'] === $cookieHash);
-$isAuthenticated = $isBypassed || (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) || $isCookieValid;
+$isAuthenticated = ppeIsAdminAuthenticated();
 
 if (!$isAuthenticated) {
     $requestedFormat = isset($_GET['format']) ? strtolower($_GET['format']) : '';

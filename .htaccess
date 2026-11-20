@@ -80,21 +80,38 @@
     Header set Referrer-Policy "strict-origin-when-cross-origin"
     Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.jsdelivr.net https://maps.googleapis.com https://cdn.emailjs.com https://api.emailjs.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https://images.unsplash.com https://maps.gstatic.com https://maps.googleapis.com https://www.petalsparadiseevents.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://places.googleapis.com https://cdn.jsdelivr.net https://api.emailjs.com https://maps.googleapis.com https://generativelanguage.googleapis.com https://www.petalsparadiseevents.com; frame-src https://www.instagram.com https://www.google.com https://maps.googleapis.com;"
     Header set Permissions-Policy 'geolocation=(self "https://maps.googleapis.com"), camera=(), microphone=(), payment=(), usb=()'
+    Header set Cross-Origin-Opener-Policy "same-origin-allow-popups"
 </IfModule>
 
 # Disable Directory Browsing
 Options -Indexes
 
-# Protect System Files
-<Files .htaccess>
-    Order Allow,Deny
-    Deny from all
-</Files>
+# Protect System, Secret, PII Data & Internal Files
+<FilesMatch "^(\.htaccess|\.htpasswd|\.env.*|config\.php|secrets\.php|secrets\.example\.php|leads\.json|orders\.json|scrape\.py|ARCHITECTURE_AND_CODE_FLOW\.md|SECURITY_REMEDIATION\.md|git-lfs\.tar\.gz)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
 
-<Files "config.php">
-    Order Allow,Deny
-    Deny from all
-</Files>
+<FilesMatch "\.(sql|log|bak|old|orig|swp)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Block access to hidden VCS directories (.git)
+    RewriteRule (^|/)\.git(/|$) - [F,L]
+</IfModule>
 
 # ─────────────────────────────────────────
 # Block Scanner Bots & Exploit Attempt Signatures

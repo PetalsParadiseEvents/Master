@@ -418,3 +418,69 @@ function formatDateToEST($dateStr, $format = 'M d, Y g:i A') {
         return $dateStr;
     }
 }
+
+/**
+ * Generates an HMAC-SHA256 admin authentication cookie token.
+ */
+function ppeAdminCookieToken(): string {
+    return hash_hmac('sha256', 'ppe_admin_session_v1|' . ADMIN_USER, ADMIN_PASS . '|' . ADMIN_SECRET);
+}
+
+/**
+ * Checks whether the current request has a valid admin session or HttpOnly HMAC cookie.
+ * URL ?key=... bypasses are intentionally disabled for security.
+ */
+function ppeIsAdminAuthenticated(): bool {
+    if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
+        return true;
+    }
+    if (!empty($_COOKIE['ppe_auth']) && is_string($_COOKIE['ppe_auth'])) {
+        return hash_equals(ppeAdminCookieToken(), $_COOKIE['ppe_auth']);
+    }
+    return false;
+}
+
+/**
+ * Sets the hardened admin auth cookie (HttpOnly, Secure on HTTPS, SameSite=Lax).
+ */
+function ppeSetAdminAuthCookie(int $ttlSeconds = 2592000): void {
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+    setcookie('ppe_auth', ppeAdminCookieToken(), [
+        'expires'  => time() + $ttlSeconds,
+        'path'     => '/',
+        'secure'   => $isHttps,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+}
+
+/**
+ * Clears the admin auth cookie on logout.
+ */
+function ppeClearAdminAuthCookie(): void {
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+    setcookie('ppe_auth', '', [
+        'expires'  => time() - 3600,
+        'path'     => '/',
+        'secure'   => $isHttps,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+}
+
+/**
+ * Enforces admin authentication for JSON API endpoints.
+ */
+function ppeRequireAdminApiAuth(): void {
+    if (!ppeIsAdminAuthenticated()) {
+        if (ob_get_length()) ob_clean();
+        http_response_code(401);
+        echo json_encode(['error' => 'Unauthorized admin access.']);
+        exit(0);
+    }
+}
+

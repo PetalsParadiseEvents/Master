@@ -38,23 +38,8 @@ try {
     $rawInput = file_get_contents('php://input');
     $data     = json_decode($rawInput, true) ?: [];
 
-    // Admin Authentication
-    $adminUser   = ADMIN_USER;
-    $adminPass   = ADMIN_PASS;
-    $adminSecret = ADMIN_SECRET;
-    $cookieHash  = md5($adminUser . $adminPass . $adminSecret);
-
-    $providedKey     = isset($data['key']) ? trim($data['key']) : (isset($_GET['key']) ? $_GET['key'] : (isset($_POST['key']) ? $_POST['key'] : ''));
-    $isBypassed      = (!empty($adminSecret) && $providedKey === $adminSecret);
-    $isCookieValid   = (isset($_COOKIE['ppe_auth']) && $_COOKIE['ppe_auth'] === $cookieHash);
-    $isAuthenticated = $isBypassed || (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) || $isCookieValid;
-
-    if (!$isAuthenticated) {
-        if (ob_get_length()) ob_clean();
-        http_response_code(401);
-        echo json_encode(['success' => false, 'error' => 'Unauthorized admin access.']);
-        exit;
-    }
+    // Admin Authentication (Session or HttpOnly HMAC cookie only)
+    ppeRequireAdminApiAuth();
 
     $orderId    = !empty($data['order_id']) ? trim($data['order_id']) : (!empty($_POST['order_id']) ? trim($_POST['order_id']) : (!empty($_GET['order_id']) ? trim($_GET['order_id']) : ''));
     $customNote = !empty($data['notes']) ? trim($data['notes']) : (!empty($_POST['notes']) ? trim($_POST['notes']) : (!empty($_GET['notes']) ? trim($_GET['notes']) : ''));

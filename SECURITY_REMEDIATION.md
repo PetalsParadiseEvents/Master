@@ -11,7 +11,7 @@
 A Google Gemini API key was accidentally hardcoded in the `.htaccess` file and committed to the public GitHub repository:
 
 ```
-SetEnv GEMINI_API_KEY AQ.Ab8RN6JXuxoDSS9xpCWGO2pf3kPPm51ZRCC-zrfQJuFZfFHcgA
+SetEnv GEMINI_API_KEY [REDACTED_REVOKED_GEMINI_API_KEY]
 ```
 
 **Commit:** `e266c84c95e1a0517c6ed25a6b70ba8e2cd2f792`
@@ -34,7 +34,7 @@ SetEnv GEMINI_API_KEY AQ.Ab8RN6JXuxoDSS9xpCWGO2pf3kPPm51ZRCC-zrfQJuFZfFHcgA
 
 1. Go to https://aistudio.google.com/
 2. Navigate to **API Keys** section
-3. Delete the key: `AQ.Ab8RN6JXuxoDSS9xpCWGO2pf3kPPm51ZRCC-zrfQJuFZfFHcgA`
+3. Delete the key: `[REDACTED_REVOKED_GEMINI_API_KEY]`
 4. Generate a new API key
 
 **⏱️ Timeline:** Do this immediately — the old key may have been used by malicious actors.
@@ -247,7 +247,7 @@ Never hardcode in workflow files.
 
 ## 📋 Security Checklist
 
-- [ ] Old API key (`AQ.Ab8RN6JXuxoDSS9xpCWGO2pf3kPPm51ZRCC-zrfQJuFZfFHcgA`) revoked
+- [ ] Old API key (`[REDACTED_REVOKED_GEMINI_API_KEY]`) revoked
 - [ ] New API key generated
 - [ ] New key set via environment variable (cPanel/server/vhost)
 - [ ] Tested: `getenv('GEMINI_API_KEY')` returns new key

@@ -8,14 +8,7 @@ require_once __DIR__ . '/loyalty.php';
 
 header('Content-Type: application/json');
 
-$cookieHash = md5(ADMIN_USER . ADMIN_PASS . ADMIN_SECRET);
-$isAuthed = (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true)
-         || (isset($_COOKIE['ppe_auth']) && $_COOKIE['ppe_auth'] === $cookieHash);
-if (!$isAuthed) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized admin access.']);
-    exit;
-}
+ppeRequireAdminApiAuth();
 
 $data = json_decode(file_get_contents('php://input'), true) ?: [];
 $cid    = (int)($data['customer_id'] ?? 0);

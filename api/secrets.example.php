@@ -9,10 +9,10 @@
  */
 
 return [
-    // Admin Lead Portal Credentials
-    'ADMIN_USER' => 'biragonimounika@gmail.com',
-    'ADMIN_PASS' => 'Mounika@65',
-    'ADMIN_SECRET' => 'ppe_admin_2026',
+    // Admin Lead Portal Credentials (REPLACE with strong unique values on your server)
+    'ADMIN_USER' => 'admin@petalsparadiseevents.com',
+    'ADMIN_PASS' => 'REPLACE_WITH_STRONG_UNIQUE_PASSWORD',
+    'ADMIN_SECRET' => 'REPLACE_WITH_RANDOM_32_CHAR_SECRET',
 
     // Hostinger phpMyAdmin MySQL Database Credentials
     'DB_HOST' => 'localhost',

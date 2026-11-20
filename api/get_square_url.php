@@ -13,7 +13,7 @@ register_shutdown_function(function() {
         http_response_code(500);
         echo json_encode([
             'success' => false,
-            'error'   => 'PHP Fatal Error: ' . $error['message'] . ' in ' . basename($error['file']) . ' on line ' . $error['line']
+            'error'   => 'Internal server error.'
         ], JSON_UNESCAPED_SLASHES);
     }
 });
@@ -32,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 try {
     require_once __DIR__ . '/config.php';
+    ppeRequireAdminApiAuth();
 
     $orderId  = !empty($_GET['order_id']) ? trim($_GET['order_id']) : (!empty($_POST['order_id']) ? trim($_POST['order_id']) : '');
     $totalVal = !empty($_GET['total']) ? floatval($_GET['total']) : (!empty($_POST['total']) ? floatval($_POST['total']) : 0);
