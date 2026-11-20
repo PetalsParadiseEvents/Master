@@ -61,6 +61,10 @@
                 a.innerHTML = '👤 Sign In';
             }
         });
+        document.querySelectorAll('.acct-rewards-cta').forEach(cta => {
+            cta.setAttribute('href', state.loggedIn ? '#profile' : '#signup');
+            cta.textContent = state.loggedIn ? `You have ${fmt(balance())} pts →` : 'Join free →';
+        });
     }
 
     // ── Reusable pieces ──────────────────────────────────────────────────
@@ -569,6 +573,15 @@
 
     window.ppeAccount = { refresh, state };
 
-    // Initial session check (runs before/alongside app.js first render)
-    document.addEventListener('DOMContentLoaded', refresh);
+    // Initial session check: immediate on account/cart/checkout routes, deferred until load on public pages
+    document.addEventListener('DOMContentLoaded', () => {
+        const r = currentRoute();
+        if (['#profile', '#checkout', '#cart', '#signin', '#signup', '#rewards', '#reset', '#forgot'].includes(r)) {
+            refresh();
+        } else if (document.readyState === 'complete') {
+            refresh();
+        } else {
+            window.addEventListener('load', () => setTimeout(refresh, 0), { once: true });
+        }
+    });
 })();

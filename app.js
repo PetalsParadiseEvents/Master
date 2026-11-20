@@ -512,19 +512,19 @@ rentalItems.forEach(item => {
 });
 
 const services = [
-    { title: 'Wedding Party', desc: 'From breathtaking floral arrangements to elegant backdrops, we craft the perfect ambiance for your special day.', img: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80' },
-    { title: 'HouseWarming', desc: 'Elegant décor and personalized styling for your housewarming party, creating a warm and welcoming ambiance.', img: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80' },
-    { title: 'Birthday Party', desc: 'From vibrant balloon garlands to elegant tablescapes, we create magical setups tailored to your theme.', img: './wp-content/uploads/2026/08/1st_birthday_pic.jpg' },
-    { title: 'Baby Shower', desc: 'Dreamy and elegant décor featuring soft pastels, enchanting backdrops, and custom-themed setups.', img: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80' },
-    { title: 'Haldi / Mehandi Parties', desc: 'Vibrant and traditional décor with beautiful backdrops, marigold arrangements, and artistic seating for your special ceremonies.', img: './wp-content/uploads/2026/10/haldi-backdrop-decor.jpg' },
-    { title: 'Retirement Party', desc: 'Celebrate a career milestone with sophisticated décor, backdrop displays, and custom balloon arrangements.', img: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80' },
-    { title: 'Festival Parties & Events', desc: 'Celebrate Diwali, Eid, Christmas, or any festive occasion with our specialized themed décor and lighting solutions.', img: 'https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?auto=format&fit=crop&w=800&q=80' }
+    { title: 'Wedding Party', desc: 'From breathtaking floral arrangements to elegant backdrops, we craft the perfect ambiance for your special day.', img: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=70&fm=webp' },
+    { title: 'HouseWarming', desc: 'Elegant décor and personalized styling for your housewarming party, creating a warm and welcoming ambiance.', img: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=70&fm=webp' },
+    { title: 'Birthday Party', desc: 'From vibrant balloon garlands to elegant tablescapes, we create magical setups tailored to your theme.', img: './wp-content/uploads/2026/08/1st_birthday_pic.webp' },
+    { title: 'Baby Shower', desc: 'Dreamy and elegant décor featuring soft pastels, enchanting backdrops, and custom-themed setups.', img: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=70&fm=webp' },
+    { title: 'Haldi / Mehandi Parties', desc: 'Vibrant and traditional décor with beautiful backdrops, marigold arrangements, and artistic seating for your special ceremonies.', img: './wp-content/uploads/2026/10/haldi-backdrop-decor.webp' },
+    { title: 'Retirement Party', desc: 'Celebrate a career milestone with sophisticated décor, backdrop displays, and custom balloon arrangements.', img: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&q=70&fm=webp' },
+    { title: 'Festival Parties & Events', desc: 'Celebrate Diwali, Eid, Christmas, or any festive occasion with our specialized themed décor and lighting solutions.', img: 'https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?auto=format&fit=crop&w=600&q=70&fm=webp' }
 ];
 
 // Rendering Layout
 function renderBanner() {
     const banner = document.getElementById('top-banner');
-    if (!banner) return;
+    if (!banner || banner.querySelector('.promo-banner')) return;
 
     banner.innerHTML = `
         <div class="promo-banner">
@@ -553,27 +553,7 @@ function renderBanner() {
 
 function renderNavbar() {
     const nav = document.getElementById('navbar');
-    nav.innerHTML = `
-        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open navigation menu">
-            <i data-feather="menu"></i>
-        </button>
-        <a href="#" class="logo-text">Petals Paradise Events</a>
-        <div class="nav-links">
-            <a href="#" class="nav-link">Home</a>
-            <a href="#rentals" class="nav-link">Rentals</a>
-            <a href="#services" class="nav-link">Services</a>
-            <a href="#gallery" class="nav-link">Gallery</a>
-            <a href="#videos" class="nav-link">Videos</a>
-            <a href="#contact" class="nav-link">Contact Us</a>
-            <a href="#track" class="nav-link">Track Order</a>
-            <a href="#signin" class="nav-link nav-account-link" data-account-link>👤 Sign In</a>
-            <a href="#contact" class="nav-link nav-plan-btn">✨ Plan My Event</a>
-        </div>
-        <a href="#cart" class="cart-icon-container" aria-label="View cart with ${cart.reduce((sum, item) => sum + item.quantity, 0)} items">
-            <i data-feather="shopping-bag"></i>
-            <span id="cart-badge" class="cart-badge">0</span>
-        </a>
-        
+    const mobileDrawerHtml = `
         <!-- Mobile Menu Overlay -->
         <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
 
@@ -615,7 +595,36 @@ function renderNavbar() {
             <a href="#contact" class="nav-link mobile-plan-btn" style="color: var(--primary-color); font-weight: 700; margin-top: 0.5rem; display: inline-block;">✨ Plan My Event</a>
         </div>
     `;
-    feather.replace();
+
+    if (nav.querySelector('.logo-text')) {
+        if (!document.getElementById('mobile-menu')) {
+            nav.insertAdjacentHTML('beforeend', mobileDrawerHtml);
+        }
+    } else {
+        nav.innerHTML = `
+            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open navigation menu">
+                <i data-feather="menu"></i>
+            </button>
+            <a href="#" class="logo-text">Petals Paradise Events</a>
+            <div class="nav-links">
+                <a href="#" class="nav-link">Home</a>
+                <a href="#rentals" class="nav-link">Rentals</a>
+                <a href="#services" class="nav-link">Services</a>
+                <a href="#gallery" class="nav-link">Gallery</a>
+                <a href="#videos" class="nav-link">Videos</a>
+                <a href="#contact" class="nav-link">Contact Us</a>
+                <a href="#track" class="nav-link">Track Order</a>
+                <a href="#signin" class="nav-link nav-account-link" data-account-link>👤 Sign In</a>
+                <a href="#contact" class="nav-link nav-plan-btn">✨ Plan My Event</a>
+            </div>
+            <a href="#cart" class="cart-icon-container" aria-label="View cart with ${cart.reduce((sum, item) => sum + item.quantity, 0)} items">
+                <i data-feather="shopping-bag"></i>
+                <span id="cart-badge" class="cart-badge">0</span>
+            </a>
+            ${mobileDrawerHtml}
+        `;
+    }
+    feather.replace(nav);
     updateCartBadge();
 
 
@@ -741,10 +750,11 @@ function renderFooter() {
 }
 
 // Views
-function renderHome() {
+function renderHomeHero() {
     return `
         <!-- HERO -->
-        <section class="hero">
+        <section class="hero" id="static-hero" aria-label="Hero section">
+            <img class="hero-bg-img no-zoom" src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=828&q=52&fm=webp" srcset="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=480&q=50&fm=webp 480w, https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=828&q=52&fm=webp 828w, https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1280&q=60&fm=webp 1280w" sizes="100vw" alt="" width="828" height="552" fetchpriority="high" decoding="async" aria-hidden="true" onerror="this.style.display='none'">
             <div class="hero-content">
                 <div class="hero-eyebrow">🌸 Serving Loudoun County &amp; the DMV Since 2025</div>
                 <h1>Your Celebration Partner,<br>For Every Chapter of Life</h1>
@@ -755,9 +765,13 @@ function renderHome() {
                 </div>
             </div>
         </section>
+    `;
+}
 
+function renderHomeLifeStages() {
+    return `
         <!-- LIFE STAGES JOURNEY TIMELINE -->
-        <section class="life-stages-section">
+        <section class="life-stages-section" id="static-life-stages">
             <div class="container">
                 <div class="text-center">
                     <h2 class="section-title">We're With You At Every Milestone</h2>
@@ -793,7 +807,11 @@ function renderHome() {
                 </div>
             </div>
         </section>
+    `;
+}
 
+function renderHomeBelowFold() {
+    return `
         <!-- HOW WE WORK WITH YOU -->
         <section class="how-we-work-section">
             <div class="container">
@@ -887,7 +905,7 @@ function renderHome() {
         </section>
 
         <!-- FEATURED SERVICES -->
-        <section class="container mt-2">
+        <section class="container mt-2" style="content-visibility: auto; contain-intrinsic-size: auto 900px;">
             <div class="text-center">
                 <h2 class="section-title">Events We Specialize In</h2>
                 <p class="section-subtitle">From intimate baby showers to grand weddings — we bring every vision to life.</p>
@@ -896,7 +914,7 @@ function renderHome() {
                 ${services.map(s => `
                     <div class="card">
                         <div class="card-img-wrapper">
-                            <img loading="lazy" src="${s.img}" alt="${s.title}">
+                            <img loading="lazy" decoding="async" fetchpriority="low" width="600" height="400" src="${s.img}" alt="${s.title}">
                         </div>
                         <div class="card-body">
                             <h3 class="card-title">${s.title}</h3>
@@ -961,6 +979,10 @@ function renderHome() {
             </div>
         </section>
     `;
+}
+
+function renderHome() {
+    return renderHomeHero() + renderHomeLifeStages() + renderHomeBelowFold();
 }
 
 
@@ -2293,13 +2315,25 @@ function initStickyObserver(targetId, actionText, actionFnStr) {
 }
 
 function renderConfirmation() {
-    setTimeout(() => {
+    const launchConfetti = () => {
         if (typeof confetti === 'function') {
             confetti({
                 particleCount: 150,
                 spread: 70,
                 origin: { y: 0.6 }
             });
+        }
+    };
+    setTimeout(() => {
+        if (typeof confetti === 'function') {
+            launchConfetti();
+        } else if (!document.querySelector('script[data-confetti]')) {
+            const s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js';
+            s.async = true;
+            s.setAttribute('data-confetti', '1');
+            s.onload = launchConfetti;
+            document.head.appendChild(s);
         }
     }, 100);
 
@@ -2617,9 +2651,20 @@ function renderCookies() {
 // Cookie Consent Banner Code
 function initCookieConsent() {
     const consent = localStorage.getItem('cookie_consent');
-    if (!consent) {
-        setTimeout(showCookieBanner, 1500);
-    }
+    if (consent) return;
+    let shown = false;
+    const trigger = () => {
+        if (shown) return;
+        shown = true;
+        ['scroll', 'pointerdown', 'keydown', 'touchstart'].forEach(ev =>
+            window.removeEventListener(ev, trigger)
+        );
+        showCookieBanner();
+    };
+    ['scroll', 'pointerdown', 'keydown', 'touchstart'].forEach(ev =>
+        window.addEventListener(ev, trigger, { once: true, passive: true })
+    );
+    setTimeout(trigger, 8000);
 }
 
 function showCookieBanner() {
@@ -2795,10 +2840,20 @@ function router(preserveScroll = false) {
         ? 'noindex, nofollow'
         : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
 
-    main.innerHTML = content;
-    feather.replace(); // Re-initialize icons
+    const existingStaticHero = (routeKey === '#') ? document.getElementById('static-hero') : null;
+    if (existingStaticHero && main.contains(existingStaticHero)) {
+        if (!document.getElementById('home-below-fold')) {
+            const anchor = document.getElementById('static-life-stages') || existingStaticHero;
+            anchor.insertAdjacentHTML('afterend', `<div id="home-below-fold">${renderHomeBelowFold()}</div>`);
+            const belowFold = document.getElementById('home-below-fold');
+            if (belowFold) feather.replace(belowFold);
+        }
+    } else {
+        main.innerHTML = content;
+        feather.replace(main); // Re-initialize icons
+    }
     if (typeof window.ppeAfterRender === 'function') {
-        try { window.ppeAfterRender(hash.split('?')[0]); } catch (e) { console.error(e); }
+        try { window.ppeAfterRender(routeKey); } catch (e) { console.error(e); }
     }
 
     // Reset Sticky Mobile Actions
@@ -2806,12 +2861,14 @@ function router(preserveScroll = false) {
     if (stickyContainer) stickyContainer.classList.remove('visible');
 
     // Initialize Sticky Observers based on page
-    if (hash === '#cart') {
+    if (routeKey === '#cart') {
         setTimeout(() => initStickyObserver('cart-checkout-btn', 'Proceed to Checkout', "goToCheckout(event)"), 200);
-    } else if (hash === '#checkout') {
+    } else if (routeKey === '#checkout') {
         setTimeout(() => initStickyObserver('checkout-submit-btn', 'Submit Rental Request', "document.getElementById('checkout-submit-btn').click()"), 200);
         if (typeof window.loadGoogleMaps === 'function') window.loadGoogleMaps();
         setTimeout(window.initAutocomplete, 250);
+    } else if (routeKey === '#contact') {
+        if (typeof window.loadGoogleMaps === 'function') window.loadGoogleMaps();
     }
 
 
@@ -3413,7 +3470,7 @@ window.handleTrackOrder = async function() {
                                     </div>
                                 </div>
                                 <div style="background: #ffffff; padding: 8px; border-radius: 10px; border: 1px solid #cbd5e1; text-align: center;">
-                                    <img src="data:image/png;base64,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" onerror="this.onerror=null; this.src='/square-qr-code.png';" alt="Scan Official Square QR Code to Pay" style="width: 130px; height: 130px; display: block; border-radius: 6px;" />
+                                    <img src="/square-qr-code.png" loading="lazy" decoding="async" width="130" height="130" alt="Scan Official Square QR Code to Pay" style="width: 130px; height: 130px; display: block; border-radius: 6px;" />
                                     <span style="font-size: 0.72rem; color: #64748b; margin-top: 4px; display: block; font-weight: 600;">📲 Scan QR with Phone</span>
                                 </div>
                             </div>
