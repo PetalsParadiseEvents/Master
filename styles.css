@@ -2884,6 +2884,26 @@ main > .acct-banner-wrap + .container,
 main > .acct-banner-wrap + section:not(.hero),
 main > .acct-banner-wrap + div > .container:first-child { padding-top: 1.25rem; }
 
+@media (min-width: 769px) {
+  main > .acct-banner-wrap.container:first-child {
+    max-width: 100%;
+    padding: 112px 0 0;
+  }
+  .acct-rewards-banner {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    padding: 0.55rem 1.5rem;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  .acct-rewards-cta { margin-left: 0.25rem; }
+}
+@media (min-width: 769px) and (max-width: 992px) {
+  main > .acct-banner-wrap.container:first-child { padding-top: 108px; }
+}
+
 @media (max-width: 768px) {
   main > .acct-banner-wrap.container:first-child { padding: calc(100px + 0.75rem) 0.9rem 0; }
   .acct-rewards-banner {
