@@ -163,7 +163,7 @@ function buildPage(page) {
 
   const cards = items.map(it => `
         <article class="product-card">
-          <img src="${relImg(it.img)}" alt="${esc(it.title)} rental - Petals Paradise Events" loading="lazy" width="400" height="220" />
+          <img src="${relImg(it.img)}" alt="${esc(it.title)} rental - Petals Paradise Events" loading="lazy" decoding="async" width="400" height="220" />
           <div class="product-body">
             <h3>${esc(it.title)}</h3>
             <p>${esc(it.desc)}</p>
@@ -201,8 +201,10 @@ function buildPage(page) {
   <script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../styles.css" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Outfit:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Outfit:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" /></noscript>
+  <link rel="stylesheet" href="../styles.css?v=1.8.1" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="../styles.css?v=1.8.1" /></noscript>
   ${styleBlock}
   ${extraCss}
 </head>
@@ -254,11 +256,17 @@ function buildPage(page) {
   <section>
     <div class="section-inner">
       <div class="section-label">Explore More</div>
-      <h2 class="section-title">Other Rental Categories</h2>
+      <h2 class="section-title">Other Rental Categories &amp; Service Areas</h2>
       <div class="internal-links-grid">
         ${otherCats}
         <a class="int-link" href="../locations/ashburn-va.html"><span class="int-arrow">→</span><span>Rentals in Ashburn, VA</span></a>
         <a class="int-link" href="../locations/aldie-va.html"><span class="int-arrow">→</span><span>Rentals in Aldie, VA</span></a>
+        <a class="int-link" href="../locations/south-riding-va.html"><span class="int-arrow">→</span><span>Rentals in South Riding, VA</span></a>
+        <a class="int-link" href="../locations/chantilly-va.html"><span class="int-arrow">→</span><span>Rentals in Chantilly, VA</span></a>
+        <a class="int-link" href="../locations/leesburg-va.html"><span class="int-arrow">→</span><span>Rentals in Leesburg, VA</span></a>
+        <a class="int-link" href="../locations/sterling-va.html"><span class="int-arrow">→</span><span>Rentals in Sterling, VA</span></a>
+        <a class="int-link" href="../locations/fairfax-va.html"><span class="int-arrow">→</span><span>Rentals in Fairfax, VA</span></a>
+        <a class="int-link" href="../locations/"><span class="int-arrow">→</span><span>All Northern VA Service Areas</span></a>
       </div>
     </div>
   </section>

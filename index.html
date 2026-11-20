@@ -45,10 +45,10 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": ["LocalBusiness", "EventVenue"],
+      "@type": "LocalBusiness",
       "name": "Petals Paradise Events",
       "alternateName": "Petals Paradise Events DMV",
-      "description": "Premium party rentals and exquisite event decor in Ashburn, Aldie, Loudoun County and the DMV area. We specialize in chairs, tables, tents, traditional backdrops, and more.",
+      "description": "Premium chair rentals, table rentals, party tents, backdrops, and custom event decor in Ashburn, Aldie, Loudoun County and Northern Virginia (DMV).",
       "image": "https://petalsparadiseevents.com/wp-content/uploads/2026/04/image.png",
       "@id": "https://petalsparadiseevents.com/",
       "url": "https://petalsparadiseevents.com/",
@@ -73,11 +73,14 @@
         "closes": "21:00"
       },
       "areaServed": [
-        {"@type": "City", "name": "Aldie"},
         {"@type": "City", "name": "Ashburn"},
-        {"@type": "City", "name": "Sterling"},
-        {"@type": "City", "name": "Leesburg"},
+        {"@type": "City", "name": "Aldie"},
+        {"@type": "City", "name": "South Riding"},
         {"@type": "City", "name": "Chantilly"},
+        {"@type": "City", "name": "Leesburg"},
+        {"@type": "City", "name": "Sterling"},
+        {"@type": "City", "name": "Herndon"},
+        {"@type": "City", "name": "Reston"},
         {"@type": "City", "name": "Fairfax"},
         {"@type": "City", "name": "Great Falls"},
         {"@type": "AdministrativeArea", "name": "Loudoun County"},
@@ -87,7 +90,7 @@
       ],
       "priceRange": "$$",
       "currenciesAccepted": "USD",
-      "paymentAccepted": "Cash, Check, Venmo, Zelle",
+      "paymentAccepted": "Cash, Check, Venmo, Zelle, Credit Card",
       "aggregateRating": {
         "@type": "AggregateRating",
         "ratingValue": "5",
@@ -103,10 +106,12 @@
         "@type": "OfferCatalog",
         "name": "Party Rental Inventory",
         "itemListElement": [
-          {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Gold Folding Chair Rental"}, "price": "2.00", "priceCurrency": "USD"},
-          {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Round Fold-In-Half Table Rental"}, "price": "12.00", "priceCurrency": "USD"},
-          {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Wedding Tent 16x26 Rental"}, "price": "150.00", "priceCurrency": "USD"},
-          {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Buffet Food Warmers Rental"}, "price": "10.00", "priceCurrency": "USD"}
+          {"@type": "Offer", "url": "https://petalsparadiseevents.com/rentals/chair-table-rentals.html", "itemOffered": {"@type": "Product", "name": "Adult Folding Chair Rental"}, "price": "2.00", "priceCurrency": "USD"},
+          {"@type": "Offer", "url": "https://petalsparadiseevents.com/rentals/chair-table-rentals.html", "itemOffered": {"@type": "Product", "name": "Round Fold-In-Half Table Rental"}, "price": "12.00", "priceCurrency": "USD"},
+          {"@type": "Offer", "url": "https://petalsparadiseevents.com/rentals/tent-rentals.html", "itemOffered": {"@type": "Product", "name": "Wedding Tent 16x26 Rental"}, "price": "150.00", "priceCurrency": "USD"},
+          {"@type": "Offer", "url": "https://petalsparadiseevents.com/rentals/backdrop-rentals.html", "itemOffered": {"@type": "Product", "name": "Event & Baby Shower Backdrop Rental"}, "price": "150.00", "priceCurrency": "USD"},
+          {"@type": "Offer", "url": "https://petalsparadiseevents.com/rentals/marquee-letters-neon-signs.html", "itemOffered": {"@type": "Product", "name": "4FT Marquee Numbers & GRAD Letters"}, "price": "20.00", "priceCurrency": "USD"},
+          {"@type": "Offer", "url": "https://petalsparadiseevents.com/rentals/haldi-mehandi-indian-decor-rentals.html", "itemOffered": {"@type": "Product", "name": "Haldi Urli & Traditional Indian Decor Rental"}, "price": "125.00", "priceCurrency": "USD"}
         ]
       }
     }
@@ -119,7 +124,7 @@
       "@type": "WebSite",
       "name": "Petals Paradise Events",
       "url": "https://petalsparadiseevents.com/",
-      "description": "Premium party rentals and event decor in Ashburn, Aldie, Loudoun County and the DMV area.",
+      "description": "Chair rentals, table rentals, party tents, and custom event decor in Ashburn, Aldie, Loudoun County and Northern Virginia.",
       "potentialAction": {
         "@type": "SearchAction",
         "target": "https://petalsparadiseevents.com/#rentals?q={search_term_string}",
@@ -135,11 +140,10 @@
       "@type": "BreadcrumbList",
       "itemListElement": [
         {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://petalsparadiseevents.com/"},
-        {"@type": "ListItem", "position": 2, "name": "Rentals", "item": "https://petalsparadiseevents.com/#rentals"},
-        {"@type": "ListItem", "position": 3, "name": "Graduation Decor", "item": "https://petalsparadiseevents.com/#graduation"},
-        {"@type": "ListItem", "position": 4, "name": "Services", "item": "https://petalsparadiseevents.com/#services"},
-        {"@type": "ListItem", "position": 5, "name": "Gallery", "item": "https://petalsparadiseevents.com/#gallery"},
-        {"@type": "ListItem", "position": 6, "name": "Contact Us", "item": "https://petalsparadiseevents.com/#contact"}
+        {"@type": "ListItem", "position": 2, "name": "Chair & Table Rentals", "item": "https://petalsparadiseevents.com/rentals/chair-table-rentals.html"},
+        {"@type": "ListItem", "position": 3, "name": "Tent Rentals", "item": "https://petalsparadiseevents.com/rentals/tent-rentals.html"},
+        {"@type": "ListItem", "position": 4, "name": "Service Areas", "item": "https://petalsparadiseevents.com/locations/"},
+        {"@type": "ListItem", "position": 5, "name": "Contact Us", "item": "https://petalsparadiseevents.com/contact/"}
       ]
     }
     </script>
@@ -312,7 +316,7 @@
     <!-- Full stylesheet loads non-blocking (print trick) -->
     <link rel="stylesheet" href="styles.css?v=1.8.1" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="styles.css?v=1.8.1"></noscript>
-    <link rel="modulepreload" href="app.js?v=2.3.0">
+    <link rel="modulepreload" href="app.js?v=2.3.1">
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -378,9 +382,9 @@
             <section class="hero" id="static-hero" aria-label="Hero section">
                 <img class="hero-bg-img no-zoom" src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=828&q=52&fm=webp" srcset="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=480&q=50&fm=webp 480w, https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=828&q=52&fm=webp 828w, https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1280&q=60&fm=webp 1280w" sizes="100vw" alt="" width="828" height="552" fetchpriority="high" decoding="async" aria-hidden="true" onerror="this.style.display='none'">
                 <div class="hero-content">
-                    <div class="hero-eyebrow">🌸 Serving Loudoun County &amp; the DMV Since 2025</div>
+                    <div class="hero-eyebrow">🌸 Chair, Table, Tent &amp; Event Decor Rentals — Ashburn, Aldie &amp; DMV</div>
                     <h1>Your Celebration Partner,<br>For Every Chapter of Life</h1>
-                    <p>From your baby's first birthday to your dream wedding — Petals Paradise Events is with you at every milestone. One team. One call. Every celebration.</p>
+                    <p>Party chair &amp; table rentals, wedding tents, custom backdrops &amp; full event decor in Ashburn, Aldie, Loudoun County &amp; Northern Virginia — one team, every celebration.</p>
                     <div class="hero-btns">
                         <a href="#rentals" class="btn btn-primary">Explore Rentals</a>
                         <a href="#contact" class="btn btn-outline">✨ Plan My Event</a>
@@ -542,7 +546,7 @@
         </main>
 
         <!-- Footer -->
-        <footer id="footer" role="contentinfo"><nav aria-label="Company"><a href="/about/">About Us</a> | <a href="/contact/">Contact</a> | <a href="/terms/">Terms of Service</a> | <a href="/#privacy">Privacy Policy</a></nav><form id="agent-quote-form" action="/contact/" method="get" toolname="request_event_quote" tooldescription="Send Petals Paradise Events a party rental or event decor quote request with name, email, event date and details."><label>Name <input name="name" required toolparamdescription="Customer full name"></label> <label>Email <input type="email" name="email" required toolparamdescription="Customer email"></label> <label>Event date <input type="date" name="event_date" toolparamdescription="Event date YYYY-MM-DD"></label> <label>Details <input name="message" toolparamdescription="Event type, guest count and items needed"></label> <button type="submit">Request quote</button></form></footer>
+        <footer id="footer" role="contentinfo"><nav aria-label="Rental Categories"><a href="/rentals/chair-table-rentals.html">Chair &amp; Table Rentals</a> | <a href="/rentals/tent-rentals.html">Tent Rentals</a> | <a href="/rentals/backdrop-rentals.html">Backdrop Rentals</a> | <a href="/rentals/marquee-letters-neon-signs.html">Marquee Letters &amp; Neon Signs</a> | <a href="/rentals/haldi-mehandi-indian-decor-rentals.html">Haldi &amp; Mehandi Decor</a></nav><nav aria-label="Service Areas"><a href="/locations/">All Northern VA Service Areas</a> | <a href="/locations/ashburn-va.html">Ashburn, VA</a> | <a href="/locations/aldie-va.html">Aldie, VA</a> | <a href="/locations/south-riding-va.html">South Riding, VA</a> | <a href="/locations/chantilly-va.html">Chantilly, VA</a> | <a href="/locations/leesburg-va.html">Leesburg, VA</a> | <a href="/locations/sterling-va.html">Sterling, VA</a> | <a href="/locations/herndon-va.html">Herndon, VA</a> | <a href="/locations/reston-va.html">Reston, VA</a> | <a href="/locations/fairfax-va.html">Fairfax, VA</a> | <a href="/locations/great-falls-va.html">Great Falls, VA</a> | <a href="/locations/loudoun-county-va.html">Loudoun County, VA</a></nav><nav aria-label="Company"><a href="/about/">About Us</a> | <a href="/contact/">Contact</a> | <a href="/terms/">Terms of Service</a> | <a href="/#privacy">Privacy Policy</a></nav><form id="agent-quote-form" action="/contact/" method="get" toolname="request_event_quote" tooldescription="Send Petals Paradise Events a party rental or event decor quote request with name, email, event date and details."><label>Name <input name="name" required toolparamdescription="Customer full name"></label> <label>Email <input type="email" name="email" required toolparamdescription="Customer email"></label> <label>Event date <input type="date" name="event_date" toolparamdescription="Event date YYYY-MM-DD"></label> <label>Details <input name="message" toolparamdescription="Event type, guest count and items needed"></label> <button type="submit">Request quote</button></form></footer>
 
         <!-- Image Modal -->
         <div id="image-modal" class="image-modal" role="dialog" aria-modal="true" aria-label="Image viewer" aria-hidden="true">
@@ -606,7 +610,7 @@
     <div id="sticky-action-container" class="sticky-mobile-action" aria-live="polite"></div>
 
     <script src="account.js?v=1.7.0" defer></script>
-    <script src="app.js?v=2.3.0" type="module"></script>
+    <script src="app.js?v=2.3.1" type="module"></script>
     <!-- Google Maps: loaded strictly on demand when user visits #contact or #checkout -->
     <script>
     (function(){

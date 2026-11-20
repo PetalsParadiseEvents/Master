@@ -710,25 +710,32 @@ function renderFooter() {
             </div>
             <div class="footer-col">
                 <h3>Service Areas</h3>
-                <a href="./locations/">All Service Areas</a>
-                <a href="./locations/aldie-va.html">Aldie, VA</a>
-                <a href="./locations/ashburn-va.html">Ashburn, VA</a>
-                <a href="./locations/leesburg-va.html">Leesburg, VA</a>
-                <a href="./locations/loudoun-county-va.html">Loudoun County, VA</a>
+                <a href="/locations/">All Service Areas</a>
+                <a href="/locations/ashburn-va.html">Ashburn, VA</a>
+                <a href="/locations/aldie-va.html">Aldie, VA</a>
+                <a href="/locations/south-riding-va.html">South Riding, VA</a>
+                <a href="/locations/chantilly-va.html">Chantilly, VA</a>
+                <a href="/locations/leesburg-va.html">Leesburg, VA</a>
+                <a href="/locations/sterling-va.html">Sterling, VA</a>
+                <a href="/locations/herndon-va.html">Herndon, VA</a>
+                <a href="/locations/reston-va.html">Reston, VA</a>
+                <a href="/locations/fairfax-va.html">Fairfax, VA</a>
+                <a href="/locations/great-falls-va.html">Great Falls, VA</a>
+                <a href="/locations/loudoun-county-va.html">Loudoun County, VA</a>
             </div>
             <div class="footer-col">
                 <h3>Rental Categories</h3>
-                <a href="./rentals/chair-table-rentals.html">Chair &amp; Table Rentals</a>
-                <a href="./rentals/tent-rentals.html">Tent Rentals</a>
-                <a href="./rentals/backdrop-rentals.html">Backdrops &amp; Photo Props</a>
-                <a href="./rentals/marquee-letters-neon-signs.html">Marquee Letters &amp; Neon</a>
-                <a href="./rentals/haldi-mehandi-indian-decor-rentals.html">Haldi &amp; Mehandi Decor</a>
+                <a href="/rentals/chair-table-rentals.html">Chair &amp; Table Rentals</a>
+                <a href="/rentals/tent-rentals.html">Tent Rentals</a>
+                <a href="/rentals/backdrop-rentals.html">Backdrops &amp; Photo Props</a>
+                <a href="/rentals/marquee-letters-neon-signs.html">Marquee Letters &amp; Neon</a>
+                <a href="/rentals/haldi-mehandi-indian-decor-rentals.html">Haldi &amp; Mehandi Decor</a>
             </div>
             <div class="footer-col">
                 <h3>Contact Us</h3>
                 <p style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;"><i data-feather="phone" style="width: 20px; height: 20px; flex-shrink: 0; color: var(--primary-color);"></i> <a href="tel:+18484486993" class="phone-link" style="color: inherit; text-decoration: none; line-height: 1;">+1 848-448-6993</a></p>
                 <p style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;"><i data-feather="mail" style="width: 20px; height: 20px; flex-shrink: 0; color: var(--primary-color);"></i> <a href="mailto:contact@petalsparadiseevents.com" style="color: inherit; text-decoration: none; word-break: break-word; line-height: 1;">contact@petalsparadiseevents.com</a></p>
-                <p style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;"><i data-feather="map-pin" style="width: 20px; height: 20px; flex-shrink: 0; color: var(--primary-color);"></i> <span style="line-height: 1;"><a href="./locations/" style="color: inherit; text-decoration: none; margin: 0; display: inline;">Serving Ashburn, Aldie & DMV Area</a></span></p>
+                <p style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;"><i data-feather="map-pin" style="width: 20px; height: 20px; flex-shrink: 0; color: var(--primary-color);"></i> <span style="line-height: 1;"><a href="/locations/" style="color: inherit; text-decoration: none; margin: 0; display: inline;">Serving Ashburn, Aldie & DMV Area</a></span></p>
             </div>
         </div>
         <div class="footer-bottom" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1.5rem;">
@@ -756,9 +763,9 @@ function renderHomeHero() {
         <section class="hero" id="static-hero" aria-label="Hero section">
             <img class="hero-bg-img no-zoom" src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=828&q=52&fm=webp" srcset="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=480&q=50&fm=webp 480w, https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=828&q=52&fm=webp 828w, https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1280&q=60&fm=webp 1280w" sizes="100vw" alt="" width="828" height="552" fetchpriority="high" decoding="async" aria-hidden="true" onerror="this.style.display='none'">
             <div class="hero-content">
-                <div class="hero-eyebrow">🌸 Serving Loudoun County &amp; the DMV Since 2025</div>
+                <div class="hero-eyebrow">🌸 Chair, Table, Tent &amp; Event Decor Rentals — Ashburn, Aldie &amp; DMV</div>
                 <h1>Your Celebration Partner,<br>For Every Chapter of Life</h1>
-                <p>From your baby's first birthday to your dream wedding — Petals Paradise Events is with you at every milestone. One team. One call. Every celebration.</p>
+                <p>Party chair &amp; table rentals, wedding tents, custom backdrops &amp; full event decor in Ashburn, Aldie, Loudoun County &amp; Northern Virginia — one team, every celebration.</p>
                 <div class="hero-btns">
                     <a href="#rentals" class="btn btn-primary">Explore Rentals</a>
                     <a href="#contact" class="btn btn-outline">✨ Plan My Event</a>
