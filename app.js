@@ -1548,6 +1548,13 @@ function renderContact() {
             })
         }).catch(err => console.error("Lead logging error:", err));
 
+        // Fire Google Ads Contact conversion event
+        if (typeof window.gtag === 'function') {
+            window.gtag('event', 'conversion', {
+                'send_to': 'AW-17018381858/nEyDCLaS_8waEKLM_7I_'
+            });
+        }
+
         const subject = encodeURIComponent(`New Event Inquiry: ${eventType || 'General'} - ${name}`);
         const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nEvent Type: ${eventType}\nService Level: ${serviceTier}\nEvent Date: ${eventDate}\nGuest Count: ${guestCount}\nBudget: ${budget}\n\nVision & Details:\n${msg}`);
         
