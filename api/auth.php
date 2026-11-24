@@ -10,6 +10,9 @@
 require_once __DIR__ . '/loyalty.php';
 
 header('Content-Type: application/json');
+header('Cache-Control: no-store, no-cache, must-revalidate, private');
+header('Pragma: no-cache');
+header('Expires: 0');
 header('Access-Control-Allow-Origin: https://petalsparadiseevents.com');
 header('Access-Control-Allow-Credentials: true');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');

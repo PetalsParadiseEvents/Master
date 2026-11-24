@@ -21,8 +21,8 @@
 
     async function api(action, body) {
         const opts = body
-            ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ action, ...body }) }
-            : { credentials: 'same-origin' };
+            ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', cache: 'no-store', body: JSON.stringify({ action, ...body }) }
+            : { credentials: 'same-origin', cache: 'no-store' };
         const res = await fetch(body ? API : `${API}?action=${action}`, opts);
         let json = {};
         try { json = await res.json(); } catch (e) { json = { error: 'Unexpected server response.' }; }
@@ -42,10 +42,21 @@
         updateNav();
     }
 
+    let refreshPromise = null;
+    let lastRefresh = 0;
+
     async function refresh() {
-        try { setSession(await api('me')); } catch (e) { state.loaded = true; updateNav(); }
-        const r = currentRoute();
-        if (['#profile', '#checkout', '#cart', '#signin', '#signup'].includes(r) && window.ppeCart) window.ppeCart.rerender();
+        if (refreshPromise) return refreshPromise;
+        refreshPromise = (async () => {
+            try { setSession(await api('me')); } catch (e) { state.loaded = true; updateNav(); }
+            finally {
+                lastRefresh = Date.now();
+                refreshPromise = null;
+            }
+            const r = currentRoute();
+            if (['#profile', '#checkout', '#cart', '#signin', '#signup', '#rewards'].includes(r) && window.ppeCart) window.ppeCart.rerender();
+        })();
+        return refreshPromise;
     }
 
     function balance() { return state.data?.points?.balance || 0; }
@@ -573,15 +584,21 @@
 
     window.ppeAccount = { refresh, state };
 
-    // Initial session check: immediate on account/cart/checkout routes, deferred until load on public pages
-    document.addEventListener('DOMContentLoaded', () => {
-        const r = currentRoute();
-        if (['#profile', '#checkout', '#cart', '#signin', '#signup', '#rewards', '#reset', '#forgot'].includes(r)) {
+    // Initial session check: run as soon as DOM is ready (never wait for window.load,
+    // which can stall on slow mobile connections or third-party scripts)
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', refresh, { once: true });
+    } else {
+        refresh();
+    }
+
+    // Re-sync session when returning to a mobile tab (bfcache restore or tab resume)
+    window.addEventListener('pageshow', (e) => {
+        if (e.persisted) refresh();
+    });
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && (!state.loaded || Date.now() - lastRefresh > 5000)) {
             refresh();
-        } else if (document.readyState === 'complete') {
-            refresh();
-        } else {
-            window.addEventListener('load', () => setTimeout(refresh, 0), { once: true });
         }
     });
 })();
