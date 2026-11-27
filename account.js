@@ -90,12 +90,12 @@
     const howItWorks = () => `
         <div class="acct-steps">
             <div class="acct-step"><div class="acct-step-num">1</div><h4>Create a free account</h4><p>Sign up with the email you use for orders. Completed orders from the last 12 months are added automatically.</p></div>
-            <div class="acct-step"><div class="acct-step-num">2</div><h4>Earn 5 pts per $1</h4><p>Points are added once your order is <strong>Returned</strong> (pickup) or <strong>Completed</strong> (delivery).</p></div>
+            <div class="acct-step"><div class="acct-step-num">2</div><h4>Earn 5 pts per $1</h4><p>Points are added automatically once your order is <strong>Completed</strong>.</p></div>
             <div class="acct-step"><div class="acct-step-num">3</div><h4>Redeem 500 pts = $5</h4><p>Use points at checkout in steps of 500 (up to 50% of your order). Points never expire.</p></div>
         </div>`;
 
     const faq = [
-        ['How do I earn points?', 'You earn 5 points for every $1 spent on rentals and decor (after any promo code). Delivery and setup fees do not earn points, and using reward points never reduces the points you earn — a $100 order with $5 in rewards still earns 500 points. Points are added when a pickup order is marked Returned or a delivery order is marked Completed.'],
+        ['How do I earn points?', 'You earn 5 points for every $1 spent on rentals and decor (after any promo code). Delivery and setup fees do not earn points, and using reward points never reduces the points you earn — a $100 order with $5 in rewards still earns 500 points. Points are added automatically as soon as your order is marked Completed.'],
         ['How do I redeem points?', 'Once you have at least 500 points, sign in and choose how many points to use in the checkout summary. Every 500 points = $5 off, and points can cover up to 50% of your order.'],
         ['Do my past orders count?', 'Yes! When you create an account with the same email you used for past orders, completed orders from the last 12 months are credited automatically.'],
         ['Do points expire?', 'No, your points do not expire.'],
@@ -393,7 +393,7 @@
                                         <div class="acct-row-sub">${esc(h.note || h.order_id || '')}</div></div>
                                     <div class="acct-pts ${Number(h.points) >= 0 ? 'plus' : 'minus'}">${Number(h.points) >= 0 ? '+' : ''}${fmt(h.points)}</div>
                                 </div>`).join('')}</div>`
-                                : `<p class="acct-empty">Points appear here once an order is Returned (pickup) or Completed (delivery).</p>`}
+                                : `<p class="acct-empty">Points appear here automatically once an order is Completed.</p>`}
                         </section>
                     </div>
 

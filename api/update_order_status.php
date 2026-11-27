@@ -73,15 +73,26 @@ if (file_exists($ordersFile)) {
     }
 }
 
-// 3b. Loyalty points: credit on Returned (pickup) / Completed (delivery); refund redeemed points on Cancelled
+// 3b. Loyalty points: credit on Completed (any order) / Returned (pickup); refund redeemed points on Cancelled
 $pointsResult = null;
 $pointsRefunded = 0;
+$pointsNote = '';
 if ($dbUpdated && $orderRecord) {
     try {
         if (orderEarnsAtStatus($orderRecord['fulfillment_method'] ?? '', $newStatus)) {
             $pointsResult = creditOrderPoints($orderId);
+            if ($pointsResult) {
+                $pointsNote = "⭐ +" . number_format($pointsResult['earned']) . " points credited to customer";
+            } elseif ((int)($orderRecord['points_earned'] ?? 0) > 0) {
+                $pointsNote = "⭐ Points were already credited for this order";
+            } elseif (pointsForTotal(pointsEligibleAmount($orderRecord)) <= 0) {
+                $pointsNote = "ℹ️ No points: rental amount on this order is \$0";
+            } else {
+                $pointsNote = "ℹ️ No points: no customer account with this order's email (they'll get them automatically if they sign up within " . (int)BACKFILL_MONTHS . " months)";
+            }
         } elseif ($newStatus === 'Cancelled') {
             $pointsRefunded = refundRedeemedPoints($orderId);
+            if ($pointsRefunded > 0) $pointsNote = "↩ " . number_format($pointsRefunded) . " redeemed points refunded";
         }
     } catch (Exception $e) {
         // Never block a status update because of loyalty errors
@@ -208,5 +219,8 @@ echo json_encode([
     'success' => true,
     'order_id' => $orderId,
     'status' => $newStatus,
-    'email_sent' => $emailSent
+    'email_sent' => $emailSent,
+    'points_earned' => $pointsResult ? $pointsResult['earned'] : 0,
+    'points_refunded' => $pointsRefunded,
+    'points_note' => $pointsNote
 ]);

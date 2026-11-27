@@ -1441,7 +1441,8 @@ if ($format === 'json') {
                 if (data.success) {
                     if (msgDiv) {
                         msgDiv.style.color = '#10b981';
-                        msgDiv.innerText = data.email_sent ? '✅ Status Updated & Email Sent!' : '✅ Status Updated!';
+                        msgDiv.innerText = (data.email_sent ? '✅ Status Updated & Email Sent!' : '✅ Status Updated!')
+                            + (data.points_note ? '\n' + data.points_note : '');
                     }
                     
                     if (badge) {
@@ -1464,7 +1465,7 @@ if ($format === 'json') {
 
                     // Reload page after short delay if status changed to or from Completed so tab arrays refresh!
                     if (newStatus === 'Completed') {
-                        setTimeout(() => { window.location.reload(); }, 1200);
+                        setTimeout(() => { window.location.reload(); }, data.points_note ? 4000 : 1200);
                     } else {
                         setTimeout(() => { if (msgDiv) msgDiv.style.display = 'none'; }, 3500);
                     }

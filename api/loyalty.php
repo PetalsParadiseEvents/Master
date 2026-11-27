@@ -10,7 +10,8 @@
  *   - 100 points = $1 off  (500 points = $5)
  *   - Minimum 500 points to redeem, in steps of 500
  *   - Points can cover at most 50% of the order subtotal
- *   - Credited when: Pickup order -> "Returned", Delivery order -> "Completed"
+ *   - Credited automatically when an order is marked "Completed" (pickup orders also at "Returned");
+ *     missed orders are self-healed when the customer signs in / opens their profile
  *   - Redeemed points are refunded if the order is "Cancelled"
  */
 
@@ -174,10 +175,49 @@ function validateRedemption(int $requested, int $balance, float $subtotal): arra
     return [$requested, $dollars];
 }
 
-/** Is this order eligible to earn points given its status + fulfillment? */
+/**
+ * Is this order eligible to earn points given its status + fulfillment?
+ * "Completed" always earns (any fulfillment). Pickup orders can also earn earlier at "Returned".
+ * Crediting is idempotent (unique order_id+type in the ledger), so hitting both never double-credits.
+ */
 function orderEarnsAtStatus(string $fulfillment, string $status): bool {
+    if ($status === 'Completed') return true;
     $isDelivery = stripos($fulfillment, 'deliver') !== false;
-    return $isDelivery ? $status === 'Completed' : $status === 'Returned';
+    return !$isDelivery && $status === 'Returned';
+}
+
+/**
+ * Self-heal: credit any eligible orders for this customer that were missed
+ * (e.g. pickup orders marked "Completed" before that status earned points, or
+ * orders placed as a guest with the account's email). Idempotent. Returns points credited.
+ */
+function creditMissedPoints(int $customerId): int {
+    $pdo = loyaltyDb();
+    if (!$pdo || $customerId <= 0) return 0;
+    try {
+        $e = $pdo->prepare("SELECT `email` FROM `customers` WHERE `id` = ?");
+        $e->execute([$customerId]);
+        $email = (string)($e->fetchColumn() ?: '');
+        if ($email !== '') {
+            $pdo->prepare("UPDATE `orders` SET `customer_id` = ? WHERE LOWER(`email`) = LOWER(?) AND (`customer_id` IS NULL OR `customer_id` = 0)
+                           AND `date_added` >= DATE_SUB(NOW(), INTERVAL " . (int)BACKFILL_MONTHS . " MONTH)")
+                ->execute([$customerId, $email]);
+        }
+        $st = $pdo->prepare("SELECT `id`,`fulfillment_method`,`status` FROM `orders`
+                             WHERE `customer_id` = ? AND `status` IN ('Completed','Returned')
+                             AND (`points_earned` IS NULL OR `points_earned` = 0)");
+        $st->execute([$customerId]);
+        $total = 0;
+        foreach ($st->fetchAll() as $o) {
+            if (orderEarnsAtStatus($o['fulfillment_method'] ?? '', $o['status'] ?? '')) {
+                $r = creditOrderPoints($o['id']);
+                if ($r) $total += $r['earned'];
+            }
+        }
+        return $total;
+    } catch (Exception $ex) {
+        return 0;
+    }
 }
 
 /**

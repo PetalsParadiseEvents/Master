@@ -34,6 +34,9 @@ $input  = json_decode(file_get_contents('php://input'), true) ?: [];
 $action = $_GET['action'] ?? ($input['action'] ?? '');
 
 function profilePayload(PDO $pdo, int $cid): array {
+    // Self-heal: credit any completed orders whose points were missed
+    try { creditMissedPoints($cid); } catch (Exception $e) {}
+
     $st = $pdo->prepare("SELECT * FROM `customers` WHERE `id` = ?");
     $st->execute([$cid]);
     $c = $st->fetch();
