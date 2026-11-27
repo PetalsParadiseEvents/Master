@@ -1059,10 +1059,8 @@ window.selectRentalsCategory = (category, element) => {
         }
     });
 
-    // Smooth scroll the selected pill to center on mobile
-    if (element && typeof element.scrollIntoView === 'function') {
-        element.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-    }
+    // Smooth scroll the selected pill to center horizontally without scrolling the page vertically
+    centerCategoryPill(element);
 
     if (window.location.hash !== '#rentals') {
         window.location.hash = '#rentals';
@@ -1070,6 +1068,14 @@ window.selectRentalsCategory = (category, element) => {
         if (window.refreshRentalsUI) window.refreshRentalsUI();
     }
 };
+
+function centerCategoryPill(pill) {
+    if (!pill) return;
+    const bar = pill.closest('.category-filter-bar');
+    if (!bar || typeof bar.scrollTo !== 'function') return;
+    const targetLeft = pill.offsetLeft - (bar.clientWidth / 2) + (pill.offsetWidth / 2);
+    bar.scrollTo({ left: Math.max(0, targetLeft), behavior: 'smooth' });
+}
 
 function renderRentals() {
     window.handleAddToCart = (id) => {
@@ -1133,11 +1139,9 @@ function renderRentals() {
             }
         });
 
-        // Smooth scroll the active category pill into center on load
+        // Smooth scroll the active category pill into center horizontally without scrolling the page vertically
         const activePill = document.querySelector('.category-pill.active');
-        if (activePill && typeof activePill.scrollIntoView === 'function') {
-            activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-        }
+        centerCategoryPill(activePill);
 
         // Hide swipe prompt dynamically upon scroll interaction
         const bar = document.querySelector('.category-filter-bar');
@@ -1481,7 +1485,7 @@ function renderVideos() {
                             <p style="font-size: 1.05rem; color: var(--text-primary); line-height: 1.7; font-style: italic;">"From stunning floral backdrops to staircase drapes &#8212; we bring your Haldi &amp; Maiyan vision to life with elegance and tradition."</p>
                             <p style="color: var(--primary-color); font-weight: 600; margin-top: 0.8rem;">&#8212; Petals Paradise Events</p>
                         </div>
-                        <a href="#rentals" onclick="navigate('#rentals')" class="btn btn-primary" style="text-align: center;">
+                        <a href="#rentals" class="btn btn-primary" style="text-align: center;">
                             Browse Haldi Decor Rentals &#8594;
                         </a>
                     </div>
@@ -1964,15 +1968,19 @@ function renderCheckout() {
                 localStorage.setItem('lastPlacedOrderId', data.order_id);
                 localStorage.setItem('lastPlacedOrderName', details.name);
                 
-                // Clear cart
+                // Clear cart (skip intermediate #checkout -> #cart rerender before navigating to #confirmation)
                 cart = [];
                 appliedPromo = null;
-                saveCart();
+                saveCart(true);
                 
                 window.ppeSelectedRedeem = 0;
                 if (window.ppeAccount && typeof window.ppeAccount.refresh === 'function') window.ppeAccount.refresh();
                 
-                window.location.hash = '#confirmation';
+                if (window.location.hash === '#confirmation') {
+                    router(false);
+                } else {
+                    window.location.hash = '#confirmation';
+                }
             } else {
                 alert(data.error || 'There was an issue submitting your order. Please try again.');
                 if (submitBtn) {
@@ -2978,10 +2986,22 @@ function router(preserveScroll = false) {
     }
 
 
-    if (!preserveScroll) {
-        window.scrollTo(0, 0); // Scroll to top on page change
+    // Strictly check `preserveScroll === true` so Event objects (e.g. HashChangeEvent) never suppress scroll-to-top
+    if (preserveScroll !== true) {
+        scrollPageToTop();
+        requestAnimationFrame(() => scrollPageToTop());
     }
 
+}
+
+function scrollPageToTop() {
+    try {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    } catch (e) {
+        window.scrollTo(0, 0);
+    }
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
 }
 
 // Initialization
@@ -2994,11 +3014,24 @@ window.ppeCart = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
     renderBanner();
     renderNavbar();
     renderFooter();
-    router();
-    window.addEventListener('hashchange', router);
+    router(false);
+    window.addEventListener('hashchange', () => router(false));
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('a[href^="#"]');
+        if (!link) return;
+        const href = link.getAttribute('href');
+        if (!href) return;
+        const currentHash = window.location.hash || '#';
+        if (href === currentHash || (href === '#' && (currentHash === '#' || currentHash === ''))) {
+            scrollPageToTop();
+        }
+    });
     renderSMSWidget();
     initImageModal();
     initAIChatbot();
